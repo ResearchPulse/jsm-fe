@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'theme/app_theme.dart';
 import '../features/home/presentation/pages/home_page.dart';
+import '../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../features/home/presentation/cubit/home_cubit.dart';
 import '../features/home/domain/usecases/get_featured_journals_usecase.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
@@ -30,6 +31,10 @@ class App extends StatelessWidget {
           title: 'Journal Publication Trend',
           theme: AppTheme.lightTheme,
           home: const HomePage(),
+          routes: {
+            '/home': (context) => const HomePage(),
+            '/admin': (context) => const AdminDashboardPage(),
+          },
           debugShowCheckedModeBanner: false,
         ),
       ),
