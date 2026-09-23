@@ -1,0 +1,104 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:jsm_fe/app/auth_gate.dart';
+import 'package:jsm_fe/core/widgets/error_view.dart';
+import 'package:jsm_fe/core/widgets/loading_view.dart';
+import 'package:jsm_fe/features/auth/domain/entities/auth_provider.dart';
+import 'package:jsm_fe/features/auth/domain/entities/auth_result.dart';
+import 'package:jsm_fe/features/auth/domain/entities/auth_user.dart';
+import 'package:jsm_fe/features/auth/domain/repositories/auth_repository.dart';
+import 'package:jsm_fe/features/auth/presentation/pages/login_page.dart';
+
+/// Stub repository: never touches a browser or the SSO network.
+class _StubRepo implements AuthRepository {
+  AuthResult? callbackResult;
+  Object? callbackError;
+  AuthSession? storedSession;
+
+  @override
+  Future<void> login(AuthProvider provider) async {}
+
+  @override
+  Future<AuthResult?> handleCallback() async {
+    if (callbackError != null) throw callbackError!;
+    return callbackResult;
+  }
+
+  @override
+  Future<AuthSession?> restoreSession() async => storedSession;
+
+  @override
+  Future<void> logout() async {}
+}
+
+Widget _gate(AuthRepository repo) => MultiRepositoryProvider(
+      providers: [
+        RepositoryProvider<AuthRepository>(create: (_) => repo),
+      ],
+      child: const MaterialApp(home: AuthGate()),
+    );
+
+void main() {
+  testWidgets('startup unauthenticated: shows Login, never Home',
+      (tester) async {
+    await tester.pumpWidget(_gate(_StubRepo()));
+    await tester.pumpAndSettle(); // checkSession -> unauthenticated
+    expect(find.byType(LoginPage), findsOneWidget);
+    expect(find.text('Journal Dashboard'), findsNothing);
+  });
+
+  testWidgets('authenticated: shows the app home', (tester) async {
+    final repo = _StubRepo()
+      ..callbackResult = AuthResult(
+          user: AuthUser(sub: 'u1', email: 'user@example.com'));
+    await tester.pumpWidget(_gate(repo));
+    await tester.pumpAndSettle();
+    expect(find.text('Journal Dashboard'), findsOneWidget);
+    expect(find.byType(LoginPage), findsNothing);
+  });
+
+  testWidgets('loading state shows the loading UI, not login or home',
+      (tester) async {
+    final repo = _SlowRepo();
+    await tester.pumpWidget(_gate(repo));
+    await tester.pump();
+    await tester.pump();
+    expect(find.byType(LoadingView), findsOneWidget);
+    expect(find.byType(LoginPage), findsNothing);
+    expect(find.text('Journal Dashboard'), findsNothing);
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('failure state shows recoverable error UI', (tester) async {
+    final repo = _StubRepo()
+      ..callbackError = Exception('Login session state mismatch.');
+    await tester.pumpWidget(_gate(repo));
+    await tester.pumpAndSettle();
+    expect(find.byType(ErrorView), findsOneWidget);
+    expect(find.byType(LoginPage), findsNothing);
+    // Recoverable: a retry button exists.
+    expect(find.byType(ElevatedButton), findsOneWidget);
+  });
+
+  testWidgets('session restoration: stored session -> authenticated',
+      (tester) async {
+    final repo = _StubRepo()
+      ..storedSession =
+          AuthSession(user: AuthUser(sub: 'u1', email: 'user@example.com'));
+    await tester.pumpWidget(_gate(repo));
+    await tester.pumpAndSettle();
+    expect(find.text('Journal Dashboard'), findsOneWidget);
+  });
+}
+
+/// Completes checkSession only after a delay so loading is observable.
+class _SlowRepo extends _StubRepo {
+  @override
+  Future<AuthSession?> restoreSession() async {
+    await Future<void>.delayed(const Duration(milliseconds: 200));
+    return null;
+  }
+}
+
+// Ensure the home entity import is used even if HomePage internals change.

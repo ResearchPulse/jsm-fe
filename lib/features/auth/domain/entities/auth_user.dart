@@ -1,16 +1,19 @@
 import 'package:equatable/equatable.dart';
 
-/// Authenticated user identity.
-///
-/// NOTE: the backend auth response contract is not yet available in this
-/// repository, so this entity intentionally contains only data the frontend
-/// itself knows (the identifier the user typed). When the real contract is
-/// confirmed, replace/extend the fields to mirror the actual backend user.
+/// Authenticated user identity, sourced from Central SSO userinfo.
 class AuthUser extends Equatable {
-  final String email;
+  final String sub;
+  final String? email;
+  final String? name;
+  final String? picture;
 
-  const AuthUser({required this.email});
+  const AuthUser({
+    required this.sub,
+    this.email,
+    this.name,
+    this.picture,
+  });
 
   @override
-  List<Object?> get props => [email];
+  List<Object?> get props => [sub, email, name, picture];
 }

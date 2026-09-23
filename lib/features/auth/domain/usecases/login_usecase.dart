@@ -1,5 +1,4 @@
 import '../entities/auth_provider.dart';
-import '../entities/auth_result.dart';
 import '../repositories/auth_repository.dart';
 
 class LoginUseCase {
@@ -7,5 +6,7 @@ class LoginUseCase {
 
   const LoginUseCase(this.repository);
 
-  Future<AuthResult> call(AuthProvider provider) => repository.login(provider);
+  /// Issues the SSO redirect; does NOT complete the login (see
+  /// AuthRepository.login).
+  Future<void> call(AuthProvider provider) => repository.login(provider);
 }

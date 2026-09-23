@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_provider.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_result.dart';
-import 'package:jsm_fe/features/auth/domain/entities/auth_user.dart';
 import 'package:jsm_fe/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jsm_fe/features/auth/domain/usecases/login_usecase.dart';
 import 'package:jsm_fe/features/auth/domain/usecases/logout_usecase.dart';
@@ -12,18 +11,21 @@ import 'package:jsm_fe/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:jsm_fe/features/auth/presentation/cubit/auth_state.dart';
 import 'package:jsm_fe/features/auth/presentation/pages/login_page.dart';
 
-/// Stub repository standing in for the external-browser flow:
-/// never launches a browser or makes real OAuth requests.
+/// Stub repository standing in for the SSO redirect flow: never launches a
+/// browser or makes real OAuth requests.
 class _StubRepo implements AuthRepository {
   Object? loginError;
+  AuthProvider? startedProvider;
 
   @override
-  Future<AuthResult> login(AuthProvider provider) async {
-    // Real timer so the loading state is observable before completion.
+  Future<void> login(AuthProvider provider) async {
     await Future<void>.delayed(const Duration(milliseconds: 50));
     if (loginError != null) throw loginError!;
-    return AuthResult(user: AuthUser(email: 'user@jsm.dev'));
+    startedProvider = provider;
   }
+
+  @override
+  Future<AuthResult?> handleCallback() async => null;
 
   @override
   Future<AuthSession?> restoreSession() async => null;
@@ -37,6 +39,7 @@ Widget _wrap(AuthRepository repo) => BlocProvider(
             loginUseCase: LoginUseCase(repo),
             logoutUseCase: LogoutUseCase(repo),
             restoreSessionUseCase: RestoreSessionUseCase(repo),
+            repository: repo,
           )..checkSession(),
       child: const MaterialApp(home: LoginPage()),
     );
@@ -49,31 +52,37 @@ void main() {
     await tester.pumpAndSettle(); // checkSession -> unauthenticated
     expect(find.text('Sign in'), findsWidgets);
     expect(find.text('Continue with Google'), findsOneWidget);
-    // No local credential form: the web page handles email/password.
+    // No local credential form: the SSO page handles credentials.
     expect(find.byType(TextFormField), findsNothing);
   });
 
-  testWidgets('tapping Sign in launches the web auth flow', (tester) async {
+  testWidgets('tapping Sign in issues the web SSO redirect', (tester) async {
     final repo = _StubRepo();
     await tester.pumpWidget(_wrap(repo));
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(); // checkSession -> unauthenticated
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump(); // begin loading
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
-    await tester.pumpAndSettle();
+    // The stub completes after 50ms of real async; pump bounded time
+    // (pumpAndSettle would never settle: the spinner animates forever).
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
+    // Browser navigates away in production; here just verify the redirect
+    // was issued with the web provider.
+    expect(repo.startedProvider, AuthProvider.web);
     final ctx = tester.element(find.byType(LoginView));
-    expect(ctx.read<AuthCubit>().state, isA<AuthAuthenticated>());
+    expect(ctx.read<AuthCubit>().state, isA<AuthLoading>());
   });
 
-  testWidgets('tapping Continue with Google launches the google flow',
+  testWidgets('tapping Continue with Google issues the google redirect',
       (tester) async {
-    var launchedProvider = AuthProvider.web;
-    final repo = _ProviderSpyRepo((p) => launchedProvider = p);
+    final repo = _StubRepo();
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Continue with Google'));
-    await tester.pumpAndSettle();
-    expect(launchedProvider, AuthProvider.google);
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(repo.startedProvider, AuthProvider.google);
   });
 
   testWidgets('auth failure surfaces a snackbar, stays on login',
@@ -82,27 +91,10 @@ void main() {
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();
     await tester.tap(find.text('Continue with Google'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
     expect(find.byType(SnackBar), findsOneWidget);
     final ctx = tester.element(find.byType(LoginView));
     expect(ctx.read<AuthCubit>().state, isA<AuthFailure>());
   });
-}
-
-class _ProviderSpyRepo implements AuthRepository {
-  final void Function(AuthProvider) onLogin;
-  _ProviderSpyRepo(this.onLogin);
-
-  @override
-  Future<AuthResult> login(AuthProvider provider) async {
-    await Future<void>.delayed(const Duration(milliseconds: 50));
-    onLogin(provider);
-    return AuthResult(user: AuthUser(email: 'g@jsm.dev'));
-  }
-
-  @override
-  Future<AuthSession?> restoreSession() async => null;
-
-  @override
-  Future<void> logout() async {}
 }

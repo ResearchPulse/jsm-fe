@@ -10,19 +10,26 @@ import 'package:jsm_fe/features/auth/domain/usecases/restore_session_usecase.dar
 import 'package:jsm_fe/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:jsm_fe/features/auth/presentation/cubit/auth_state.dart';
 
-/// Fake repository standing in for the external-browser flow:
-/// never makes real OAuth or network requests.
+/// Fake repository standing in for the SSO flow: never makes real OAuth or
+/// network requests.
 class _FakeAuthRepository implements AuthRepository {
-  AuthResult? loginResult;
   Object? loginError;
+  Object? callbackError;
+  AuthResult? callbackResult;
   AuthSession? storedSession;
   bool logoutCalled = false;
+  AuthProvider? loginProvider;
 
   @override
-  Future<AuthResult> login(AuthProvider provider) async {
-    await Future<void>.delayed(const Duration(milliseconds: 50));
+  Future<void> login(AuthProvider provider) async {
     if (loginError != null) throw loginError!;
-    return loginResult ?? AuthResult(user: AuthUser(email: 'user@jsm.dev'));
+    loginProvider = provider;
+  }
+
+  @override
+  Future<AuthResult?> handleCallback() async {
+    if (callbackError != null) throw callbackError!;
+    return callbackResult;
   }
 
   @override
@@ -39,30 +46,34 @@ void main() {
   late _FakeAuthRepository repo;
   late AuthCubit cubit;
 
+  AuthCubit makeCubit(AuthRepository r) => AuthCubit(
+        loginUseCase: LoginUseCase(r),
+        logoutUseCase: LogoutUseCase(r),
+        restoreSessionUseCase: RestoreSessionUseCase(r),
+        repository: r,
+      );
+
   setUp(() {
     repo = _FakeAuthRepository();
-    cubit = AuthCubit(
-      loginUseCase: LoginUseCase(repo),
-      logoutUseCase: LogoutUseCase(repo),
-      restoreSessionUseCase: RestoreSessionUseCase(repo),
-    );
+    cubit = makeCubit(repo);
   });
 
   tearDown(() => cubit.close());
+
 
   test('initial state is AuthInitial', () {
     expect(cubit.state, isA<AuthInitial>());
   });
 
-  test('checkSession with no stored session emits AuthUnauthenticated',
-      () async {
+  test('checkSession with no session emits AuthUnauthenticated', () async {
     await cubit.checkSession();
     expect(cubit.state, isA<AuthUnauthenticated>());
   });
 
   test('checkSession restores stored session -> AuthAuthenticated',
       () async {
-    repo.storedSession = AuthSession(user: AuthUser(email: 'saved@jsm.dev'));
+    repo.storedSession = AuthSession(
+        user: AuthUser(sub: 's1', email: 'saved@jsm.dev'));
     await cubit.checkSession();
     expect(cubit.state, isA<AuthAuthenticated>());
     expect((cubit.state as AuthAuthenticated).user.email, 'saved@jsm.dev');
@@ -71,61 +82,55 @@ void main() {
   test('checkSession with throwing storage falls back to unauthenticated',
       () async {
     final throwing = _ThrowingRepo();
-    final c = AuthCubit(
-      loginUseCase: LoginUseCase(throwing),
-      logoutUseCase: LogoutUseCase(throwing),
-      restoreSessionUseCase: RestoreSessionUseCase(throwing),
-    );
+    final c = makeCubit(throwing);
     await c.checkSession();
     expect(c.state, isA<AuthUnauthenticated>());
     await c.close();
   });
 
-  test('login success emits loading then authenticated (web provider)',
+  test('checkSession processes a valid callback -> AuthAuthenticated',
       () async {
-    final states = <AuthState>[];
-    final sub = cubit.stream.listen(states.add);
+    repo.callbackResult = AuthResult(
+        user: AuthUser(sub: 's1', email: 'user@example.com'));
+    await cubit.checkSession();
+    expect(cubit.state, isA<AuthAuthenticated>());
+    expect((cubit.state as AuthAuthenticated).user.sub, 's1');
+  });
+
+  test('checkSession with invalid state callback -> AuthFailure (no crash)',
+      () async {
+    repo.callbackError = const ServerException('Login session state mismatch.');
+    await cubit.checkSession();
+    expect(cubit.state, isA<AuthFailure>());
+    expect((cubit.state as AuthFailure).message,
+        contains('state mismatch'));
+  });
+
+  test('checkSession with missing code callback -> AuthFailure', () async {
+    repo.callbackError = const ServerException('Login callback is missing a code.');
+    await cubit.checkSession();
+    expect(cubit.state, isA<AuthFailure>());
+  });
+
+  test('login issues the redirect and stays loading (web navigates away)',
+      () async {
     await cubit.login(AuthProvider.web);
-    await Future<void>.delayed(Duration.zero); // let stream deliver
-    await sub.cancel();
-    expect(
-      states.map((s) => s.runtimeType),
-      [AuthLoading, AuthAuthenticated],
-    );
-    expect((cubit.state as AuthAuthenticated).user.email, 'user@jsm.dev');
+    expect(repo.loginProvider, AuthProvider.web);
+    // On web the browser navigated away; the cubit stays in AuthLoading
+    // until the callback page load restarts the app.
+    expect(cubit.state, isA<AuthLoading>());
   });
 
-  test('login with google provider passes provider through', () async {
-    var seenProvider = AuthProvider.web;
-    final recording = _RecordingRepo()
-      ..onLogin = (p) => seenProvider = p;
-    final c = AuthCubit(
-      loginUseCase: LoginUseCase(recording),
-      logoutUseCase: LogoutUseCase(recording),
-      restoreSessionUseCase: RestoreSessionUseCase(recording),
-    );
-    await c.login(AuthProvider.google);
-    expect(seenProvider, AuthProvider.google);
-    await c.close();
-  });
-
-  test('login failure (invalid callback / denied) emits AuthFailure',
+  test('login failure (no browser / store error) emits AuthFailure',
       () async {
-    repo.loginError = ServerException('access_denied', 401);
-    final states = <AuthState>[];
-    final sub = cubit.stream.listen(states.add);
-    await cubit.login(AuthProvider.google);
-    await Future<void>.delayed(Duration.zero);
-    await sub.cancel();
-    expect(
-      states.map((s) => s.runtimeType),
-      [AuthLoading, AuthFailure],
-    );
-    expect((cubit.state as AuthFailure).message, contains('access_denied'));
+    repo.loginError = const ServerException('SSO login requires the web build.');
+    await cubit.login(AuthProvider.web);
+    expect(cubit.state, isA<AuthFailure>());
   });
 
   test('logout emits AuthLoggedOut and clears session', () async {
-    repo.storedSession = AuthSession(user: AuthUser(email: 'a@b.com'));
+    repo.storedSession =
+        AuthSession(user: AuthUser(sub: 's1', email: 'a@b.com'));
     final states = <AuthState>[];
     final sub = cubit.stream.listen(states.add);
     await cubit.logout();
@@ -137,38 +142,20 @@ void main() {
   });
 
   test('logout emits AuthLoggedOut even if repository throws', () async {
-    final throwing = _ThrowingRepo();
-    final c = AuthCubit(
-      loginUseCase: LoginUseCase(throwing),
-      logoutUseCase: LogoutUseCase(throwing),
-      restoreSessionUseCase: RestoreSessionUseCase(throwing),
-    );
+    final c = makeCubit(_ThrowingRepo());
     await c.logout();
     expect(c.state, isA<AuthLoggedOut>());
     await c.close();
   });
 }
 
-class _RecordingRepo implements AuthRepository {
-  void Function(AuthProvider)? onLogin;
-
-  @override
-  Future<AuthResult> login(AuthProvider provider) async {
-    onLogin?.call(provider);
-    return AuthResult(user: AuthUser(email: 'g@jsm.dev'));
-  }
-
-  @override
-  Future<AuthSession?> restoreSession() async => null;
-
-  @override
-  Future<void> logout() async {}
-}
-
 class _ThrowingRepo implements AuthRepository {
   @override
-  Future<AuthResult> login(AuthProvider provider) async =>
-      throw ServerException();
+  Future<void> login(AuthProvider provider) async =>
+      throw const ServerException();
+
+  @override
+  Future<AuthResult?> handleCallback() async => null; // not a callback page
 
   @override
   Future<AuthSession?> restoreSession() async => throw CacheException();
