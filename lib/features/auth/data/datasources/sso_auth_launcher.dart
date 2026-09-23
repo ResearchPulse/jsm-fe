@@ -35,6 +35,7 @@ class SsoAuthLauncher implements AuthLauncher {
       jsonEncode({
         'state': pending.state,
         'code_verifier': pending.codeVerifier,
+        'redirect_uri': redirectUri,
       }),
     );
     final url = urlBuilder.build(
@@ -62,11 +63,13 @@ class SsoAuthLauncher implements AuthLauncher {
     }
     String? state;
     String? codeVerifier;
+    String? redirectUri;
     if (stored != null) {
       try {
         final decoded = jsonDecode(stored) as Map<String, dynamic>;
         state = decoded['state'] as String?;
         codeVerifier = decoded['code_verifier'] as String?;
+        redirectUri = decoded['redirect_uri'] as String?;
       } catch (_) {
         // fall through: missing state fails validation below
       }
@@ -82,12 +85,28 @@ class SsoAuthLauncher implements AuthLauncher {
 
     final tokens = await apiClient.exchangeCode(
       code: callback.code,
-      redirectUri: BrowserSso.redirectUri(),
+      redirectUri: redirectUri ?? BrowserSso.redirectUri(),
       codeVerifier: codeVerifier,
     );
     store.write(SsoSessionKeys.tokens, jsonEncode(tokens.toJson()));
 
-    final profile = await apiClient.fetchUserInfo(tokens.accessToken);
+    // User profile retrieval:
+    // Method 1 (Fastest, per quickstart doc): Decode id_token directly.
+    // Method 2: GET /api/v1/oidc/userinfo with Bearer token.
+    SsoUserInfo profile;
+    final fromIdToken = OidcApiClient.parseIdToken(tokens.idToken);
+    if (fromIdToken != null) {
+      profile = fromIdToken;
+      // Best-effort userinfo call to enrich profile, without failing login if offline/error.
+      try {
+        final enriched = await apiClient.fetchUserInfo(tokens.accessToken);
+        profile = enriched;
+      } catch (_) {
+        // Keep profile from id_token
+      }
+    } else {
+      profile = await apiClient.fetchUserInfo(tokens.accessToken);
+    }
     store.write(SsoSessionKeys.user, jsonEncode(profile.toJson()));
 
     BrowserSso.cleanHistory();

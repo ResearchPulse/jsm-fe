@@ -86,6 +86,15 @@ void main() {
     expect(result?.user.sub, 'u1');
   });
 
+  test('handleCallback returns null when missing callback code or error param', () async {
+    BrowserSso.currentUri = () => Uri.parse('http://localhost:3003/auth/callback');
+    final launcher = _FakeLauncher();
+    final repo = AuthRepositoryImpl(launcher: launcher);
+    final result = await repo.handleCallback();
+    expect(result, isNull);
+    expect(launcher.completeCalled, isFalse);
+  });
+
   test('restoreSession returns null when nothing stored', () async {
     final repo = AuthRepositoryImpl(launcher: _FakeLauncher());
     expect(await repo.restoreSession(), isNull);
@@ -138,7 +147,8 @@ void main() {
   test('logout clears all stored session state', () async {
     final store = _MemoryStore();
     final repo = AuthRepositoryImpl(
-        launcher: SsoAuthLauncher(store: store));
+        launcher: SsoAuthLauncher(store: store),
+        httpClient: MockClient((req) async => http.Response('{"message":"ok"}', 200)));
     store.write(SsoSessionKeys.pendingRequest, '{}');
     store.write(SsoSessionKeys.tokens, '{"access_token":"at"}');
     store.write(SsoSessionKeys.user, '{"sub":"u1"}');
@@ -150,7 +160,8 @@ void main() {
   test('logout never throws even if the store is broken', () async {
     final store = _BrokenStore();
     final repo = AuthRepositoryImpl(
-        launcher: SsoAuthLauncher(store: store));
+        launcher: SsoAuthLauncher(store: store),
+        httpClient: MockClient((req) async => http.Response('{"message":"ok"}', 200)));
     await repo.logout(); // must not throw
   });
 }

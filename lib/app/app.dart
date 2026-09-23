@@ -34,7 +34,7 @@ class App extends StatelessWidget {
           ),
         ],
         child: MaterialApp(
-          title: 'Journal Publication Trend',
+          title: 'journal system miner - HyperDataLab',
           theme: AppTheme.lightTheme,
 
           // Authentication is now the entry point of the application.

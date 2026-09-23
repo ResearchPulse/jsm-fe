@@ -1,9 +1,14 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:http/http.dart' as http;
+
+import '../../../../core/constants/api_endpoints.dart';
 import '../../domain/entities/auth_provider.dart';
 import '../../domain/entities/auth_result.dart';
 import '../../domain/entities/auth_user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/usecases/auth_launcher.dart';
 import '../datasources/browser_sso_seam.dart';
+import '../datasources/desktop_sso_launcher.dart';
 import '../datasources/sso_auth_launcher.dart';
 
 /// Auth repository backed by the Central SSO (OIDC Authorization Code +
@@ -11,20 +16,40 @@ import '../datasources/sso_auth_launcher.dart';
 /// tokens never leave this layer.
 class AuthRepositoryImpl implements AuthRepository {
   final AuthLauncher launcher;
+  final http.Client? httpClient;
 
-  AuthRepositoryImpl({AuthLauncher? launcher})
-      : launcher = launcher ?? SsoAuthLauncher();
+  AuthRepositoryImpl({AuthLauncher? launcher, this.httpClient})
+      : launcher = launcher ??
+            // Web: the browser navigates to the SSO page and back.
+            // Desktop: the system browser opens; a loopback server on the
+            // configured redirect port receives the callback in-process.
+            (kIsWeb ? SsoAuthLauncher() : DesktopSsoLauncher());
 
   @override
   Future<void> login(AuthProvider provider) async {
-    // On web the browser navigates away to the SSO authorize page; the flow
+    // Web: the browser navigates away to the SSO authorize page; the flow
     // completes later via [handleCallback] on the /auth/callback page load.
+    // Desktop: [DesktopSsoLauncher] opens the system browser and waits for
+    // the loopback callback, completing the exchange before returning.
     await launcher.start(provider);
+    final desktop = launcher;
+    if (desktop is DesktopSsoLauncher) {
+      await desktop.awaitCallbackAndComplete();
+    }
   }
 
   /// True when the current page load is the SSO /auth/callback (app start
-  /// after the browser redirected back).
-  bool isOnCallbackPage() => BrowserSso.currentUri().path == '/auth/callback';
+  /// after the browser redirected back). Requires both the callback path
+  /// and authorization code/error query parameters so normal reloads (F5)
+  /// or navigations without code are not mistakenly treated as pending callbacks.
+  bool isOnCallbackPage() {
+    final uri = BrowserSso.currentUri();
+    final isCallbackPath =
+        uri.path == '/auth/callback' || uri.path.endsWith('/auth/callback');
+    final hasCallbackParams = uri.queryParameters.containsKey('code') ||
+        uri.queryParameters.containsKey('error');
+    return isCallbackPath && hasCallbackParams;
+  }
 
   /// Processes the callback page load: validates state, exchanges the code
   /// with PKCE, fetches userinfo. Returns the authenticated result, or
@@ -57,12 +82,17 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<void> logout() async {
-    // No SSO logout endpoint is confirmed in the backend contract; only
-    // local session state is cleared (tokens, user, pending request). If a
-    // confirmed endpoint appears, call it here — do not invent one.
     final ssoLauncher = launcher;
     if (ssoLauncher is SsoAuthLauncher) {
       ssoLauncher.clearSession();
+    }
+    // Attempt best-effort SSO server session invalidation
+    try {
+      final client = httpClient ?? http.Client();
+      final uri = Uri.parse('${ApiEndpoints.ssoIssuer}/api/v1/auth/logout');
+      await client.post(uri).timeout(const Duration(seconds: 3));
+    } catch (_) {
+      // Local session is cleared; ignore network/logout errors
     }
   }
 
