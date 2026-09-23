@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../admin/presentation/pages/admin_dashboard_page.dart';
+import '../../../auth/presentation/cubit/auth_cubit.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -12,14 +15,19 @@ class HomePage extends StatelessWidget {
         title: const Text('Journal Dashboard'),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 16),
+            padding: const EdgeInsets.only(right: 8),
             child: ElevatedButton.icon(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AdminDashboardPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const AdminDashboardPage(),
+                  ),
                 );
               },
-              icon: const Icon(Icons.admin_panel_settings_rounded, size: 16),
+              icon: const Icon(
+                Icons.admin_panel_settings_rounded,
+                size: 16,
+              ),
               label: const Text('Admin dashboard'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
@@ -29,6 +37,11 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+          IconButton(
+            tooltip: 'Sign out',
+            icon: const Icon(Icons.logout),
+            onPressed: () => context.read<AuthCubit>().logout(),
           ),
         ],
       ),
@@ -56,7 +69,9 @@ class HomePage extends StatelessWidget {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const AdminDashboardPage()),
+                  MaterialPageRoute(
+                    builder: (_) => const AdminDashboardPage(),
+                  ),
                 );
               },
               style: ElevatedButton.styleFrom(
