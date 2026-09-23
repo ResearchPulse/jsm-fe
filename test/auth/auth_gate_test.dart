@@ -30,9 +30,13 @@ class _StubRepo implements AuthRepository {
   Future<AuthSession?> restoreSession() async => storedSession;
 
   @override
+  @override
   Future<void> logout() async {
     logoutCalled = true;
   }
+
+  @override
+  Future<String?> currentToken() async => null;
 }
 
 Widget _gate(AuthRepository repo) => MultiRepositoryProvider(

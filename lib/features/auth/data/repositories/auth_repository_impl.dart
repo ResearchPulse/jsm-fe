@@ -65,4 +65,10 @@ class AuthRepositoryImpl implements AuthRepository {
       ssoLauncher.clearSession();
     }
   }
+
+  @override
+  Future<String?> currentToken() async {
+    final session = await restoreSession();
+    return session?.accessToken;
+  }
 }

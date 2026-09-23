@@ -40,6 +40,9 @@ class _FakeAuthRepository implements AuthRepository {
     logoutCalled = true;
     storedSession = null;
   }
+
+  @override
+  Future<String?> currentToken() async => null;
 }
 
 void main() {
@@ -162,4 +165,7 @@ class _ThrowingRepo implements AuthRepository {
 
   @override
   Future<void> logout() async => throw Exception('boom');
+
+  @override
+  Future<String?> currentToken() async => null;
 }

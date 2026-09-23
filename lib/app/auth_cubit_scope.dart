@@ -18,17 +18,21 @@ class AuthCubitScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) {
-        final repo = context.read<AuthRepository?>() ?? AuthRepositoryImpl();
-        return AuthCubit(
-          loginUseCase: LoginUseCase(repo),
-          logoutUseCase: LogoutUseCase(repo),
-          restoreSessionUseCase: RestoreSessionUseCase(repo),
-          repository: repo,
-        )..checkSession();
-      },
-      child: child,
+    return RepositoryProvider<AuthRepository>(
+      create: (context) =>
+          context.read<AuthRepository?>() ?? AuthRepositoryImpl(),
+      child: BlocProvider(
+        create: (context) {
+          final repo = context.read<AuthRepository>();
+          return AuthCubit(
+            loginUseCase: LoginUseCase(repo),
+            logoutUseCase: LogoutUseCase(repo),
+            restoreSessionUseCase: RestoreSessionUseCase(repo),
+            repository: repo,
+          )..checkSession();
+        },
+        child: child,
+      ),
     );
   }
 }

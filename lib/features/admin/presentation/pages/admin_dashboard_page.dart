@@ -7,6 +7,7 @@ import '../views/overview_view.dart';
 import '../views/profiles_review_view.dart';
 import '../views/settings_view.dart';
 import '../views/snapshots_view.dart';
+import '../../../users/presentation/views/users_view.dart';
 import '../widgets/admin_header.dart';
 import '../widgets/admin_sidebar.dart';
 
@@ -194,6 +195,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         );
       case 6:
         return const SettingsView();
+      case 7:
+        return const UsersView();
       default:
         return OverviewView(
           onNavigateToTab: _navigateToTab,

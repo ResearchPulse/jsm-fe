@@ -29,6 +29,8 @@ class AdminHeader extends StatelessWidget {
         return 'Hồ Sơ Phong Cách';
       case 6:
         return 'Tài Khoản Cá Nhân';
+      case 7:
+        return 'Quản Lý Người Dùng';
       default:
         return 'Không Gian Làm Việc';
     }
@@ -50,6 +52,8 @@ class AdminHeader extends StatelessWidget {
         return 'Thẩm định / Phong cách';
       case 6:
         return 'Hệ thống / Tài khoản';
+      case 7:
+        return 'Hệ thống / Người dùng';
       default:
         return 'Hệ thống';
     }

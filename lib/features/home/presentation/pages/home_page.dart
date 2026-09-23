@@ -51,12 +51,7 @@ class HomePage extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('User workspace is under development.'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+                Navigator.of(context).pushNamed('/user-info');
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(

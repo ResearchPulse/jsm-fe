@@ -8,6 +8,9 @@ import '../../features/home/presentation/cubit/home_cubit.dart';
 import '../../features/home/domain/usecases/get_featured_journals_usecase.dart';
 import '../../features/home/data/repositories/home_repository_impl.dart';
 import '../features/auth/domain/entities/auth_provider.dart';
+import '../features/auth/domain/repositories/auth_repository.dart';
+import '../features/users/data/repositories/users_repository_impl.dart';
+import '../features/users/domain/usecases/create_account_usecase.dart';
 import '../features/auth/presentation/cubit/auth_cubit.dart';
 import '../features/auth/presentation/cubit/auth_state.dart';
 import '../features/auth/presentation/pages/login_page.dart';
@@ -24,6 +27,13 @@ class AuthGate extends StatelessWidget {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (_) => HomeRepositoryImpl()),
+        RepositoryProvider<CreateAccountUseCase>(
+          create: (context) {
+            final authRepo = context.read<AuthRepository>();
+            return CreateAccountUseCase(
+                UsersRepositoryImpl(authRepository: authRepo));
+          },
+        ),
       ],
       child: MultiBlocProvider(
         providers: [

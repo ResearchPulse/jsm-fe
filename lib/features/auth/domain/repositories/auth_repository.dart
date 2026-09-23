@@ -32,6 +32,10 @@ abstract class AuthRepository {
 
   /// Clears the current session, if any.
   Future<void> logout();
+
+  /// The stored SSO access token for calling protected backend endpoints,
+  /// or null when not authenticated.
+  Future<String?> currentToken();
 }
 
 /// A persisted authenticated session: user plus the SSO-issued token(s).
