@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 
 class ApiClient {
-  static const String defaultBaseUrl = 'http://localhost:8000/api/v1';
+  static const String defaultBaseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://localhost:8000/api/v1',
+  );
 
   final Dio dio;
 
