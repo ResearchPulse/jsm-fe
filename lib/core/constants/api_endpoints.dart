@@ -22,4 +22,11 @@ class ApiEndpoints {
     'SSO_CLIENT_ID',
     defaultValue: 'researchpulse-ecosystem',
   );
+  static const String ssoRedirectUri = String.fromEnvironment(
+    'SSO_REDIRECT_URI',
+    defaultValue: 'http://localhost:5173/auth/callback',
+  );
+
+  // Users (admin account management; BE users module contract).
+  static const String users = '$baseUrl/users';
 }

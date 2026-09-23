@@ -22,6 +22,9 @@ class _RecordingRepo implements AuthRepository {
 
   @override
   Future<void> logout() async {}
+
+  @override
+  Future<String?> currentToken() async => null;
 }
 
 void main() {

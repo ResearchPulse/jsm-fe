@@ -82,6 +82,12 @@ class AdminSidebar extends StatelessWidget {
 
                 _buildSectionHeader('HỆ THỐNG'),
                 _buildNavItem(
+                  index: 7,
+                  icon: Icons.group_add_outlined,
+                  activeIcon: Icons.group_add_rounded,
+                  title: 'Quản Lý Người Dùng',
+                ),
+                _buildNavItem(
                   index: 6,
                   icon: Icons.person_outline_rounded,
                   activeIcon: Icons.person_rounded,

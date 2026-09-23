@@ -32,6 +32,9 @@ class _StubRepo implements AuthRepository {
 
   @override
   Future<void> logout() async {}
+
+  @override
+  Future<String?> currentToken() async => null;
 }
 
 Widget _wrap(AuthRepository repo) => BlocProvider(
