@@ -15,6 +15,7 @@ class _StubRepo implements AuthRepository {
   AuthResult? callbackResult;
   Object? callbackError;
   AuthSession? storedSession;
+  bool logoutCalled = false;
 
   @override
   Future<void> login(AuthProvider provider) async {}
@@ -29,7 +30,9 @@ class _StubRepo implements AuthRepository {
   Future<AuthSession?> restoreSession() async => storedSession;
 
   @override
-  Future<void> logout() async {}
+  Future<void> logout() async {
+    logoutCalled = true;
+  }
 }
 
 Widget _gate(AuthRepository repo) => MultiRepositoryProvider(
@@ -56,6 +59,23 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Journal Dashboard'), findsOneWidget);
     expect(find.byType(LoginPage), findsNothing);
+  });
+
+  testWidgets('sign-out from home returns to login (never stays authed)',
+      (tester) async {
+    final repo = _StubRepo()
+      ..callbackResult = AuthResult(
+          user: AuthUser(sub: 'u1', email: 'user@example.com'));
+    await tester.pumpWidget(_gate(repo));
+    await tester.pumpAndSettle();
+    expect(find.text('Journal Dashboard'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Sign out'));
+    await tester.pumpAndSettle();
+
+    expect(repo.logoutCalled, isTrue);
+    expect(find.byType(LoginPage), findsOneWidget);
+    expect(find.text('Journal Dashboard'), findsNothing);
   });
 
   testWidgets('loading state shows the loading UI, not login or home',

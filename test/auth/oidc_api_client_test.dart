@@ -92,6 +92,42 @@ void main() {
         throwsA(isA<NetworkException>()),
       );
     });
+    test('failure: invalid credentials (invalid_grant) surfaces the '
+        'server-provided error_description', () async {
+      final client = MockClient((request) async => _json(
+          {'error': 'invalid_grant', 'error_description': 'Invalid code.'},
+          400));
+      final api = OidcApiClient(client: client);
+      await expectLater(
+        api.exchangeCode(code: 'c', redirectUri: 'r', codeVerifier: 'v'),
+        throwsA(isA<ServerException>().having(
+            (e) => e.message, 'message', 'Invalid code.')),
+      );
+    });
+
+    test('failure: unknown JSON error body falls back to a generic message',
+        () async {
+      final client = MockClient(
+          (request) async => _json({'error': 'server_error'}, 500));
+      final api = OidcApiClient(client: client);
+      await expectLater(
+        api.exchangeCode(code: 'c', redirectUri: 'r', codeVerifier: 'v'),
+        throwsA(isA<ServerException>().having(
+            (e) => e.statusCode, 'statusCode', 500)),
+      );
+    });
+
+    test('failure: non-JSON error body falls back to a generic message',
+        () async {
+      final client = MockClient(
+          (request) async => http.Response('<html>502</html>', 502));
+      final api = OidcApiClient(client: client);
+      await expectLater(
+        api.exchangeCode(code: 'c', redirectUri: 'r', codeVerifier: 'v'),
+        throwsA(isA<ServerException>().having(
+            (e) => e.message, 'message', contains('rejected'))),
+      );
+    });
   });
 
   group('fetchUserInfo', () {

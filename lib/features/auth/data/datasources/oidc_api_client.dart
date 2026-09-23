@@ -103,7 +103,9 @@ class OidcApiClient {
       throw NetworkException('Could not reach the login server.');
     }
     if (response.statusCode != 200) {
-      throw const ServerException('Login was rejected by the login server.');
+      throw ServerException(
+          _errorMessage(response) ?? 'Login was rejected by the login server.',
+          response.statusCode);
     }
     final Map<String, dynamic> body;
     try {
@@ -141,7 +143,9 @@ class OidcApiClient {
       throw NetworkException('Could not reach the login server.');
     }
     if (response.statusCode != 200) {
-      throw const ServerException('Could not load the user profile.');
+      throw ServerException(
+          _errorMessage(response) ?? 'Could not load the user profile.',
+          response.statusCode);
     }
     try {
       return SsoUserInfo.fromJson(
@@ -149,5 +153,22 @@ class OidcApiClient {
     } catch (_) {
       throw const ServerException('Malformed user profile response.');
     }
+  }
+
+  /// Extracts a user-safe message from an OIDC-style error body
+  /// ({"error": "...", "error_description": "..."}); null if absent.
+  static String? _errorMessage(http.Response response) {
+    try {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      final description = body['error_description'];
+      if (description is String && description.isNotEmpty) {
+        return description;
+      }
+      final error = body['error'];
+      if (error is String && error.isNotEmpty) return 'Login failed: $error';
+    } catch (_) {
+      // Non-JSON error body: caller uses the fallback message.
+    }
+    return null;
   }
 }
