@@ -6,6 +6,8 @@ import '../cubit/home_state.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../../core/widgets/error_view.dart';
 
+import '../../../admin/presentation/pages/admin_dashboard_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -24,7 +26,31 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Journal Dashboard')),
+      appBar: AppBar(
+        title: const Text('Journal Dashboard'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const AdminDashboardPage()),
+                );
+              },
+              icon: const Icon(Icons.admin_panel_settings_rounded, size: 16),
+              label: const Text('Admin dashboard'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF0071BC),
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
       body: BlocBuilder<HomeCubit, HomeState>(
         builder: (context, state) {
           if (state is HomeLoading) {

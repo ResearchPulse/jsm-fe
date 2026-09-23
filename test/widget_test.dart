@@ -5,6 +5,7 @@ void main() {
   testWidgets('App smoke test', (WidgetTester tester) async {
     await tester.pumpWidget(const App());
     expect(find.text('Journal Dashboard'), findsOneWidget);
-    await tester.pumpAndSettle();
+    expect(find.text('Admin dashboard'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 2));
   });
 }
