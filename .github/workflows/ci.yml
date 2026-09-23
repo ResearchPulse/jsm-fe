@@ -69,20 +69,14 @@ jobs:
           path: coverage/lcov.info
           retention-days: 7
 
-  # ── 3. Build Check (Sanity Build) ──────────────────────────────────
+  # ── 3. Build Check (Windows Desktop) ──────────────────────────────
   build:
-    name: Build Verification
-    runs-on: ubuntu-latest
+    name: Build Windows Desktop App
+    runs-on: windows-latest
     needs: [analyze, test]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -91,8 +85,11 @@ jobs:
           cache: true
           cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:"
 
+      - name: Enable Windows Desktop
+        run: flutter config --enable-windows-desktop
+
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Web
-        run: flutter build web --release --no-pub
+      - name: Build Windows App
+        run: flutter build windows --release --no-pub
