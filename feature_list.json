@@ -1,0 +1,32 @@
+[
+  {
+    "id": "phase-01-dependencies-and-api-pagination",
+    "title": "Dependencies & API Pagination Integration",
+    "status": "passing",
+    "evidence": "flutter pub get passed, flutter analyze lib/features/admin: 0 issues",
+    "user_visible_behavior": "Tải gói phụ thuộc animation và chuẩn bị dữ liệu phân trang 10 tạp chí mỗi trang từ backend.",
+    "verification_command": "flutter pub get && flutter analyze lib/features/admin",
+    "notes": "Covers stories: US-04",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-card-grid-widget-and-animations",
+    "title": "Responsive Card Grid & Smooth Animations",
+    "status": "passing",
+    "evidence": "Responsive 3-column LayoutBuilder, _JournalCardWidget with hover translateY/shadow/border, flutter_animate staggered cascade verified; flutter analyze 0 issues",
+    "user_visible_behavior": "Danh sách tạp chí hiển thị dạng lưới 3 cột cân đối, thẻ nổi nhẹ khi hover, xuất hiện dạng thác đổ so le êm dịu.",
+    "verification_command": "flutter analyze lib/features/admin/presentation",
+    "notes": "Covers stories: US-01, US-02, US-03",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-pagination-controls-and-integration",
+    "title": "Pagination Controls & View Integration",
+    "status": "passing",
+    "evidence": "PaginationBar with Prev/Next/PageNumbers, skeleton shimmer loading grid with flutter_animate; all 4 tests passing",
+    "user_visible_behavior": "Thanh điều hướng trang ở đáy danh sách cho phép lật trang mượt mà kèm hiệu ứng skeleton shimmer khi tải dữ liệu.",
+    "verification_command": "flutter analyze lib/features/admin/presentation/views/journals_view.dart",
+    "notes": "Covers stories: US-04, US-05",
+    "priority": "P1"
+  }
+]

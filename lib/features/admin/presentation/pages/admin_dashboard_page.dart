@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../cubit/admin_cubit.dart';
 import '../views/configurations_view.dart';
 import '../views/job_monitor_view.dart';
 import '../views/journals_view.dart';
@@ -10,14 +12,29 @@ import '../views/snapshots_view.dart';
 import '../widgets/admin_header.dart';
 import '../widgets/admin_sidebar.dart';
 
-class AdminDashboardPage extends StatefulWidget {
+class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
 
   @override
-  State<AdminDashboardPage> createState() => _AdminDashboardPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider<AdminCubit>(
+      create: (_) => AdminCubit()
+        ..searchOpenAlex('IEEE')
+        ..loadConfigurations()
+        ..loadJobs(),
+      child: const _AdminDashboardView(),
+    );
+  }
 }
 
-class _AdminDashboardPageState extends State<AdminDashboardPage> {
+class _AdminDashboardView extends StatefulWidget {
+  const _AdminDashboardView();
+
+  @override
+  State<_AdminDashboardView> createState() => _AdminDashboardViewState();
+}
+
+class _AdminDashboardViewState extends State<_AdminDashboardView> {
   int _selectedIndex = 0;
   bool _isSidebarCollapsed = false;
 
@@ -81,7 +98,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               const Text('Start year', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
-                                value: yearStart,
+                                initialValue: yearStart,
                                 decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
                                 items: [2018, 2019, 2020, 2021, 2022].map((y) {
                                   return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
@@ -101,7 +118,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               const Text('End year', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
-                                value: yearEnd,
+                                initialValue: yearEnd,
                                 decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
                                 items: [2023, 2024, 2025].map((y) {
                                   return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
