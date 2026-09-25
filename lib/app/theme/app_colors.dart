@@ -31,6 +31,10 @@ class AppColors {
   static const Color green100 = Color(0xFFB7DFC5);
   static const Color green50 = Color(0xFFF2FBF5);
 
+  static const Color amber700 = Color(0xFFB45309);
+  static const Color amber100 = Color(0xFFFDE68A);
+  static const Color amber50 = Color(0xFFFFFBEB);
+
   // Semantic Aliases
   static const Color primary = blue600;
   static const Color primaryHover = blue700;

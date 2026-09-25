@@ -50,5 +50,15 @@ class ApiEndpoints {
 
   // Users (admin account management; BE users module contract).
   static String get users => '$baseUrl/users';
+
+  // Member 2 & Member 3 Pipeline & AI Endpoints
+  static String get rhetoricalPredict => '$baseUrl/rhetorical-moves/predict';
+  static String get rhetoricalPredictBatch => '$baseUrl/rhetorical-moves/predict-batch';
+  static String get rhetoricalInfo => '$baseUrl/rhetorical-moves/info';
+  static String get nlpExtractFeatures => '$baseUrl/nlp/extract-features';
+  static String get nlpBuildProfile => '$baseUrl/nlp/build-profile';
+  static String get monitorStats => '$baseUrl/monitor/stats';
+  static String get adminAnalysisJobs => '$baseUrl/admin/analysis-jobs';
+  static String get adminJournalConfigurations => '$baseUrl/admin/journal-configurations';
 }
 

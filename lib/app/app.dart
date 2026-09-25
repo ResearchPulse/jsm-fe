@@ -43,6 +43,8 @@ class App extends StatelessWidget {
           routes: {
             '/home': (context) => const HomePage(),
             '/admin': (context) => const AdminDashboardPage(),
+            '/admin/pipeline': (context) =>
+                const AdminDashboardPage(initialIndex: 8),
             '/user-info': (context) => const UserInfoPage(),
           },
 

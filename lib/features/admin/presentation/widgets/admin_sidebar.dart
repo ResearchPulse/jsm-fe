@@ -80,6 +80,15 @@ class AdminSidebar extends StatelessWidget {
                 ),
                 const SizedBox(height: 24),
 
+                _buildSectionHeader('R&D / PIPELINE & AI'),
+                _buildNavItem(
+                  index: 8,
+                  icon: Icons.science_outlined,
+                  activeIcon: Icons.science_rounded,
+                  title: 'Pipeline & AI Studio',
+                ),
+                const SizedBox(height: 24),
+
                 _buildSectionHeader('HỆ THỐNG'),
                 _buildNavItem(
                   index: 7,

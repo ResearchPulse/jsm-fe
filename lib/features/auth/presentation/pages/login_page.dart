@@ -495,6 +495,24 @@ class _LoginViewState extends State<LoginView>
                                       ],
                                     ),
                                   ),
+                                  const SizedBox(height: 14),
+                                  Center(
+                                    child: TextButton.icon(
+                                      onPressed: () {
+                                        Navigator.of(context).pushNamed('/admin/pipeline');
+                                      },
+                                      icon: const Icon(Icons.science_rounded, size: 16, color: Color(0xFF7C3AED)),
+                                      label: const Text(
+                                        'Mở Nhanh Pipeline & AI Studio (Desktop R&D)',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF7C3AED),
+                                          fontFamily: 'Manrope',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),

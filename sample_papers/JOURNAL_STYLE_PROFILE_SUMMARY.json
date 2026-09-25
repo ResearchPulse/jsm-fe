@@ -1,0 +1,56 @@
+{
+  "journal_id": "tse",
+  "title": "IEEE Transactions on Software Engineering",
+  "short_name": "IEEE TSE",
+  "publisher": "IEEE Computer Society",
+  "issn": "0098-5589",
+  "quartile": "Q1",
+  "impact_factor": 6.5,
+  "corpus_metadata": {
+    "total_articles": 300,
+    "total_sentences": 3280,
+    "total_tokens": 85200,
+    "storage_backend": "MinIO Local (jsm-articles/raw/)",
+    "year_range": "2021-2024"
+  },
+  "style_metrics": {
+    "sentence_length_percentiles": {
+      "p10": 14.2,
+      "p25": 19.0,
+      "p50_median": 25.2,
+      "p75": 32.5,
+      "p90": 41.0
+    },
+    "voice_and_stance": {
+      "active_voice_share": 0.745,
+      "passive_voice_share": 0.255,
+      "first_person_we_share": 0.242,
+      "hedge_rate_per_1k_words": 16.8,
+      "booster_rate_per_1k_words": 7.2,
+      "reporting_verbs_rate_per_1k_words": 12.4
+    },
+    "rhetorical_move_distribution": {
+      "METHOD": 0.287,
+      "RESULT": 0.238,
+      "BACKGROUND": 0.116,
+      "CONTRIBUTION": 0.107,
+      "GAP": 0.085,
+      "PURPOSE": 0.073,
+      "LIMITATION": 0.052,
+      "CONCLUSION": 0.042
+    },
+    "frequent_lexical_bundles": [
+      {"bundle": "in this paper we", "frequency": 412, "move": "CONTRIBUTION"},
+      {"bundle": "results indicate that", "frequency": 320, "move": "RESULT"},
+      {"bundle": "threats to validity", "frequency": 280, "move": "LIMITATION"},
+      {"bundle": "our empirical evaluation", "frequency": 245, "move": "METHOD"},
+      {"bundle": "the state of the art", "frequency": 198, "move": "BACKGROUND/GAP"}
+    ],
+    "keyness_keywords": [
+      {"word": "refactoring", "log_likelihood": 98.4, "ratio": 3.2},
+      {"word": "empirical", "log_likelihood": 84.2, "ratio": 2.9},
+      {"word": "smell", "log_likelihood": 76.5, "ratio": 3.5},
+      {"word": "maintainability", "log_likelihood": 62.1, "ratio": 2.4}
+    ]
+  }
+}
