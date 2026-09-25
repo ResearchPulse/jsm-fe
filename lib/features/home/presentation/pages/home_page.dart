@@ -78,6 +78,22 @@ class HomePage extends StatelessWidget {
               ),
               child: const Text('admin'),
             ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).pushNamed('/student-checker');
+              },
+              icon: const Icon(
+                Icons.spellcheck_rounded,
+                size: 16,
+              ),
+              label: const Text('checker'),
+              style: ElevatedButton.styleFrom(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
           ],
         ),
       ),
