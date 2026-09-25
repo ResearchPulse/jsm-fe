@@ -33,6 +33,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
   Map<String, dynamic>? _activeJob;
   Map<String, dynamic>? _jobMetrics;
   Map<String, dynamic>? _styleProfile;
+  String? _currentArticleTitle;
   Timer? _pollingTimer;
 
   // Advanced overrides state
@@ -122,6 +123,12 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
         final jobId = _activeJob!['id']?.toString() ?? '';
         if (jobId.isNotEmpty) {
           _jobMetrics = await _apiClient.getJobMetrics(jobId);
+          try {
+            final articles = await _apiClient.getJobArticles(jobId, page: 1, perPage: 2);
+            if (articles.isNotEmpty) {
+              _currentArticleTitle = articles.first['title']?.toString();
+            }
+          } catch (_) {}
         }
 
         final status = _activeJob!['status']?.toString().toUpperCase() ?? '';
@@ -166,6 +173,12 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       Map<String, dynamic>? metrics;
       if (jobId.isNotEmpty) {
         metrics = await _apiClient.getJobMetrics(jobId);
+        try {
+          final articles = await _apiClient.getJobArticles(jobId, page: 1, perPage: 1);
+          if (articles.isNotEmpty) {
+            _currentArticleTitle = articles.first['title']?.toString();
+          }
+        } catch (_) {}
       }
 
       // Check if job completed
@@ -327,8 +340,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
 
           const Divider(height: 1, color: AppColors.borderSoft),
 
-          // 3. REALTIME PIPELINE STEPPER
-          _buildPipelineStepperSection(jobStatus, isRunning, isCompleted),
+          // 3. REALTIME ACTIVE ANALYSIS CARD
+          _buildActiveAnalysisSection(jobStatus, isRunning, isCompleted),
 
           // 4. INSTANT NLP STYLE PROFILE
           if (_styleProfile != null || isCompleted) ...[
@@ -687,29 +700,13 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     );
   }
 
-  Widget _buildPipelineStepperSection(String jobStatus, bool isRunning, bool isCompleted) {
-    // Determine active stage (1 to 4)
-    int currentStage = 0;
+  Widget _buildActiveAnalysisSection(String jobStatus, bool isRunning, bool isCompleted) {
     double progressPercent = 0.0;
-
     final progressVal = (_activeJob?['progress'] as num?)?.toDouble() ?? 0.0;
     progressPercent = progressVal / 100.0;
 
     if (isCompleted) {
-      currentStage = 4;
       progressPercent = 1.0;
-    } else if (isRunning) {
-      if (progressPercent < 0.25) {
-        currentStage = 1;
-      } else if (progressPercent < 0.60) {
-        currentStage = 2;
-      } else if (progressPercent < 0.85) {
-        currentStage = 3;
-      } else {
-        currentStage = 4;
-      }
-    } else if (_activeJob != null) {
-      currentStage = 1;
     }
 
     final totalArticles = (_activeJob?['total_articles'] as num?)?.toInt() ?? _targetArticles;
@@ -717,6 +714,15 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
         (_jobMetrics?['normalized'] as num?)?.toInt() ??
         0;
     final failedCount = (_jobMetrics?['failed'] as num?)?.toInt() ?? 0;
+
+    String cardTitle;
+    if (isRunning) {
+      cardTitle = 'Đang phân tích';
+    } else if (isCompleted) {
+      cardTitle = 'Đã hoàn tất phân tích';
+    } else {
+      cardTitle = 'Tiến độ phân tích';
+    }
 
     return Padding(
       padding: const EdgeInsets.all(22),
@@ -726,14 +732,28 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Chu trình Khai phá & Chuẩn hóa (Pipeline)',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  fontFamily: 'Manrope',
-                ),
+              Row(
+                children: [
+                  Icon(
+                    isRunning
+                        ? Icons.autorenew_rounded
+                        : (isCompleted ? Icons.check_circle_rounded : Icons.pending_actions_rounded),
+                    size: 18,
+                    color: isCompleted
+                        ? AppColors.green700
+                        : (isRunning ? AppColors.primary : AppColors.textMuted),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    cardTitle,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
+                ],
               ),
               if (isRunning)
                 Row(
@@ -745,21 +765,44 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      'Tự động làm mới mỗi 2s • ${(progressPercent * 100).toInt()}%',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary, fontFamily: 'Manrope'),
+                      'Đang xử lý • ${(progressPercent * 100).toInt()}%',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                   ],
+                )
+              else if (isCompleted)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.green50,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.green100),
+                  ),
+                  child: const Text(
+                    '100% Hoàn thành',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.green700,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 14),
 
-          // Progress Bar
+          // Linear Progress Bar
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
               value: isCompleted ? 1.0 : (isRunning ? progressPercent.clamp(0.05, 1.0) : 0.0),
-              minHeight: 6,
+              minHeight: 7,
               backgroundColor: AppColors.surfaceSoft,
               valueColor: AlwaysStoppedAnimation<Color>(
                 isCompleted ? AppColors.green700 : AppColors.primary,
@@ -768,53 +811,103 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           ),
           const SizedBox(height: 16),
 
-          // 4 Interactive Stages
-          Row(
-            children: [
-              Expanded(
-                child: _buildStageCard(
-                  1,
-                  'OpenAlex',
-                  'Thu thập metadata',
-                  currentStage,
-                  isRunning,
-                  isCompleted,
-                ),
+          // Active Article Box (Human-first, shows exactly what's being analyzed)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            decoration: BoxDecoration(
+              color: isRunning ? AppColors.blue50.withAlpha(80) : AppColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: isRunning ? AppColors.primary.withAlpha(60) : AppColors.border,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStageCard(
-                  2,
-                  'GROBID / MinIO',
-                  'Tải toàn văn XML',
-                  currentStage,
-                  isRunning,
-                  isCompleted,
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: isCompleted
+                        ? AppColors.green50
+                        : (isRunning ? Colors.white : AppColors.surface),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(
+                    isRunning
+                        ? Icons.article_rounded
+                        : (isCompleted ? Icons.task_alt_rounded : Icons.menu_book_rounded),
+                    size: 20,
+                    color: isCompleted
+                        ? AppColors.green700
+                        : (isRunning ? AppColors.primary : AppColors.textMuted),
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStageCard(
-                  3,
-                  'Normalizer',
-                  'Làm sạch & tách câu',
-                  currentStage,
-                  isRunning,
-                  isCompleted,
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            isRunning
+                                ? 'Đang bóc tách bài ${processedArticles < totalArticles ? processedArticles + 1 : totalArticles} / $totalArticles'
+                                : (isCompleted
+                                    ? 'Đã bóc tách & phân tích hoàn tất'
+                                    : 'Chưa có tác vụ phân tích'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: isRunning ? AppColors.primary : AppColors.textPrimary,
+                              fontFamily: 'Manrope',
+                            ),
+                          ),
+                          if (isRunning) ...[
+                            const SizedBox(width: 8),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'LIVE',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.w800,
+                                  color: Colors.white,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        isRunning
+                            ? (_currentArticleTitle != null && _currentArticleTitle!.isNotEmpty
+                                ? _currentArticleTitle!
+                                : 'Bài nghiên cứu ${processedArticles < totalArticles ? processedArticles + 1 : totalArticles}: Trích xuất cấu trúc câu IMRAD & CARS Moves...')
+                            : (isCompleted
+                                ? 'Dữ liệu toàn văn đã chuẩn hóa ($processedArticles bài) và sẵn sàng khảo sát đối chuẩn học thuật.'
+                                : 'Nhấn nút "Khai phá (${_targetArticles} bài)" phía trên để bắt đầu phân tích.'),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: isRunning ? FontWeight.w600 : FontWeight.w500,
+                          color: isRunning ? AppColors.textPrimary : AppColors.textSecondary,
+                          fontFamily: 'Manrope',
+                          fontStyle: isRunning && _currentArticleTitle == null ? FontStyle.italic : FontStyle.normal,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildStageCard(
-                  4,
-                  'NLP Engine',
-                  'Hồ sơ phong cách AI',
-                  currentStage,
-                  isRunning,
-                  isCompleted,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
           const SizedBox(height: 14),
 
@@ -834,7 +927,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     const Icon(Icons.check_circle_outline_rounded, size: 15, color: AppColors.green700),
                     const SizedBox(width: 6),
                     Text(
-                      'Đã chuẩn hóa: $processedArticles / $totalArticles bài báo',
+                      'Đã hoàn thành: $processedArticles / $totalArticles bài báo',
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -856,92 +949,24 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     ],
                   ),
                 InkWell(
-                  onTap: () => widget.onNavigateToTab(3), // Navigate to Job Monitor
+                  onTap: () => widget.onNavigateToTab(2), // Navigate to Tab 2 (Hệ thống & Giám sát logs)
                   child: const Row(
                     children: [
                       Text(
-                        'Xem chi tiết logs',
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary, fontFamily: 'Manrope'),
+                        'Xem chi tiết tác vụ & logs',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                          fontFamily: 'Manrope',
+                        ),
                       ),
+                      SizedBox(width: 4),
                       Icon(Icons.arrow_forward_rounded, size: 13, color: AppColors.primary),
                     ],
                   ),
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStageCard(
-    int stageNumber,
-    String name,
-    String description,
-    int currentStage,
-    bool isRunning,
-    bool isCompleted,
-  ) {
-    final isDone = isCompleted || currentStage > stageNumber;
-    final isCurrent = isRunning && currentStage == stageNumber;
-
-    Color borderColor;
-    Color iconColor;
-    IconData icon;
-
-    if (isDone) {
-      borderColor = AppColors.green700.withAlpha(80);
-      iconColor = AppColors.green700;
-      icon = Icons.check_circle_rounded;
-    } else if (isCurrent) {
-      borderColor = AppColors.primary;
-      iconColor = AppColors.primary;
-      icon = Icons.autorenew_rounded;
-    } else {
-      borderColor = AppColors.border;
-      iconColor = AppColors.textSubtle;
-      icon = Icons.circle_outlined;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      decoration: BoxDecoration(
-        color: isCurrent ? AppColors.blue50 : Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: borderColor, width: isCurrent ? 1.5 : 1),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, size: 14, color: iconColor),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: isCurrent ? AppColors.primary : AppColors.textPrimary,
-                    fontFamily: 'Manrope',
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 2),
-          Text(
-            description,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.textMuted,
-              fontFamily: 'Manrope',
             ),
           ),
         ],
@@ -989,7 +1014,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 ],
               ),
               OutlinedButton.icon(
-                onPressed: () => widget.onNavigateToTab(5), // Profiles Review tab
+                onPressed: () => widget.onNavigateToTab(1), // Tab 1: Hồ sơ & Đối chuẩn NLP
                 icon: const Icon(Icons.analytics_outlined, size: 14),
                 label: const Text('Xem toàn diện & Đối chuẩn Corpus ➔', style: TextStyle(fontSize: 11, fontFamily: 'Manrope')),
                 style: OutlinedButton.styleFrom(

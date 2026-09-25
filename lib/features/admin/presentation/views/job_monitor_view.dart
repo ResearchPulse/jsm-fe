@@ -285,17 +285,6 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       return st == _selectedFilter;
     }).toList();
 
-    int activeGlobalStage = 1;
-    final runningJob = _jobs.firstWhere(
-      (j) => (j['status'] ?? '').toString().toUpperCase() == 'RUNNING',
-      orElse: () => _jobs.isNotEmpty ? _jobs.first : {},
-    );
-    if (runningJob.isNotEmpty) {
-      final st = (runningJob['status'] ?? '').toString();
-      final sp = (runningJob['current_step'] ?? '').toString();
-      activeGlobalStage = _currentStageNumber(sp, st);
-    }
-
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
       child: Column(
@@ -320,7 +309,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Theo dõi tiến độ toàn trình theo thời gian thực: Tải PDF ➔ Grobid Parse TEI ➔ NLP Trích xuất ➔ Freeze Snapshot.',
+                    'Giám sát trạng thái các tác vụ khai phá dữ liệu, tra cứu nhật ký và xử lý lại bài lỗi.',
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textMuted,
@@ -329,73 +318,15 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   ),
                 ],
               ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () => _loadJobs(),
-                    icon: const Icon(Icons.refresh_rounded),
-                    tooltip: 'Cập nhật trạng thái tác vụ',
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton.icon(
-                    onPressed: widget.onTriggerNewAnalysis,
-                    icon: const Icon(Icons.bolt_rounded, size: 18),
-                    label: const Text('Bắt đầu phân tích mới'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.onPrimary,
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    ),
-                  ),
-                ],
+              IconButton(
+                onPressed: () => _loadJobs(),
+                icon: const Icon(Icons.refresh_rounded),
+                tooltip: 'Cập nhật trạng thái tác vụ',
+                color: AppColors.primary,
               ),
             ],
           ),
-          const SizedBox(height: 24),
-
-          // Interactive Stage Pipeline Stepper
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'TIẾN TRÌNH KHAI PHÁ DỮ LIỆU ĐANG VẬN HÀNH',
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textSubtle,
-                    fontFamily: 'Manrope',
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    _buildStepperStage(1, 'OpenAlex Crawl', isDone: activeGlobalStage > 1, isActive: activeGlobalStage == 1),
-                    _buildStepperLine(isDone: activeGlobalStage > 1),
-                    _buildStepperStage(2, 'PDF Harvester', isDone: activeGlobalStage > 2, isActive: activeGlobalStage == 2),
-                    _buildStepperLine(isDone: activeGlobalStage > 2),
-                    _buildStepperStage(3, 'Grobid TEI XML', isDone: activeGlobalStage > 3, isActive: activeGlobalStage == 3),
-                    _buildStepperLine(isDone: activeGlobalStage > 3),
-                    _buildStepperStage(4, 'Normalizer', isDone: activeGlobalStage > 4, isActive: activeGlobalStage == 4),
-                    _buildStepperLine(isDone: activeGlobalStage > 4),
-                    _buildStepperStage(5, 'NLP Moves & Stance', isDone: activeGlobalStage > 5, isActive: activeGlobalStage == 5),
-                    _buildStepperLine(isDone: activeGlobalStage > 5),
-                    _buildStepperStage(6, 'Freeze Snapshot', isDone: activeGlobalStage >= 6, isActive: false),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 20),
 
           // Filters Toolbar
           Row(
@@ -492,65 +423,6 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildStepperStage(int number, String label, {required bool isDone, required bool isActive}) {
-    Color bg = AppColors.surfaceSoft;
-    Color border = AppColors.border;
-    Color textCol = AppColors.textSubtle;
-
-    if (isDone) {
-      bg = AppColors.green50;
-      border = AppColors.green700;
-      textCol = AppColors.green700;
-    } else if (isActive) {
-      bg = AppColors.blue50;
-      border = AppColors.primary;
-      textCol = AppColors.primary;
-    }
-
-    return Expanded(
-      child: Column(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: bg,
-              shape: BoxShape.circle,
-              border: Border.all(color: border, width: 2),
-            ),
-            child: Center(
-              child: isDone
-                  ? const Icon(Icons.check_rounded, size: 16, color: AppColors.green700)
-                  : Text('$number', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: textCol, fontFamily: 'Manrope')),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
-              color: isActive ? AppColors.primary : AppColors.textSecondary,
-              fontFamily: 'Manrope',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStepperLine({required bool isDone}) {
-    return Container(
-      width: 24,
-      height: 2,
-      margin: const EdgeInsets.only(bottom: 18),
-      color: isDone ? AppColors.green700 : AppColors.border,
     );
   }
 

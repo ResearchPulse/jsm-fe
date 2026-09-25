@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../data/datasources/admin_api_client.dart';
@@ -24,6 +25,8 @@ class _JournalsViewState extends State<JournalsView> {
   String _searchQuery = '';
   String _selectedDomain = 'Tất cả';
   String _filterStatus = 'all'; // 'all' | 'configured' | 'unconfigured'
+  int _currentPage = 1;
+  static const int _pageSize = 6;
 
   List<Map<String, dynamic>> _journals = [];
   List<Map<String, dynamic>> _configs = [];
@@ -230,7 +233,7 @@ class _JournalsViewState extends State<JournalsView> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      widget.onNavigateToTab(3); // Chuyển sang Tab 3 (Giám sát tác vụ)
+      widget.onNavigateToTab(2); // Chuyển sang Tab 2 (Hệ thống & Giám sát)
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -1042,7 +1045,10 @@ class _JournalsViewState extends State<JournalsView> {
               Expanded(
                 child: TextField(
                   controller: _searchController,
-                  onChanged: (val) => setState(() => _searchQuery = val),
+                  onChanged: (val) => setState(() {
+                    _searchQuery = val;
+                    _currentPage = 1;
+                  }),
                   onSubmitted: (val) => _searchOpenAlex(val),
                   style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
                   decoration: InputDecoration(
@@ -1056,6 +1062,7 @@ class _JournalsViewState extends State<JournalsView> {
                               _searchController.clear();
                               setState(() {
                                 _searchQuery = '';
+                                _currentPage = 1;
                                 _openAlexResults = [];
                                 _lastSearchedOpenAlexQuery = null;
                               });
@@ -1126,7 +1133,12 @@ class _JournalsViewState extends State<JournalsView> {
                       );
                     }).toList(),
                     onChanged: (val) {
-                      if (val != null) setState(() => _selectedDomain = val);
+                      if (val != null) {
+                        setState(() {
+                          _selectedDomain = val;
+                          _currentPage = 1;
+                        });
+                      }
                     },
                   ),
                 ),
@@ -1141,7 +1153,10 @@ class _JournalsViewState extends State<JournalsView> {
   Widget _buildStatusFilterChip(String status, String label) {
     final isSelected = _filterStatus == status;
     return InkWell(
-      onTap: () => setState(() => _filterStatus = status),
+      onTap: () => setState(() {
+        _filterStatus = status;
+        _currentPage = 1;
+      }),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -1213,10 +1228,23 @@ class _JournalsViewState extends State<JournalsView> {
       );
     }
 
+    final totalCount = filteredJournals.length;
+    final totalPages = (totalCount / _pageSize).ceil();
+    final safeTotalPages = totalPages > 0 ? totalPages : 1;
+    if (_currentPage > safeTotalPages) {
+      _currentPage = safeTotalPages;
+    }
+    final startIndex = (_currentPage - 1) * _pageSize;
+    final paginatedJournals = filteredJournals.skip(startIndex).take(_pageSize).toList();
+
     return Column(
       children: [
-        for (final journal in filteredJournals)
+        for (final journal in paginatedJournals)
           _buildJournalCard(journal),
+        if (totalCount > _pageSize) ...[
+          const SizedBox(height: 12),
+          _buildPaginationBar(totalCount, safeTotalPages),
+        ],
         if (_openAlexResults.isNotEmpty) ...[
           const SizedBox(height: 16),
           Container(
@@ -1238,6 +1266,77 @@ class _JournalsViewState extends State<JournalsView> {
           ),
         ],
       ],
+    );
+  }
+
+  Widget _buildPaginationBar(int totalCount, int totalPages) {
+    if (totalCount <= _pageSize) return const SizedBox.shrink();
+
+    final startIndex = (_currentPage - 1) * _pageSize + 1;
+    final endIndex = math.min(_currentPage * _pageSize, totalCount);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Hiển thị $startIndex - $endIndex / $totalCount tạp chí',
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textMuted,
+              fontWeight: FontWeight.w500,
+              fontFamily: 'Manrope',
+            ),
+          ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.chevron_left_rounded),
+                iconSize: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                color: _currentPage > 1 ? AppColors.primary : AppColors.slate300,
+                onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                tooltip: 'Trang trước',
+              ),
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.borderSoft),
+                ),
+                child: Text(
+                  'Trang $_currentPage / $totalPages',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.chevron_right_rounded),
+                iconSize: 20,
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                color: _currentPage < totalPages ? AppColors.primary : AppColors.slate300,
+                onPressed: _currentPage < totalPages ? () => setState(() => _currentPage++) : null,
+                tooltip: 'Trang sau',
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

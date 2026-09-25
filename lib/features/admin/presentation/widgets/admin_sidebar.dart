@@ -33,59 +33,30 @@ class AdminSidebar extends StatelessWidget {
           _buildBrandHeader(),
           const Divider(color: AppColors.sidebarBorder, height: 1),
 
-          // Menu navigation
+          // Menu navigation: 3 Core Items
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 20),
               children: [
-                _buildSectionHeader('TỔNG QUAN'),
                 _buildNavItem(
                   index: 0,
-                  icon: Icons.dashboard_outlined,
-                  activeIcon: Icons.dashboard_rounded,
-                  title: 'Tổng quan Pipeline',
+                  icon: Icons.auto_stories_outlined,
+                  activeIcon: Icons.auto_stories_rounded,
+                  title: 'Trung tâm Tạp chí',
                 ),
-                const SizedBox(height: 24),
-
-                _buildSectionHeader('QUY TRÌNH KHAI PHÁ DỮ LIỆU'),
+                const SizedBox(height: 6),
                 _buildNavItem(
                   index: 1,
-                  icon: Icons.tune_outlined,
-                  activeIcon: Icons.tune_rounded,
-                  title: 'Danh mục & Cấu hình',
-                ),
-                _buildNavItem(
-                  index: 3,
-                  icon: Icons.monitor_heart_outlined,
-                  activeIcon: Icons.monitor_heart_rounded,
-                  title: 'Giám sát tác vụ',
-                ),
-                _buildNavItem(
-                  index: 4,
-                  icon: Icons.layers_outlined,
-                  activeIcon: Icons.layers_rounded,
-                  title: 'Kho Corpus Snapshots',
-                ),
-                _buildNavItem(
-                  index: 5,
                   icon: Icons.psychology_outlined,
                   activeIcon: Icons.psychology_rounded,
-                  title: 'Hồ sơ phong cách',
+                  title: 'Hồ sơ & Đối chuẩn NLP',
                 ),
-                const SizedBox(height: 24),
-
-                _buildSectionHeader('HỆ THỐNG'),
+                const SizedBox(height: 6),
                 _buildNavItem(
-                  index: 7,
-                  icon: Icons.manage_accounts_outlined,
-                  activeIcon: Icons.manage_accounts_rounded,
-                  title: 'Quản lý người dùng',
-                ),
-                _buildNavItem(
-                  index: 6,
-                  icon: Icons.settings_outlined,
-                  activeIcon: Icons.settings_rounded,
-                  title: 'Cài đặt hệ thống',
+                  index: 2,
+                  icon: Icons.tune_outlined,
+                  activeIcon: Icons.tune_rounded,
+                  title: 'Hệ thống & Kỹ thuật',
                 ),
               ],
             ),

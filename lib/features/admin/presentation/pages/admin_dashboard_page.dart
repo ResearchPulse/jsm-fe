@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
-import '../views/job_monitor_view.dart';
 import '../views/journals_view.dart';
-import '../views/overview_view.dart';
-import '../views/profiles_review_view.dart';
-import '../views/settings_view.dart';
-import '../views/snapshots_view.dart';
-import '../../../users/presentation/views/users_view.dart';
+import '../views/style_and_corpus_view.dart';
+import '../views/system_and_debug_view.dart';
 import '../widgets/admin_header.dart';
 import '../widgets/admin_sidebar.dart';
 
@@ -21,12 +17,18 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   int _selectedIndex = 0;
   bool _isSidebarCollapsed = false;
   String? _targetJournalIdForProfile;
+  int _styleCorpusSubTab = 0;
+  int _systemDebugSubTab = 0;
 
-  void _navigateToTab(int index, {String? journalId}) {
+  void _navigateToTab(int index, {String? journalId, int? subTabIndex}) {
     setState(() {
       _selectedIndex = index;
       if (journalId != null) {
         _targetJournalIdForProfile = journalId;
+      }
+      if (subTabIndex != null) {
+        if (index == 1) _styleCorpusSubTab = subTabIndex;
+        if (index == 2) _systemDebugSubTab = subTabIndex;
       }
     });
   }
@@ -149,7 +151,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 ElevatedButton(
                   onPressed: () {
                     Navigator.of(ctx).pop();
-                    _navigateToTab(3); // Navigate to Job Monitor
+                    _navigateToTab(2, subTabIndex: 0); // Navigate to Tab 2 (Job Monitor logs)
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         content: Text('Đã kích hoạt tác vụ phân tích tạp chí thành công.'),
@@ -170,36 +172,24 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
   Widget _buildActiveView() {
     switch (_selectedIndex) {
       case 0:
-        return OverviewView(
-          onNavigateToTab: _navigateToTab,
-          onTriggerNewAnalysis: _showTriggerAnalysisDialog,
-        );
-      case 1:
-      case 2:
         return JournalsView(
           onNavigateToTab: _navigateToTab,
           onTriggerNewAnalysis: _showTriggerAnalysisDialog,
         );
-      case 3:
-        return JobMonitorView(
-          onNavigateToTab: _navigateToTab,
-          onTriggerNewAnalysis: _showTriggerAnalysisDialog,
-        );
-      case 4:
-        return SnapshotsView(
-          onNavigateToTab: _navigateToTab,
-        );
-      case 5:
-        return ProfilesReviewView(
+      case 1:
+        return StyleAndCorpusView(
           onNavigateToTab: _navigateToTab,
           selectedJournalId: _targetJournalIdForProfile,
+          initialSubTabIndex: _styleCorpusSubTab,
         );
-      case 6:
-        return const SettingsView();
-      case 7:
-        return const UsersView();
+      case 2:
+        return SystemAndDebugView(
+          onNavigateToTab: _navigateToTab,
+          onTriggerNewAnalysis: _showTriggerAnalysisDialog,
+          initialSubTabIndex: _systemDebugSubTab,
+        );
       default:
-        return OverviewView(
+        return JournalsView(
           onNavigateToTab: _navigateToTab,
           onTriggerNewAnalysis: _showTriggerAnalysisDialog,
         );
