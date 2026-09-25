@@ -163,14 +163,29 @@ class _JournalsViewState extends State<JournalsView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: const Text(
-                'Đăng ký Tạp chí Khoa học mới',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Manrope',
-                  color: AppColors.textPrimary,
-                ),
+              title: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Nhập Tạp chí thủ công',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Manrope',
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Dành cho tạp chí nội bộ, trong nước hoặc chưa có trên OpenAlex.',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w400,
+                      fontFamily: 'Manrope',
+                      color: AppColors.textMuted,
+                    ),
+                  ),
+                ],
               ),
               content: SizedBox(
                 width: 480,
@@ -376,14 +391,14 @@ class _JournalsViewState extends State<JournalsView> {
                     color: AppColors.primary,
                   ),
                   const SizedBox(width: 8),
-                  ElevatedButton.icon(
+                  OutlinedButton.icon(
                     onPressed: () => _showAddJournalDialog(context),
-                    icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('Đăng ký tạp chí mới'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: AppColors.onPrimary,
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                    icon: const Icon(Icons.post_add_rounded, size: 18),
+                    label: const Text('Nhập thủ công', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     ),
                   ),
@@ -871,14 +886,20 @@ class _JournalsViewState extends State<JournalsView> {
               'Chưa có tạp chí nào trong cơ sở dữ liệu.',
               style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
             ),
-            const SizedBox(height: 12),
-            ElevatedButton.icon(
+            const SizedBox(height: 6),
+            const Text(
+              'Gõ tên tạp chí vào ô tìm kiếm ở trên để tra cứu từ OpenAlex, hoặc nhập thủ công.',
+              style: TextStyle(fontSize: 12, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+            ),
+            const SizedBox(height: 14),
+            OutlinedButton.icon(
               onPressed: () => _showAddJournalDialog(context),
-              icon: const Icon(Icons.add_rounded, size: 16),
-              label: const Text('Đăng ký tạp chí mới'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
+              icon: const Icon(Icons.post_add_rounded, size: 16),
+              label: const Text('Nhập thủ công', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.primary,
+                side: const BorderSide(color: AppColors.primary),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
             ),
