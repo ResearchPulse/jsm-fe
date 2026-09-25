@@ -28,6 +28,7 @@ class _OverviewViewState extends State<OverviewView> {
   int _runningJobsCount = 0;
   int _totalJobsCount = 0;
   int _snapshotsCount = 0;
+  int _configsCount = 0;
   int _usersCount = 0;
   bool _backendAlive = true;
   bool _grobidAlive = false;
@@ -50,6 +51,7 @@ class _OverviewViewState extends State<OverviewView> {
         _adminApiClient.getSnapshots(),
         _usersApiClient.getUsers(),
         _adminApiClient.checkHealth(),
+        _adminApiClient.getConfigurations(),
       ]);
 
       if (!mounted) return;
@@ -60,6 +62,7 @@ class _OverviewViewState extends State<OverviewView> {
       final snapshots = results[3] as List<Map<String, dynamic>>;
       final users = results[4] as List<Map<String, dynamic>>;
       final backendOk = results[5] as bool;
+      final configs = results[6] as List<Map<String, dynamic>>;
 
       final summary = stats['summary'] as Map<String, dynamic>?;
       final isGrobidAlive = summary?['grobid_alive'] == true;
@@ -76,6 +79,7 @@ class _OverviewViewState extends State<OverviewView> {
         _totalJobsCount = jobs.length;
         _runningJobsCount = running;
         _snapshotsCount = snapshots.length;
+        _configsCount = configs.length;
         _usersCount = users.length;
         _backendAlive = backendOk;
         _grobidAlive = isGrobidAlive;
@@ -87,6 +91,7 @@ class _OverviewViewState extends State<OverviewView> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -419,11 +424,12 @@ class _OverviewViewState extends State<OverviewView> {
       _PipelineStageData(
         number: 2,
         title: 'Cấu hình tham số',
-        subtitle: 'Khoảng năm & số bài',
+        subtitle: '$_configsCount cấu hình đã lưu',
         status: 'Sẵn sàng',
         icon: Icons.tune_rounded,
         targetTab: 2,
       ),
+
       _PipelineStageData(
         number: 3,
         title: 'Grobid TEI Parse',

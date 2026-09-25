@@ -365,20 +365,42 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: AppColors.border),
                       ),
-                      child: Row(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.article_outlined, size: 18, color: AppColors.primary),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Text(
-                              'Bài báo mẫu chứng cứ: ${exemplar['title']} (${exemplar['doi']})',
-                              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'Manrope'),
-                            ),
+                          Row(
+                            children: [
+                              const Icon(Icons.article_outlined, size: 18, color: AppColors.primary),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                child: Text(
+                                  'Bài báo mẫu chứng cứ: ${exemplar['title']} (${exemplar['doi']})',
+                                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                                ),
+                              ),
+                            ],
                           ),
+                          if (exemplar['sentence'] != null && exemplar['sentence'].toString().isNotEmpty) ...[
+                            const SizedBox(height: 8),
+                            Padding(
+                              padding: const EdgeInsets.only(left: 28),
+                              child: Text(
+                                '“${exemplar['sentence']}”',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                  color: AppColors.textPrimary,
+                                  fontFamily: 'Manrope',
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),
                   ],
+
                 ],
               ),
             ),
