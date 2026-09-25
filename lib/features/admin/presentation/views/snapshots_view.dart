@@ -3,7 +3,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../data/datasources/admin_api_client.dart';
 
 class SnapshotsView extends StatefulWidget {
-  final Function(int) onNavigateToTab;
+  final Function(int, {String? journalId}) onNavigateToTab;
 
   const SnapshotsView({super.key, required this.onNavigateToTab});
 
@@ -248,6 +248,7 @@ class _SnapshotsViewState extends State<SnapshotsView> {
   Widget _buildSnapshotRow(Map<String, dynamic> s) {
     final journal = s['journal'] ?? 'Chưa rõ';
     final id = s['id'] ?? 'N/A';
+    final journalId = s['journal_id']?.toString();
     final yearRange = s['yearRange'] ?? '2021 - 2024';
     final paperCount = s['paperCount'] ?? 0;
     final createdAt = s['createdAt'] ?? '24/09/2026';
@@ -321,7 +322,7 @@ class _SnapshotsViewState extends State<SnapshotsView> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 ElevatedButton(
-                  onPressed: () => widget.onNavigateToTab(4),
+                  onPressed: () => widget.onNavigateToTab(5, journalId: journalId),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,

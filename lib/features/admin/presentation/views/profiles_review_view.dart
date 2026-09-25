@@ -4,8 +4,13 @@ import '../../data/datasources/admin_api_client.dart';
 
 class ProfilesReviewView extends StatefulWidget {
   final Function(int) onNavigateToTab;
+  final String? selectedJournalId;
 
-  const ProfilesReviewView({super.key, required this.onNavigateToTab});
+  const ProfilesReviewView({
+    super.key,
+    required this.onNavigateToTab,
+    this.selectedJournalId,
+  });
 
   @override
   State<ProfilesReviewView> createState() => _ProfilesReviewViewState();
@@ -24,6 +29,18 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
     _loadProfiles();
   }
 
+  @override
+  void didUpdateWidget(covariant ProfilesReviewView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.selectedJournalId != null &&
+        widget.selectedJournalId != oldWidget.selectedJournalId &&
+        _profiles.any((p) => p['journal_id']?.toString() == widget.selectedJournalId)) {
+      setState(() {
+        _selectedJournalId = widget.selectedJournalId;
+      });
+    }
+  }
+
   Future<void> _loadProfiles() async {
     setState(() {
       _isLoading = true;
@@ -35,7 +52,10 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
       if (!mounted) return;
       setState(() {
         _profiles = list;
-        if (list.isNotEmpty) {
+        if (widget.selectedJournalId != null &&
+            list.any((p) => p['journal_id']?.toString() == widget.selectedJournalId)) {
+          _selectedJournalId = widget.selectedJournalId;
+        } else if (list.isNotEmpty && _selectedJournalId == null) {
           _selectedJournalId = list.first['journal_id']?.toString();
         }
         _isLoading = false;

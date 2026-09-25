@@ -21,10 +21,14 @@ class AdminDashboardPage extends StatefulWidget {
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   int _selectedIndex = 0;
   bool _isSidebarCollapsed = false;
+  String? _targetJournalIdForProfile;
 
-  void _navigateToTab(int index) {
+  void _navigateToTab(int index, {String? journalId}) {
     setState(() {
       _selectedIndex = index;
+      if (journalId != null) {
+        _targetJournalIdForProfile = journalId;
+      }
     });
   }
 
@@ -192,6 +196,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       case 5:
         return ProfilesReviewView(
           onNavigateToTab: _navigateToTab,
+          selectedJournalId: _targetJournalIdForProfile,
         );
       case 6:
         return const SettingsView();
