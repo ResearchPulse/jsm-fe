@@ -23,6 +23,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
   bool _isLoading = true;
   String? _error;
 
+
   @override
   void initState() {
     super.initState();
@@ -310,6 +311,242 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     }
   }
 
+  Future<void> _updateYearFrom(Map<String, dynamic> config, int newYear) async {
+    final configId = config['id'].toString();
+    final oldYear = config['year_from'] ?? 2021;
+    final yearTo = (config['year_to'] ?? 2024) as int;
+
+    if (newYear > yearTo) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Năm bắt đầu không được lớn hơn năm kết thúc.')),
+      );
+      return;
+    }
+
+    setState(() {
+      config['year_from'] = newYear;
+    });
+
+    try {
+      await _apiClient.updateConfiguration(configId, yearFrom: newYear);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đã cập nhật năm bắt đầu: $newYear'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        config['year_from'] = oldYear;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi cập nhật: $e'), backgroundColor: AppColors.error),
+      );
+    }
+  }
+
+  Future<void> _updateYearTo(Map<String, dynamic> config, int newYear) async {
+    final configId = config['id'].toString();
+    final oldYear = config['year_to'] ?? 2024;
+    final yearFrom = (config['year_from'] ?? 2021) as int;
+
+    if (newYear < yearFrom) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Năm kết thúc không được nhỏ hơn năm bắt đầu.')),
+      );
+      return;
+    }
+
+    setState(() {
+      config['year_to'] = newYear;
+    });
+
+    try {
+      await _apiClient.updateConfiguration(configId, yearTo: newYear);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đã cập nhật năm kết thúc: $newYear'),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        config['year_to'] = oldYear;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi cập nhật: $e'), backgroundColor: AppColors.error),
+      );
+    }
+  }
+
+  void _showEditTargetArticlesDialog(Map<String, dynamic> config) {
+    final configId = config['id'].toString();
+    final currentTarget = (config['target_articles'] ?? 200) as int;
+    final controller = TextEditingController(text: currentTarget.toString());
+    int selectedValue = currentTarget;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Row(
+                children: [
+                  Icon(Icons.tune_rounded, color: AppColors.primary, size: 20),
+                  SizedBox(width: 8),
+                  Text(
+                    'Số lượng bài báo mục tiêu',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Manrope',
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 380,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Nhập trực tiếp hoặc chọn nhanh số bài báo Grobid sẽ trích xuất toàn văn:',
+                      style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                    ),
+                    const SizedBox(height: 16),
+                    TextField(
+                      controller: controller,
+                      keyboardType: TextInputType.number,
+                      autofocus: true,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Manrope', color: AppColors.textPrimary),
+                      decoration: InputDecoration(
+                        labelText: 'Số lượng bài báo',
+                        suffixText: 'bài',
+                        suffixStyle: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary),
+                        fillColor: AppColors.surfaceSoft,
+                        filled: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      onChanged: (val) {
+                        final parsed = int.tryParse(val);
+                        if (parsed != null) {
+                          setDialogState(() => selectedValue = parsed);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 14),
+                    const Text(
+                      'Chọn nhanh:',
+                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                    ),
+                    const SizedBox(height: 6),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [30, 50, 100, 200, 300, 500].map((preset) {
+                        final isSelected = selectedValue == preset;
+                        return InkWell(
+                          onTap: () {
+                            setDialogState(() {
+                              selectedValue = preset;
+                              controller.text = preset.toString();
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.primary : AppColors.surfaceSoft,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(
+                                color: isSelected ? AppColors.primary : AppColors.border,
+                              ),
+                            ),
+                            child: Text(
+                              '$preset bài',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected ? Colors.white : AppColors.textSecondary,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Hủy'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    final count = int.tryParse(controller.text.trim()) ?? selectedValue;
+                    if (count < 5 || count > 5000) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Vui lòng nhập số lượng từ 5 đến 5000 bài.')),
+                      );
+                      return;
+                    }
+
+                    Navigator.of(ctx).pop();
+
+                    final oldCount = config['target_articles'];
+                    setState(() {
+                      config['target_articles'] = count;
+                    });
+
+                    try {
+                      await _apiClient.updateConfiguration(configId, targetArticles: count);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Đã cập nhật mục tiêu: $count bài báo'),
+                            backgroundColor: AppColors.green700,
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        setState(() {
+                          config['target_articles'] = oldCount;
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+                        );
+                      }
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('Lưu thay đổi'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -544,7 +781,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   ElevatedButton.icon(
                     onPressed: () => _triggerAnalysis(configId, journalTitle),
                     icon: const Icon(Icons.bolt_rounded, size: 16),
-                    label: const Text('Khai phá với cấu hình này'),
+                    label: const Text('Khai phá ngay'),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.onPrimary,
@@ -558,16 +795,142 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           const Divider(height: 1, color: AppColors.borderSoft),
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
 
-          // Specs grid
+          // Interactive specs row
           Row(
             children: [
-              _buildSpecItem('KHOẢNG NĂM KHẢO SÁT', '$yearFrom - $yearTo', Icons.calendar_today_rounded),
-              _buildSpecItem('MỤC TIÊU BÀI BÁO', '$targetArticles bài báo', Icons.description_outlined),
-              _buildSpecItem('CHẾ ĐỘ GROBID PARSER', 'Toàn văn TEI XML (Sections, Moves)', Icons.code_rounded),
+              // 1. Interactive Year Range Picker (No box, black text)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.textSubtle),
+                        SizedBox(width: 4),
+                        Text(
+                          'KHOẢNG NĂM KHẢO SÁT',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textSubtle,
+                            fontFamily: 'Manrope',
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _buildYearPickerButton(
+                          currentYear: yearFrom,
+                          years: const [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+                          tooltip: 'Bấm chọn năm bắt đầu',
+                          onSelected: (y) => _updateYearFrom(config, y),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 6),
+                          child: Text('–', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                        ),
+                        _buildYearPickerButton(
+                          currentYear: yearTo,
+                          years: const [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027],
+                          tooltip: 'Bấm chọn năm kết thúc',
+                          onSelected: (y) => _updateYearTo(config, y),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // 2. Interactive Target Articles (Opens edit dialog, text đen, no box, no pencil icon)
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Row(
+                      children: [
+                        Icon(Icons.description_outlined, size: 12, color: AppColors.textSubtle),
+                        SizedBox(width: 4),
+                        Text(
+                          'MỤC TIÊU BÀI BÁO',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textSubtle,
+                            fontFamily: 'Manrope',
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Tooltip(
+                      message: 'Nhấn để đổi số lượng bài báo',
+                      child: InkWell(
+                        onTap: () => _showEditTargetArticlesDialog(config),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              '$targetArticles bài báo',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(Icons.edit_outlined, size: 14, color: AppColors.textPrimary),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 3. Grobid Parser Mode
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.code_rounded, size: 12, color: AppColors.textSubtle),
+                        SizedBox(width: 4),
+                        Text(
+                          'CHẾ ĐỘ GROBID PARSER',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textSubtle,
+                            fontFamily: 'Manrope',
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Toàn văn TEI XML (Sections, Moves)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ],
@@ -575,38 +938,58 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     );
   }
 
-  Widget _buildSpecItem(String label, String value, IconData icon) {
-    return Expanded(
+  Widget _buildYearPickerButton({
+    required int currentYear,
+    required List<int> years,
+    required String tooltip,
+    required Function(int) onSelected,
+  }) {
+    return PopupMenuButton<int>(
+      tooltip: tooltip,
+      initialValue: currentYear,
+      onSelected: onSelected,
+      position: PopupMenuPosition.under,
+      color: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      itemBuilder: (ctx) {
+        return years.map((y) {
+          final isCurrent = y == currentYear;
+          return PopupMenuItem<int>(
+            value: y,
+            height: 36,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '$y',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+                    color: isCurrent ? AppColors.primary : AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+                if (isCurrent)
+                  const Icon(Icons.check_rounded, size: 14, color: AppColors.primary),
+              ],
+            ),
+          );
+        }).toList();
+      },
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 16, color: AppColors.textSubtle),
-          const SizedBox(width: 8),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textSubtle,
-                  fontFamily: 'Manrope',
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                value,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textPrimary,
-                  fontFamily: 'Manrope',
-                ),
-              ),
-            ],
+          Text(
+            '$currentYear',
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textPrimary,
+              fontFamily: 'Manrope',
+            ),
           ),
+          const SizedBox(width: 2),
+          const Icon(Icons.arrow_drop_down_rounded, size: 18, color: AppColors.textPrimary),
         ],
       ),
     );

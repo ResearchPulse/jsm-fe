@@ -150,6 +150,38 @@ class AdminApiClient {
     }
   }
 
+  Future<Map<String, dynamic>> updateConfiguration(
+    String configId, {
+    int? yearFrom,
+    int? yearTo,
+    int? targetArticles,
+    String? domain,
+    bool? isActive,
+  }) async {
+    try {
+      final uri = Uri.parse('${ApiEndpoints.adminConfigurations}/$configId');
+      final res = await _client.put(
+        uri,
+        headers: await _headers(),
+        body: jsonEncode({
+          if (yearFrom != null) 'year_from': yearFrom,
+          if (yearTo != null) 'year_to': yearTo,
+          if (targetArticles != null) 'target_articles': targetArticles,
+          if (domain != null) 'domain': domain,
+          if (isActive != null) 'is_active': isActive,
+        }),
+      );
+      if (res.statusCode == 200) {
+        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        return (body['data'] as Map<String, dynamic>?) ?? {};
+      }
+      throw ServerException('Lỗi khi cập nhật cấu hình', res.statusCode);
+    } catch (e) {
+      if (e is ServerException) rethrow;
+      throw NetworkException('Lỗi kết nối máy chủ: $e');
+    }
+  }
+
   Future<void> deleteConfiguration(String configId) async {
     try {
       final uri = Uri.parse('${ApiEndpoints.adminConfigurations}/$configId');
@@ -202,6 +234,44 @@ class AdminApiClient {
     } catch (e) {
       if (e is ServerException) rethrow;
       throw NetworkException('Lỗi kết nối máy chủ: $e');
+    }
+  }
+
+  Future<Map<String, dynamic>> getJobMetrics(String jobId) async {
+    try {
+      final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}/$jobId/metrics');
+      final res = await _client.get(uri, headers: await _headers());
+      if (res.statusCode == 200) {
+        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        return (body['data'] as Map<String, dynamic>?) ?? {};
+      }
+      return {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getJobArticles(
+    String jobId, {
+    int page = 1,
+    int perPage = 50,
+    String? status,
+  }) async {
+    try {
+      final queryParams = <String>['page=$page', 'per_page=$perPage'];
+      if (status != null) queryParams.add('status=$status');
+      final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}/$jobId/articles?${queryParams.join('&')}');
+      final res = await _client.get(uri, headers: await _headers());
+      if (res.statusCode == 200) {
+        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final data = body['data'];
+        if (data is List) {
+          return data.whereType<Map<String, dynamic>>().toList();
+        }
+      }
+      return [];
+    } catch (_) {
+      return [];
     }
   }
 

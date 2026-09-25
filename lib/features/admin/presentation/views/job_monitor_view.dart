@@ -121,8 +121,8 @@ class _JobMonitorViewState extends State<JobMonitorView> {
   int _currentStageNumber(String step, String status) {
     if (status.toUpperCase() == 'COMPLETED') return 6;
     final s = step.toUpperCase();
-    if (s.contains('QUEUED') || s.contains('PENDING')) return 1;
-    if (s.contains('HARVEST')) return 2;
+    if (s.contains('QUEUED') || s.contains('PENDING') || s.contains('HARVEST')) return 1;
+    if (s.contains('FETCH')) return 2;
     if (s.contains('GROBID') || s.contains('PARS')) return 3;
     if (s.contains('NORM')) return 4;
     if (s.contains('NLP') || s.contains('MOVE') || s.contains('STANCE')) return 5;
@@ -135,15 +135,15 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     }
     switch (stageNum) {
       case 1:
-        return 'Giai đoạn 1/6: Hàng đợi thu thập metadata OpenAlex';
+        return 'Giai đoạn 1/6: Thu thập metadata bài báo (OpenAlex)';
       case 2:
-        return 'Giai đoạn 2/6: Tải toàn văn PDF từ Open Access';
+        return 'Giai đoạn 2/6: Tải toàn văn PDF từ nguồn Open Access';
       case 3:
-        return 'Giai đoạn 3/6: Grobid parsing TEI XML';
+        return 'Giai đoạn 3/6: Grobid engine parsing TEI XML';
       case 4:
-        return 'Giai đoạn 4/6: Chuẩn hóa Schema và Checksum SHA-256';
+        return 'Giai đoạn 4/6: Chuẩn hóa Schema & Checksum SHA-256';
       case 5:
-        return 'Giai đoạn 5/6: Trích xuất Stance & Moves NLP';
+        return 'Giai đoạn 5/6: Trích xuất Stance & Rhetorical Moves NLP';
       case 6:
       default:
         return 'Giai đoạn 6/6: Đóng gói Corpus Snapshot & Hồ sơ';
@@ -157,6 +157,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       final st = _mapStatusText(job['status'] ?? '');
       return st == _selectedFilter;
     }).toList();
+
+    int activeGlobalStage = 1;
+    final runningJob = _jobs.firstWhere(
+      (j) => (j['status'] ?? '').toString().toUpperCase() == 'RUNNING',
+      orElse: () => _jobs.isNotEmpty ? _jobs.first : {},
+    );
+    if (runningJob.isNotEmpty) {
+      final st = (runningJob['status'] ?? '').toString();
+      final sp = (runningJob['current_step'] ?? '').toString();
+      activeGlobalStage = _currentStageNumber(sp, st);
+    }
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
@@ -241,17 +252,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    _buildStepperStage(1, 'OpenAlex Crawl', isDone: true, isActive: false),
-                    _buildStepperLine(isDone: true),
-                    _buildStepperStage(2, 'PDF Harvester', isDone: true, isActive: false),
-                    _buildStepperLine(isDone: true),
-                    _buildStepperStage(3, 'Grobid TEI XML', isDone: false, isActive: true),
-                    _buildStepperLine(isDone: false),
-                    _buildStepperStage(4, 'Normalizer', isDone: false, isActive: false),
-                    _buildStepperLine(isDone: false),
-                    _buildStepperStage(5, 'NLP Moves & Stance', isDone: false, isActive: false),
-                    _buildStepperLine(isDone: false),
-                    _buildStepperStage(6, 'Freeze Snapshot', isDone: false, isActive: false),
+                    _buildStepperStage(1, 'OpenAlex Crawl', isDone: activeGlobalStage > 1, isActive: activeGlobalStage == 1),
+                    _buildStepperLine(isDone: activeGlobalStage > 1),
+                    _buildStepperStage(2, 'PDF Harvester', isDone: activeGlobalStage > 2, isActive: activeGlobalStage == 2),
+                    _buildStepperLine(isDone: activeGlobalStage > 2),
+                    _buildStepperStage(3, 'Grobid TEI XML', isDone: activeGlobalStage > 3, isActive: activeGlobalStage == 3),
+                    _buildStepperLine(isDone: activeGlobalStage > 3),
+                    _buildStepperStage(4, 'Normalizer', isDone: activeGlobalStage > 4, isActive: activeGlobalStage == 4),
+                    _buildStepperLine(isDone: activeGlobalStage > 4),
+                    _buildStepperStage(5, 'NLP Moves & Stance', isDone: activeGlobalStage > 5, isActive: activeGlobalStage == 5),
+                    _buildStepperLine(isDone: activeGlobalStage > 5),
+                    _buildStepperStage(6, 'Freeze Snapshot', isDone: activeGlobalStage >= 6, isActive: false),
                   ],
                 ),
               ],
@@ -431,6 +442,18 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     final statusColor = _mapStatusColor(status);
     final jobId = job['id'].toString();
 
+    final metrics = job['metrics'] as Map<String, dynamic>?;
+    final totalArticles = (metrics?['total_articles'] as num?)?.toInt() ?? 0;
+    final fetched = (metrics?['fetched'] as num?)?.toInt() ?? 0;
+    final parsed = (metrics?['parsed'] as num?)?.toInt() ?? 0;
+    final normalized = (metrics?['normalized'] as num?)?.toInt() ?? 0;
+    final failed = (metrics?['failed'] as num?)?.toInt() ?? 0;
+    final isDone = status.toUpperCase() == 'COMPLETED';
+
+    final successCount = isDone
+        ? totalArticles
+        : (normalized > 0 ? normalized : (parsed > 0 ? parsed : fetched));
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -505,18 +528,20 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       ),
                     ),
                   ),
-                  if (status == 'FAILED') ...[
-                    const SizedBox(width: 10),
-                    OutlinedButton.icon(
+                  if (failed > 0 || status == 'FAILED') ...[
+                    const SizedBox(width: 8),
+                    ElevatedButton.icon(
                       onPressed: () => _retryJob(jobId),
-                      icon: const Icon(Icons.refresh_rounded, size: 14, color: AppColors.primary),
-                      label: const Text('Thử lại', style: TextStyle(fontSize: 12, color: AppColors.primary, fontFamily: 'Manrope')),
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.border),
+                      icon: const Icon(Icons.refresh_rounded, size: 14),
+                      label: Text(failed > 0 ? 'Thử lại $failed bài lỗi' : 'Thử lại'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.error,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        elevation: 0,
                       ),
                     ),
                   ],
@@ -526,7 +551,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           ),
           const SizedBox(height: 18),
 
-          // Progress Bar
+          // Progress Bar with Article Count
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -534,9 +559,25 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                 stageText,
                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
               ),
-              Text(
-                '${(progress * 100).toInt()}%',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
+              Row(
+                children: [
+                  Text(
+                    '${(progress * 100).toInt()}%',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
+                  ),
+                  if (totalArticles > 0) ...[
+                    const SizedBox(width: 8),
+                    Text(
+                      '•  $successCount/$totalArticles bài báo',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
@@ -550,7 +591,407 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               valueColor: AlwaysStoppedAnimation<Color>(statusColor),
             ),
           ),
+          const SizedBox(height: 14),
+
+          // Real-time Article State Tracking Strip
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.border.withAlpha(120)),
+            ),
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 12,
+              runSpacing: 8,
+              children: [
+                Wrap(
+                  spacing: 14,
+                  runSpacing: 6,
+                  children: [
+                    _buildMetricBadge(
+                      icon: Icons.article_outlined,
+                      label: 'Tổng mục tiêu',
+                      value: '$totalArticles',
+                      color: AppColors.textPrimary,
+                    ),
+                    _buildMetricBadge(
+                      icon: Icons.download_done_rounded,
+                      label: 'Đã tải PDF',
+                      value: '$fetched',
+                      color: const Color(0xFF6366F1),
+                    ),
+                    _buildMetricBadge(
+                      icon: Icons.integration_instructions_outlined,
+                      label: 'Parse TEI XML',
+                      value: '$parsed',
+                      color: AppColors.primary,
+                    ),
+                    _buildMetricBadge(
+                      icon: Icons.verified_outlined,
+                      label: 'Chuẩn hóa DB',
+                      value: '$normalized',
+                      color: AppColors.green700,
+                    ),
+                    if (failed > 0)
+                      _buildMetricBadge(
+                        icon: Icons.warning_amber_rounded,
+                        label: 'Bài lỗi',
+                        value: '$failed',
+                        color: AppColors.error,
+                      ),
+                  ],
+                ),
+                OutlinedButton.icon(
+                  onPressed: () => _showJobArticlesDialog(context, jobId, journalTitle, metrics),
+                  icon: const Icon(Icons.format_list_bulleted_rounded, size: 14, color: AppColors.textSecondary),
+                  label: const Text(
+                    'Chi tiết từng bài báo',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    backgroundColor: AppColors.surface,
+                    side: const BorderSide(color: AppColors.border),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMetricBadge({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 15, color: color),
+        const SizedBox(width: 5),
+        Text(
+          '$label: ',
+          style: const TextStyle(
+            fontSize: 12,
+            color: AppColors.textSecondary,
+            fontFamily: 'Manrope',
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w700,
+            color: color,
+            fontFamily: 'Manrope',
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showJobArticlesDialog(
+    BuildContext context,
+    String jobId,
+    String journalTitle,
+    Map<String, dynamic>? metrics,
+  ) {
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        String filter = 'ALL';
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Chi tiết bài báo: $journalTitle',
+                          style: const TextStyle(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                            fontFamily: 'Manrope',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Mã Job: $jobId • Tổng ${(metrics?['total_articles'] as num?)?.toInt() ?? 0} bài',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textMuted,
+                            fontFamily: 'Manrope',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(ctx).pop(),
+                    icon: const Icon(Icons.close_rounded, size: 20),
+                    color: AppColors.textMuted,
+                  ),
+                ],
+              ),
+              content: SizedBox(
+                width: 700,
+                height: 480,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        _buildDialogFilterChip('Tất cả', 'ALL', filter, (val) => setDialogState(() => filter = val)),
+                        const SizedBox(width: 8),
+                        _buildDialogFilterChip('Đã chuẩn hóa TEI', 'NORMALIZED', filter, (val) => setDialogState(() => filter = val)),
+                        const SizedBox(width: 8),
+                        _buildDialogFilterChip('Đã tải PDF', 'FETCHED', filter, (val) => setDialogState(() => filter = val)),
+                        const SizedBox(width: 8),
+                        _buildDialogFilterChip('Lỗi', 'FAILED', filter, (val) => setDialogState(() => filter = val), isError: true),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: FutureBuilder<List<Map<String, dynamic>>>(
+                        future: _apiClient.getJobArticles(jobId, perPage: 100),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                'Lỗi tải danh sách bài báo: ${snapshot.error}',
+                                style: const TextStyle(color: AppColors.error, fontFamily: 'Manrope'),
+                              ),
+                            );
+                          }
+                          final allArticles = snapshot.data ?? [];
+                          final filtered = allArticles.where((a) {
+                            if (filter == 'ALL') return true;
+                            return (a['status'] ?? '').toString().toUpperCase() == filter;
+                          }).toList();
+
+                          if (filtered.isEmpty) {
+                            return Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.inbox_outlined, size: 40, color: AppColors.slate300),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    allArticles.isEmpty
+                                        ? 'Chưa có bài báo nào được ghi nhận trong job này.'
+                                        : 'Không có bài báo nào với trạng thái này.',
+                                    style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope', fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+
+                          return ListView.separated(
+                            itemCount: filtered.length,
+                            separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.border),
+                            itemBuilder: (context, index) {
+                              final art = filtered[index];
+                              final artStatus = (art['status'] ?? '').toString().toUpperCase();
+                              final artTitle = (art['title'] ?? 'Bài báo không tiêu đề').toString();
+                              final doi = (art['doi'] ?? 'N/A').toString();
+                              final year = art['year']?.toString() ?? 'N/A';
+                              final errorMsg = art['error_message']?.toString();
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _buildArticleStatusIcon(artStatus),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            artTitle,
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              color: AppColors.textPrimary,
+                                              fontFamily: 'Manrope',
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'DOI: $doi',
+                                                style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                                              ),
+                                              const SizedBox(width: 12),
+                                              Text(
+                                                'Năm: $year',
+                                                style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                                              ),
+                                            ],
+                                          ),
+                                          if (errorMsg != null && errorMsg.isNotEmpty) ...[
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              'Lỗi: $errorMsg',
+                                              style: const TextStyle(fontSize: 11, color: AppColors.error, fontFamily: 'Manrope'),
+                                            ),
+                                          ],
+                                        ],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    _buildArticleStatusBadge(artStatus),
+                                  ],
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                if (((metrics?['failed'] as num?)?.toInt() ?? 0) > 0)
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.of(ctx).pop();
+                      _retryJob(jobId);
+                    },
+                    icon: const Icon(Icons.refresh_rounded, size: 14),
+                    label: Text('Thử lại ${(metrics?['failed'] as num?)?.toInt()} bài lỗi'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                  ),
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Đóng', style: TextStyle(fontFamily: 'Manrope')),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildDialogFilterChip(String label, String value, String current, Function(String) onSelect, {bool isError = false}) {
+    final isSelected = current == value;
+    return InkWell(
+      onTap: () => onSelect(value),
+      borderRadius: BorderRadius.circular(6),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? (isError ? AppColors.error : AppColors.primary)
+              : AppColors.surfaceSoft,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(
+            color: isSelected
+                ? (isError ? AppColors.error : AppColors.primary)
+                : AppColors.border,
+          ),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w600,
+            color: isSelected ? Colors.white : (isError ? AppColors.error : AppColors.textSecondary),
+            fontFamily: 'Manrope',
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildArticleStatusIcon(String status) {
+    switch (status) {
+      case 'NORMALIZED':
+        return const Icon(Icons.check_circle_rounded, size: 18, color: AppColors.green700);
+      case 'PARSED':
+        return const Icon(Icons.integration_instructions_outlined, size: 18, color: AppColors.primary);
+      case 'FETCHED':
+        return const Icon(Icons.download_done_rounded, size: 18, color: Color(0xFF6366F1));
+      case 'FAILED':
+        return const Icon(Icons.error_outline_rounded, size: 18, color: AppColors.error);
+      case 'HARVESTED':
+      default:
+        return const Icon(Icons.schedule_rounded, size: 18, color: AppColors.textMuted);
+    }
+  }
+
+  Widget _buildArticleStatusBadge(String status) {
+    Color col;
+    String txt;
+    switch (status) {
+      case 'NORMALIZED':
+        col = AppColors.green700;
+        txt = 'Chuẩn hóa TEI';
+        break;
+      case 'PARSED':
+        col = AppColors.primary;
+        txt = 'Parse TEI';
+        break;
+      case 'FETCHED':
+        col = const Color(0xFF6366F1);
+        txt = 'Đã tải PDF';
+        break;
+      case 'FAILED':
+        col = AppColors.error;
+        txt = 'Lỗi';
+        break;
+      case 'HARVESTED':
+      default:
+        col = AppColors.textMuted;
+        txt = 'Đang chờ';
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: col.withAlpha(20),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        txt,
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: col, fontFamily: 'Manrope'),
       ),
     );
   }
