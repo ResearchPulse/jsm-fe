@@ -616,25 +616,21 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       icon: Icons.article_outlined,
                       label: 'Tổng mục tiêu',
                       value: '$totalArticles',
-                      color: AppColors.textPrimary,
                     ),
                     _buildMetricBadge(
                       icon: Icons.download_done_rounded,
                       label: 'Đã tải PDF',
                       value: '$fetched',
-                      color: const Color(0xFF6366F1),
                     ),
                     _buildMetricBadge(
                       icon: Icons.integration_instructions_outlined,
                       label: 'Parse TEI XML',
                       value: '$parsed',
-                      color: AppColors.primary,
                     ),
                     _buildMetricBadge(
                       icon: Icons.verified_outlined,
                       label: 'Chuẩn hóa DB',
                       value: '$normalized',
-                      color: AppColors.green700,
                     ),
                     if (failed > 0)
                       _buildMetricBadge(
@@ -673,12 +669,13 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     required IconData icon,
     required String label,
     required String value,
-    required Color color,
+    Color? color,
   }) {
+    final finalColor = color ?? AppColors.textPrimary;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 15, color: color),
+        Icon(icon, size: 15, color: AppColors.textPrimary),
         const SizedBox(width: 5),
         Text(
           '$label: ',
@@ -691,9 +688,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
         Text(
           value,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 13,
             fontWeight: FontWeight.w700,
-            color: color,
+            color: finalColor,
             fontFamily: 'Manrope',
           ),
         ),

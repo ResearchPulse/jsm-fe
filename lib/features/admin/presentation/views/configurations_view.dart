@@ -56,6 +56,54 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     }
   }
 
+  String _getDomainForJournal(String journalId) {
+    // 1. Check if journal has field in its object (from OpenAlex or DB)
+    final j = _journals.firstWhere(
+      (j) => j['id']?.toString() == journalId,
+      orElse: () => {},
+    );
+    if (j.isNotEmpty && (j['field'] ?? '').toString().trim().isNotEmpty) {
+      return j['field'].toString();
+    }
+
+    // 2. Check if journal already has a configuration with a domain
+    final cfg = _configs.firstWhere(
+      (c) => c['journal_id']?.toString() == journalId || c['journal']?['id']?.toString() == journalId,
+      orElse: () => {},
+    );
+    if (cfg.isNotEmpty && (cfg['domain'] ?? '').toString().trim().isNotEmpty) {
+      return cfg['domain'].toString();
+    }
+
+    // 3. Fallback based on keywords in journal title
+    if (j.isNotEmpty) {
+      final title = (j['title'] ?? '').toString().toLowerCase();
+      if (title.contains('bioinformatics') || title.contains('computational biology')) {
+        return 'Bioinformatics & Computational Biology';
+      }
+      if (title.contains('software engineering') || title.contains('programming')) {
+        return 'Software Engineering';
+      }
+      if (title.contains('artificial intelligence') || title.contains('machine learning') || title.contains('ai')) {
+        return 'Artificial Intelligence & Machine Learning';
+      }
+      if (title.contains('big data') || title.contains('data science')) {
+        return 'Big Data & Data Science';
+      }
+      if (title.contains('genetics') || title.contains('genomics')) {
+        return 'Genetics & Genomics';
+      }
+      if (title.contains('biomedical') || title.contains('medicine') || title.contains('life')) {
+        return 'Biomedical & Life Sciences';
+      }
+      if (title.contains('computer science')) {
+        return 'Computer Science';
+      }
+    }
+
+    return 'Khoa học máy tính & Công nghệ';
+  }
+
   void _showConfigDialog(BuildContext context) {
     if (_journals.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -69,7 +117,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     int yearEnd = 2024;
     double targetPapers = 200;
     final domainController = TextEditingController(
-      text: _journals.first['publisher'] ?? 'Khoa học máy tính & Công nghệ',
+      text: _getDomainForJournal(selectedJournalId),
     );
     bool isSaving = false;
 
@@ -101,7 +149,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                       style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Tạp chí áp dụng *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                    const Text('Tạp chí áp dụng *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       initialValue: selectedJournalId,
@@ -114,7 +162,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                             '${j['title']} (${j['issn_l'] ?? 'No ISSN'})',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 13, fontFamily: 'Manrope'),
+                            style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                           ),
                         );
                       }).toList(),
@@ -122,18 +170,25 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                         if (val != null) {
                           setModalState(() {
                             selectedJournalId = val;
+                            domainController.text = _getDomainForJournal(val);
                           });
                         }
                       },
                     ),
                     const SizedBox(height: 16),
-                    const Text('Lĩnh vực nghiên cứu (Domain) *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                    const Text('Lĩnh vực nghiên cứu (Domain) *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
                     const SizedBox(height: 6),
                     TextField(
                       controller: domainController,
+                      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                       decoration: const InputDecoration(
-                        hintText: 'Ví dụ: Software Engineering / Computer Science',
+                        hintText: 'Ví dụ: Bioinformatics & Computational Biology',
                       ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Tự động đồng bộ từ OpenAlex. Bạn có thể giữ nguyên hoặc điều chỉnh.',
+                      style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 16),
                     Row(
