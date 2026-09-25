@@ -1,0 +1,151 @@
+import 'package:flutter/material.dart';
+import '../../../../app/theme/app_colors.dart';
+import 'profiles_review_view.dart';
+import 'snapshots_view.dart';
+
+/// Style & Corpus Unified Workspace (Tab 1)
+/// Consolidates Member 3's deep NLP Style Profiles and Corpus Snapshots into
+/// a sleek composite view with a top segmented tab switcher.
+class StyleAndCorpusView extends StatefulWidget {
+  final Function(int, {String? journalId}) onNavigateToTab;
+  final String? selectedJournalId;
+  final int initialSubTabIndex;
+
+  const StyleAndCorpusView({
+    super.key,
+    required this.onNavigateToTab,
+    this.selectedJournalId,
+    this.initialSubTabIndex = 0,
+  });
+
+  @override
+  State<StyleAndCorpusView> createState() => _StyleAndCorpusViewState();
+}
+
+class _StyleAndCorpusViewState extends State<StyleAndCorpusView> {
+  late int _activeSubTab;
+
+  @override
+  void initState() {
+    super.initState();
+    _activeSubTab = widget.initialSubTabIndex;
+  }
+
+  @override
+  void didUpdateWidget(covariant StyleAndCorpusView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.initialSubTabIndex != widget.initialSubTabIndex) {
+      setState(() => _activeSubTab = widget.initialSubTabIndex);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Top Segmented Navigation Header
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          decoration: const BoxDecoration(
+            color: AppColors.surface,
+            border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
+          ),
+          child: Row(
+            children: [
+              _buildSegmentItem(
+                index: 0,
+                icon: Icons.psychology_rounded,
+                title: 'Hồ Sơ Phong Cách NLP & CARS Moves',
+                subtitle: 'Hyland Stance, CARS Rhetorical Moves, Phân phối câu',
+              ),
+              const SizedBox(width: 12),
+              _buildSegmentItem(
+                index: 1,
+                icon: Icons.layers_rounded,
+                title: 'Kho Corpus Snapshots & Dữ Liệu',
+                subtitle: 'Reference Corpus, Phiên bản kho bài, Tải JSON/CSV',
+              ),
+            ],
+          ),
+        ),
+
+        // Sub-view Body (Using IndexedStack to preserve child state and scroll positions)
+        Expanded(
+          child: IndexedStack(
+            index: _activeSubTab,
+            children: [
+              ProfilesReviewView(
+                onNavigateToTab: widget.onNavigateToTab,
+                selectedJournalId: widget.selectedJournalId,
+              ),
+              SnapshotsView(
+                onNavigateToTab: widget.onNavigateToTab,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSegmentItem({
+    required int index,
+    required IconData icon,
+    required String title,
+    required String subtitle,
+  }) {
+    final isSelected = _activeSubTab == index;
+
+    return InkWell(
+      onTap: () => setState(() => _activeSubTab = index),
+      borderRadius: BorderRadius.circular(10),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.blue50 : AppColors.surfaceSoft,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+            width: isSelected ? 1.6 : 1,
+          ),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 20,
+              color: isSelected ? AppColors.primary : AppColors.textMuted,
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

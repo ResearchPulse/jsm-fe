@@ -82,8 +82,8 @@
   {
     "id": "phase-01-sidebar-three-tabs",
     "title": "Minimalist 3-Item Sidebar & Default Landing View",
-    "status": "not_started",
-    "evidence": "",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 18.3s)",
     "user_visible_behavior": "Sidebar renders exactly 3 items and boots directly into Trung tâm Tạp chí.",
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1",
@@ -92,8 +92,8 @@
   {
     "id": "phase-02-style-corpus-composite-view",
     "title": "Unified Style & Corpus Analytics Hub",
-    "status": "not_started",
-    "evidence": "",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 21.3s)",
     "user_visible_behavior": "Tab 1 combines Profiles Review and Snapshots View with top segmented switcher.",
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1",
@@ -102,8 +102,8 @@
   {
     "id": "phase-03-system-debug-composite-view",
     "title": "Unified System Monitor & Settings Hub",
-    "status": "not_started",
-    "evidence": "",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 13.5s)",
     "user_visible_behavior": "Tab 2 combines Job Monitor and Settings/Users with top segmented switcher.",
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1",
@@ -112,11 +112,41 @@
   {
     "id": "phase-04-dashboard-routing-and-deep-links",
     "title": "Dashboard Routing & Deep-Link Synchronization",
-    "status": "not_started",
-    "evidence": "",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 15.0s)",
     "user_visible_behavior": "Router maps 0..2 cleanly and all deep links from Command Center work seamlessly.",
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-pagination-and-header-cleanup",
+    "title": "Catalog Pagination & Header Clean-up",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.7s)",
+    "user_visible_behavior": "Left journal catalog displays 6 items per page with compact pagination controls; header removes Kích hoạt phân tích button.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-realtime-analysis-card",
+    "title": "Real-time 'Đang phân tích' Progress Card",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.8s)",
+    "user_visible_behavior": "4-box technical pipeline replaced with clean 'Đang phân tích' card displaying exact article title being analyzed.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-system-debug-declutter",
+    "title": "System & Debug Tab Decluttering",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.7s)",
+    "user_visible_behavior": "Job Monitor removes 6-stage diagram and duplicate action button, displaying a clean task list.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
     "priority": "P1"
   }
 ]
