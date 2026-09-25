@@ -18,9 +18,8 @@ class AdminHeader extends StatelessWidget {
       case 0:
         return 'Tổng Quan Pipeline';
       case 1:
-        return 'Danh Mục Tạp Chí';
       case 2:
-        return 'Cấu Hình Khai Phá';
+        return 'Danh Mục & Cấu Hình Khai Phá';
       case 3:
         return 'Giám Sát Tác Vụ';
       case 4:
@@ -41,9 +40,8 @@ class AdminHeader extends StatelessWidget {
       case 0:
         return 'Quản trị / Tổng quan';
       case 1:
-        return 'Khai phá dữ liệu / Tạp chí khoa học';
       case 2:
-        return 'Khai phá dữ liệu / Cấu hình';
+        return 'Khai phá dữ liệu / Danh mục & Cấu hình';
       case 3:
         return 'Khai phá dữ liệu / Giám sát tác vụ';
       case 4:

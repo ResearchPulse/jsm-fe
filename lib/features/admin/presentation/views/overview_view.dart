@@ -415,23 +415,14 @@ class _OverviewViewState extends State<OverviewView> {
     final stages = [
       _PipelineStageData(
         number: 1,
-        title: 'Khảo sát Tạp chí',
-        subtitle: '$_journalsCount tạp chí đã lưu',
-        status: 'Hoàn tất',
-        icon: Icons.menu_book_rounded,
+        title: 'Danh mục & Cấu hình',
+        subtitle: '$_journalsCount tạp chí • $_configsCount cấu hình',
+        status: 'Sẵn sàng',
+        icon: Icons.tune_rounded,
         targetTab: 1,
       ),
       _PipelineStageData(
         number: 2,
-        title: 'Cấu hình tham số',
-        subtitle: '$_configsCount cấu hình đã lưu',
-        status: 'Sẵn sàng',
-        icon: Icons.tune_rounded,
-        targetTab: 2,
-      ),
-
-      _PipelineStageData(
-        number: 3,
         title: 'Grobid TEI Parse',
         subtitle: '$_runningJobsCount job đang xử lý',
         status: _runningJobsCount > 0 ? 'Đang chạy' : 'Sẵn sàng',
@@ -439,7 +430,7 @@ class _OverviewViewState extends State<OverviewView> {
         targetTab: 3,
       ),
       _PipelineStageData(
-        number: 4,
+        number: 3,
         title: 'Freeze Snapshot',
         subtitle: '$_snapshotsCount bộ bất biến',
         status: 'Bảo mật',
@@ -447,7 +438,7 @@ class _OverviewViewState extends State<OverviewView> {
         targetTab: 4,
       ),
       _PipelineStageData(
-        number: 5,
+        number: 4,
         title: 'Hồ sơ phong cách',
         subtitle: 'Stance, CARS, Hedges',
         status: 'Đã sẵn sàng',

@@ -50,15 +50,9 @@ class AdminSidebar extends StatelessWidget {
                 _buildSectionHeader('QUY TRÌNH KHAI PHÁ DỮ LIỆU'),
                 _buildNavItem(
                   index: 1,
-                  icon: Icons.menu_book_outlined,
-                  activeIcon: Icons.menu_book_rounded,
-                  title: 'Danh mục Tạp chí',
-                ),
-                _buildNavItem(
-                  index: 2,
                   icon: Icons.tune_outlined,
                   activeIcon: Icons.tune_rounded,
-                  title: 'Cấu hình khai phá',
+                  title: 'Danh mục & Cấu hình',
                 ),
                 _buildNavItem(
                   index: 3,
@@ -180,7 +174,7 @@ class AdminSidebar extends StatelessWidget {
     required IconData activeIcon,
     required String title,
   }) {
-    final bool isSelected = selectedIndex == index;
+    final bool isSelected = selectedIndex == index || (index == 1 && selectedIndex == 2);
 
     Widget item = Container(
       margin: EdgeInsets.symmetric(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../data/datasources/admin_api_client.dart';
+import '../widgets/journal_command_center_panel.dart';
 
 class JournalsView extends StatefulWidget {
   final Function(int) onNavigateToTab;
@@ -19,10 +20,14 @@ class JournalsView extends StatefulWidget {
 class _JournalsViewState extends State<JournalsView> {
   final AdminApiClient _apiClient = AdminApiClient();
   final TextEditingController _searchController = TextEditingController();
+
   String _searchQuery = '';
   String _selectedDomain = 'Tất cả';
+  String _filterStatus = 'all'; // 'all' | 'configured' | 'unconfigured'
 
   List<Map<String, dynamic>> _journals = [];
+  List<Map<String, dynamic>> _configs = [];
+  Map<String, dynamic>? _selectedJournal;
   bool _isLoading = true;
   String? _error;
 
@@ -32,17 +37,100 @@ class _JournalsViewState extends State<JournalsView> {
   String? _openAlexSearchError;
   String? _lastSearchedOpenAlexQuery;
   final Set<String> _importingIds = {};
+  final Set<String> _triggeringConfigIds = {};
 
   @override
   void initState() {
     super.initState();
-    _loadJournals();
+    _loadAllData();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  Future<void> _loadAllData() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final results = await Future.wait([
+        _apiClient.getJournals(),
+        _apiClient.getConfigurations(),
+      ]);
+      if (!mounted) return;
+      setState(() {
+        _journals = results[0];
+        _configs = results[1];
+        _isLoading = false;
+
+        // Keep _selectedJournal synced with fresh data if already chosen
+        if (_selectedJournal != null) {
+          final sId = _selectedJournal!['id']?.toString();
+          final updated = _journals.where((j) => j['id']?.toString() == sId).toList();
+          if (updated.isNotEmpty) {
+            _selectedJournal = updated.first;
+          }
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  Map<String, dynamic>? _getConfigForJournal(String journalId) {
+    for (final c in _configs) {
+      final jId = c['journal_id']?.toString() ?? c['journal']?['id']?.toString();
+      if (jId == journalId) {
+        return c;
+      }
+    }
+    return null;
+  }
+
+  String _getDomainForJournal(Map<String, dynamic> journal) {
+    if ((journal['field'] ?? '').toString().trim().isNotEmpty) {
+      return journal['field'].toString();
+    }
+
+    final journalId = journal['id']?.toString() ?? '';
+    final cfg = _getConfigForJournal(journalId);
+    if (cfg != null && (cfg['domain'] ?? '').toString().trim().isNotEmpty) {
+      return cfg['domain'].toString();
+    }
+
+    final title = (journal['title'] ?? '').toString().toLowerCase();
+    if (title.contains('bioinformatics') || title.contains('computational biology')) {
+      return 'Bioinformatics & Computational Biology';
+    }
+    if (title.contains('software engineering') || title.contains('programming')) {
+      return 'Software Engineering';
+    }
+    if (title.contains('artificial intelligence') || title.contains('machine learning') || title.contains('ai')) {
+      return 'Artificial Intelligence & Machine Learning';
+    }
+    if (title.contains('big data') || title.contains('data science')) {
+      return 'Big Data & Data Science';
+    }
+    if (title.contains('genetics') || title.contains('genomics')) {
+      return 'Genetics & Genomics';
+    }
+    if (title.contains('biomedical') || title.contains('medicine') || title.contains('life')) {
+      return 'Biomedical & Life Sciences';
+    }
+    if (title.contains('computer science')) {
+      return 'Computer Science';
+    }
+
+    return 'Khoa học máy tính & Công nghệ';
   }
 
   Future<void> _searchOpenAlex([String? query]) async {
@@ -109,7 +197,7 @@ class _JournalsViewState extends State<JournalsView> {
         _importingIds.remove(openalexId);
       });
 
-      await _loadJournals();
+      await _loadAllData();
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -124,25 +212,37 @@ class _JournalsViewState extends State<JournalsView> {
     }
   }
 
-  Future<void> _loadJournals() async {
+  Future<void> _triggerAnalysis(String configId, String journalName) async {
     setState(() {
-      _isLoading = true;
-      _error = null;
+      _triggeringConfigIds.add(configId);
     });
 
     try {
-      final list = await _apiClient.getJournals();
+      await _apiClient.triggerAnalysis(configId);
       if (!mounted) return;
       setState(() {
-        _journals = list;
-        _isLoading = false;
+        _triggeringConfigIds.remove(configId);
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('⚡ Đã kích hoạt chu trình phân tích cho: $journalName'),
+          backgroundColor: AppColors.green700,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      widget.onNavigateToTab(3); // Chuyển sang Tab 3 (Giám sát tác vụ)
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = e.toString();
-        _isLoading = false;
+        _triggeringConfigIds.remove(configId);
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi kích hoạt khai phá: $e'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
     }
   }
 
@@ -161,7 +261,7 @@ class _JournalsViewState extends State<JournalsView> {
             return AlertDialog(
               backgroundColor: AppColors.surface,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
               ),
               title: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +366,7 @@ class _JournalsViewState extends State<JournalsView> {
               actions: [
                 TextButton(
                   onPressed: isSubmitting ? null : () => Navigator.of(ctx).pop(),
-                  child: const Text('Hủy'),
+                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
                 ),
                 ElevatedButton(
                   onPressed: isSubmitting
@@ -306,7 +406,7 @@ class _JournalsViewState extends State<JournalsView> {
                                 ),
                               );
                             }
-                            _loadJournals();
+                            _loadAllData();
                           } catch (err) {
                             setModalState(() => isSubmitting = false);
                             if (context.mounted) {
@@ -336,280 +436,724 @@ class _JournalsViewState extends State<JournalsView> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final filteredJournals = _journals.where((j) {
-      final title = (j['title'] ?? '').toString().toLowerCase();
-      final issn = (j['issn_l'] ?? '').toString().toLowerCase();
-      final publisher = (j['publisher'] ?? '').toString().toLowerCase();
-      final q = _searchQuery.toLowerCase();
+  void _showQuickConfigDialog(BuildContext context, Map<String, dynamic> journal) {
+    final journalId = journal['id'].toString();
+    final journalTitle = journal['title']?.toString() ?? 'Tạp chí';
+    final existingConfig = _getConfigForJournal(journalId);
 
-      final matchesSearch = title.contains(q) || issn.contains(q) || publisher.contains(q);
-      final matchesDomain = _selectedDomain == 'Tất cả' || (j['domain'] ?? '') == _selectedDomain;
-      return matchesSearch && matchesDomain;
-    }).toList();
+    final domainController = TextEditingController(
+      text: existingConfig != null
+          ? (existingConfig['domain']?.toString() ?? _getDomainForJournal(journal))
+          : _getDomainForJournal(journal),
+    );
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header Section
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    int yearStart = existingConfig != null ? (existingConfig['year_from'] ?? 2021) : 2021;
+    int yearEnd = existingConfig != null ? (existingConfig['year_to'] ?? 2024) : 2024;
+    int targetPapers = existingConfig != null ? (existingConfig['target_articles'] ?? 200) : 200;
+    final targetController = TextEditingController(text: targetPapers.toString());
+
+    bool isSaving = false;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
                 children: [
-                  Text(
-                    'Danh Mục Tạp Chí Khoa Học',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      fontFamily: 'Manrope',
-                      letterSpacing: -0.4,
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceSoft,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.border),
                     ),
+                    child: const Icon(Icons.tune_rounded, size: 20, color: AppColors.textPrimary),
                   ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Đăng ký và quản lý tạp chí nghiên cứu với mã ISSN chuẩn quốc tế, theo dõi số bài báo và kích hoạt khai phá.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textMuted,
-                      fontFamily: 'Manrope',
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          existingConfig != null ? 'Cập nhật cấu hình khai phá' : 'Thiết lập cấu hình khai phá',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Manrope',
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          journalTitle,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.textMuted,
+                            fontFamily: 'Manrope',
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: _loadJournals,
-                    icon: const Icon(Icons.refresh_rounded),
-                    tooltip: 'Tải lại danh sách',
-                    color: AppColors.primary,
-                  ),
-                  const SizedBox(width: 8),
-                  OutlinedButton.icon(
-                    onPressed: () => _showAddJournalDialog(context),
-                    icon: const Icon(Icons.post_add_rounded, size: 18),
-                    label: const Text('Nhập thủ công', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              content: SizedBox(
+                width: 520,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Lĩnh vực nghiên cứu (Domain) *',
+                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                     ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: domainController,
+                      style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      decoration: InputDecoration(
+                        hintText: 'Ví dụ: Bioinformatics & Computational Biology',
+                        fillColor: AppColors.surfaceSoft,
+                        filled: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    const Text(
+                      'Tự động xác định từ dữ liệu học thuật. Bạn có thể chỉnh sửa nếu cần.',
+                      style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                    ),
+                    const SizedBox(height: 16),
 
-          // Search & Filter Toolbar
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: (val) => setState(() => _searchQuery = val),
-                    onSubmitted: (val) => _searchOpenAlex(val),
-                    style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
-                    decoration: InputDecoration(
-                      hintText: 'Tìm kiếm theo tên tạp chí, mã ISSN, nhà xuất bản...',
-                      hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                      prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
-                      suffixIcon: _searchQuery.isNotEmpty
-                          ? IconButton(
-                              icon: const Icon(Icons.clear_rounded, size: 16, color: AppColors.textSubtle),
-                              onPressed: () {
-                                _searchController.clear();
-                                setState(() {
-                                  _searchQuery = '';
-                                  _openAlexResults = [];
-                                  _lastSearchedOpenAlexQuery = null;
-                                });
-                              },
-                            )
-                          : null,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      fillColor: AppColors.surfaceSoft,
-                      filled: true,
-                      border: OutlineInputBorder(
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Từ năm xuất bản', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              const SizedBox(height: 6),
+                              DropdownButtonFormField<int>(
+                                initialValue: yearStart,
+                                decoration: InputDecoration(
+                                  fillColor: AppColors.surfaceSoft,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                                ),
+                                items: [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023].map((y) {
+                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontSize: 13, fontFamily: 'Manrope')));
+                                }).toList(),
+                                onChanged: (val) {
+                                  if (val != null) setModalState(() => yearStart = val);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('Đến năm xuất bản', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              const SizedBox(height: 6),
+                              DropdownButtonFormField<int>(
+                                initialValue: yearEnd,
+                                decoration: InputDecoration(
+                                  fillColor: AppColors.surfaceSoft,
+                                  filled: true,
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                                ),
+                                items: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027].map((y) {
+                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontSize: 13, fontFamily: 'Manrope')));
+                                }).toList(),
+                                onChanged: (val) {
+                                  if (val != null) setModalState(() => yearEnd = val);
+                                },
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Số bài báo mục tiêu (Target)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                        Text(
+                          '$targetPapers bài',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: targetController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                      decoration: InputDecoration(
+                        suffixText: 'bài báo',
+                        fillColor: AppColors.surfaceSoft,
+                        filled: true,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                      ),
+                      onChanged: (val) {
+                        final parsed = int.tryParse(val);
+                        if (parsed != null && parsed > 0) {
+                          setModalState(() => targetPapers = parsed);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 6,
+                      children: [30, 50, 100, 200, 300, 500].map((preset) {
+                        final isSelected = targetPapers == preset;
+                        return InkWell(
+                          onTap: () {
+                            setModalState(() {
+                              targetPapers = preset;
+                              targetController.text = preset.toString();
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(6),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: isSelected ? AppColors.textPrimary : AppColors.surfaceSoft,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: isSelected ? AppColors.textPrimary : AppColors.border),
+                            ),
+                            child: Text(
+                              '$preset bài',
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: isSelected ? Colors.white : AppColors.textSecondary,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 16),
+
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceSoft,
                         borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.border),
+                        border: Border.all(color: AppColors.border),
                       ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: AppColors.border),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                _buildFilterChip('Tất cả'),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: _searchQuery.trim().isEmpty || _isSearchingOpenAlex
-                      ? null
-                      : () => _searchOpenAlex(_searchQuery),
-                  icon: _isSearchingOpenAlex
-                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Icon(Icons.travel_explore_rounded, size: 16),
-                  label: const Text(
-                    'Tra cứu OpenAlex',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Journals Data List
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.border),
-            ),
-            child: Column(
-              children: [
-                // Table header
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                  decoration: const BoxDecoration(
-                    color: AppColors.surfaceSoft,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
-                  ),
-                  child: const Row(
-                    children: [
-                      Expanded(
-                        flex: 4,
-                        child: Text(
-                          'TÊN TẠP CHÍ & NHÀ XUẤT BẢN',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'MÃ ISSN',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'TỔNG BÀI BÁO',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'LƯỢT TRÍCH DẪN',
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                        ),
-                      ),
-                      SizedBox(
-                        width: 180,
-                        child: Text(
-                          'THAO TÁC',
-                          textAlign: TextAlign.right,
-                          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Table state handling
-                if (_isLoading)
-                  const Padding(
-                    padding: EdgeInsets.all(48),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (_error != null)
-                  Padding(
-                    padding: const EdgeInsets.all(32),
-                    child: Center(
-                      child: Column(
+                      child: const Row(
                         children: [
-                          const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
-                          const SizedBox(height: 8),
-                          Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
-                          const SizedBox(height: 12),
-                          OutlinedButton.icon(
-                            onPressed: _loadJournals,
-                            icon: const Icon(Icons.refresh_rounded, size: 16),
-                            label: const Text('Thử lại'),
+                          Icon(Icons.code_rounded, size: 16, color: AppColors.textPrimary),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Cấu trúc đầu ra: Toàn văn TEI XML',
+                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  'Động cơ Grobid tự động bóc tách Abstract, Sections, References & Sentences.',
+                                  style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  )
-                else if (filteredJournals.isEmpty)
-                  _buildEmptyOrOpenAlexFallback()
-                else ...[
-                  for (int i = 0; i < filteredJournals.length; i++) ...[
-                    _buildJournalRow(filteredJournals[i]),
-                    if (i < filteredJournals.length - 1)
-                      const Divider(height: 1, color: AppColors.borderSoft),
                   ],
-                  if (_openAlexResults.isNotEmpty) ...[
-                    const Divider(height: 1, color: AppColors.border),
-                    _buildOpenAlexHeaderBanner(),
-                    for (int i = 0; i < _openAlexResults.length; i++) ...[
-                      _buildOpenAlexJournalRow(_openAlexResults[i]),
-                      if (i < _openAlexResults.length - 1)
-                        const Divider(height: 1, color: AppColors.borderSoft),
-                    ],
-                  ],
-                ],
+                ),
+              ),
+              actions: [
+                if (existingConfig != null)
+                  TextButton.icon(
+                    onPressed: isSaving
+                        ? null
+                        : () async {
+                            final configId = existingConfig['id'].toString();
+                            setModalState(() => isSaving = true);
+                            try {
+                              await _apiClient.deleteConfiguration(configId);
+                              if (ctx.mounted) Navigator.of(ctx).pop();
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Đã xóa cấu hình khai phá.')),
+                                );
+                              }
+                              _loadAllData();
+                            } catch (e) {
+                              setModalState(() => isSaving = false);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+                                );
+                              }
+                            }
+                          },
+                    icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.error),
+                    label: const Text('Xóa cấu hình', style: TextStyle(color: AppColors.error, fontSize: 12, fontFamily: 'Manrope')),
+                  ),
+                const Spacer(),
+                TextButton(
+                  onPressed: isSaving ? null : () => Navigator.of(ctx).pop(),
+                  child: const Text('Đóng', style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
+                ),
+                OutlinedButton(
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          final domain = domainController.text.trim();
+                          if (domain.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Vui lòng nhập tên lĩnh vực nghiên cứu.')),
+                            );
+                            return;
+                          }
+                          if (yearStart > yearEnd) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Năm bắt đầu không được lớn hơn năm kết thúc.')),
+                            );
+                            return;
+                          }
+
+                          setModalState(() => isSaving = true);
+                          try {
+                            if (existingConfig != null) {
+                              final configId = existingConfig['id'].toString();
+                              await _apiClient.updateConfiguration(
+                                configId,
+                                domain: domain,
+                                yearFrom: yearStart,
+                                yearTo: yearEnd,
+                                targetArticles: targetPapers,
+                              );
+                            } else {
+                              await _apiClient.createConfiguration(
+                                journalId: journalId,
+                                domain: domain,
+                                yearFrom: yearStart,
+                                yearTo: yearEnd,
+                                targetArticles: targetPapers,
+                                referenceCorpusName: 'Academic Core Corpus',
+                              );
+                            }
+
+                            if (ctx.mounted) Navigator.of(ctx).pop();
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Đã lưu cấu hình cho "$journalTitle" thành công.'),
+                                  backgroundColor: AppColors.green700,
+                                ),
+                              );
+                            }
+                            _loadAllData();
+                          } catch (err) {
+                            setModalState(() => isSaving = false);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Lỗi: $err'), backgroundColor: AppColors.error),
+                              );
+                            }
+                          }
+                        },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.textPrimary,
+                    side: const BorderSide(color: AppColors.border),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  child: const Text('Lưu cấu hình', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: isSaving
+                      ? null
+                      : () async {
+                          final domain = domainController.text.trim();
+                          if (domain.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Vui lòng nhập tên lĩnh vực nghiên cứu.')),
+                            );
+                            return;
+                          }
+                          if (yearStart > yearEnd) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Năm bắt đầu không được lớn hơn năm kết thúc.')),
+                            );
+                            return;
+                          }
+
+                          setModalState(() => isSaving = true);
+                          try {
+                            String activeConfigId;
+                            if (existingConfig != null) {
+                              activeConfigId = existingConfig['id'].toString();
+                              await _apiClient.updateConfiguration(
+                                activeConfigId,
+                                domain: domain,
+                                yearFrom: yearStart,
+                                yearTo: yearEnd,
+                                targetArticles: targetPapers,
+                              );
+                            } else {
+                              final created = await _apiClient.createConfiguration(
+                                journalId: journalId,
+                                domain: domain,
+                                yearFrom: yearStart,
+                                yearTo: yearEnd,
+                                targetArticles: targetPapers,
+                                referenceCorpusName: 'Academic Core Corpus',
+                              );
+                              activeConfigId = created['id']?.toString() ?? '';
+                            }
+
+                            if (ctx.mounted) Navigator.of(ctx).pop();
+                            await _loadAllData();
+
+                            if (activeConfigId.isNotEmpty) {
+                              await _triggerAnalysis(activeConfigId, journalTitle);
+                            }
+                          } catch (err) {
+                            setModalState(() => isSaving = false);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('Lỗi: $err'), backgroundColor: AppColors.error),
+                              );
+                            }
+                          }
+                        },
+                  icon: isSaving
+                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.bolt_rounded, size: 16),
+                  label: const Text('Lưu & Khởi chạy ngay', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
               ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final configuredCount = _journals.where((j) => _getConfigForJournal(j['id'].toString()) != null).length;
+    final unconfiguredCount = _journals.length - configuredCount;
+
+    final domains = _journals
+        .map((j) => _getDomainForJournal(j))
+        .where((d) => d.trim().isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+
+    final filteredJournals = _journals.where((j) {
+      final title = (j['title'] ?? '').toString().toLowerCase();
+      final issn = (j['issn_l'] ?? '').toString().toLowerCase();
+      final publisher = (j['publisher'] ?? '').toString().toLowerCase();
+      final domain = _getDomainForJournal(j).toLowerCase();
+      final q = _searchQuery.toLowerCase();
+
+      final matchesSearch = title.contains(q) || issn.contains(q) || publisher.contains(q) || domain.contains(q);
+      final matchesDomain = _selectedDomain == 'Tất cả' || _getDomainForJournal(j) == _selectedDomain;
+
+      final hasConfig = _getConfigForJournal(j['id'].toString()) != null;
+      bool matchesStatus = true;
+      if (_filterStatus == 'configured') {
+        matchesStatus = hasConfig;
+      } else if (_filterStatus == 'unconfigured') {
+        matchesStatus = !hasConfig;
+      }
+
+      return matchesSearch && matchesDomain && matchesStatus;
+    }).toList();
+
+    // Auto-select first journal if available and none selected yet for zero-friction
+    if (_selectedJournal == null && filteredJournals.isNotEmpty) {
+      _selectedJournal = filteredJournals.first;
+    }
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth >= 1050;
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Header
+              _buildTopHeader(context),
+              const SizedBox(height: 20),
+
+              if (isDesktop)
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Left Column: Catalog (flex 5)
+                    Expanded(
+                      flex: 5,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildSearchAndFilterToolbar(domains, configuredCount, unconfiguredCount),
+                          const SizedBox(height: 16),
+                          _buildJournalCatalogList(filteredJournals),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 24),
+                    // Right Column: Command Center (flex 6)
+                    Expanded(
+                      flex: 6,
+                      child: _selectedJournal != null
+                          ? JournalCommandCenterPanel(
+                              key: ValueKey(_selectedJournal!['id']),
+                              journal: _selectedJournal!,
+                              initialConfig: _getConfigForJournal(_selectedJournal!['id'].toString()),
+                              onNavigateToTab: widget.onNavigateToTab,
+                              onRefreshParent: _loadAllData,
+                            )
+                          : _buildEmptyCommandCenterPlaceholder(),
+                    ),
+                  ],
+                )
+              else
+                // Mobile/Tablet: Stacked view
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (_selectedJournal != null) ...[
+                      JournalCommandCenterPanel(
+                        key: ValueKey(_selectedJournal!['id']),
+                        journal: _selectedJournal!,
+                        initialConfig: _getConfigForJournal(_selectedJournal!['id'].toString()),
+                        onNavigateToTab: widget.onNavigateToTab,
+                        onRefreshParent: _loadAllData,
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                    _buildSearchAndFilterToolbar(domains, configuredCount, unconfiguredCount),
+                    const SizedBox(height: 16),
+                    _buildJournalCatalogList(filteredJournals),
+                  ],
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildTopHeader(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Danh Mục & Trung Tâm Khai Phá Tạp Chí',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                fontFamily: 'Manrope',
+                letterSpacing: -0.4,
+              ),
             ),
+            SizedBox(height: 4),
+            Text(
+              'Chọn tạp chí để kích hoạt khai phá 1-chạm (300 bài), giám sát bóc tách TEI XML và xem hồ sơ phong cách NLP tức thì.',
+              style: TextStyle(
+                fontSize: 14,
+                color: AppColors.textMuted,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: _loadAllData,
+              icon: const Icon(Icons.refresh_rounded),
+              tooltip: 'Tải lại danh sách',
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 8),
+            OutlinedButton.icon(
+              onPressed: () => _showAddJournalDialog(context),
+              icon: const Icon(Icons.post_add_rounded, size: 18),
+              label: const Text('Nhập tạp chí thủ công', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.textPrimary,
+                side: const BorderSide(color: AppColors.border),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSearchAndFilterToolbar(List<String> domains, int configuredCount, int unconfiguredCount) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (val) => setState(() => _searchQuery = val),
+                  onSubmitted: (val) => _searchOpenAlex(val),
+                  style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
+                  decoration: InputDecoration(
+                    hintText: 'Tìm theo tên, ISSN, nhà xuất bản...',
+                    hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                    prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: const Icon(Icons.clear_rounded, size: 16, color: AppColors.textSubtle),
+                            onPressed: () {
+                              _searchController.clear();
+                              setState(() {
+                                _searchQuery = '';
+                                _openAlexResults = [];
+                                _lastSearchedOpenAlexQuery = null;
+                              });
+                            },
+                          )
+                        : null,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    fillColor: AppColors.surfaceSoft,
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: const BorderSide(color: AppColors.border),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton.icon(
+                onPressed: _searchQuery.trim().isEmpty || _isSearchingOpenAlex
+                    ? null
+                    : () => _searchOpenAlex(_searchQuery),
+                icon: _isSearchingOpenAlex
+                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    : const Icon(Icons.travel_explore_rounded, size: 16),
+                label: const Text(
+                  'OpenAlex',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.textPrimary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              _buildStatusFilterChip('all', 'Tất cả (${_journals.length})'),
+              const SizedBox(width: 6),
+              _buildStatusFilterChip('configured', 'Đã cấu hình ($configuredCount)'),
+              const SizedBox(width: 6),
+              _buildStatusFilterChip('unconfigured', 'Chưa có ($unconfiguredCount)'),
+              const Spacer(),
+              if (domains.isNotEmpty) ...[
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceSoft,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: DropdownButton<String>(
+                    value: domains.contains(_selectedDomain) || _selectedDomain == 'Tất cả' ? _selectedDomain : 'Tất cả',
+                    isDense: true,
+                    underline: const SizedBox(),
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                    items: ['Tất cả', ...domains].map((d) {
+                      return DropdownMenuItem<String>(
+                        value: d,
+                        child: Text(d, style: const TextStyle(fontSize: 11, fontFamily: 'Manrope')),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      if (val != null) setState(() => _selectedDomain = val);
+                    },
+                  ),
+                ),
+              ],
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip(String label) {
-    final isSelected = _selectedDomain == label;
+  Widget _buildStatusFilterChip(String status, String label) {
+    final isSelected = _filterStatus == status;
     return InkWell(
-      onTap: () => setState(() => _selectedDomain = label),
+      onTap: () => setState(() => _filterStatus = status),
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.surfaceSoft,
+          color: isSelected ? AppColors.textPrimary : AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: isSelected ? AppColors.primary : AppColors.border),
+          border: Border.all(color: isSelected ? AppColors.textPrimary : AppColors.border),
         ),
         child: Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: FontWeight.w600,
             color: isSelected ? Colors.white : AppColors.textSecondary,
             fontFamily: 'Manrope',
@@ -619,7 +1163,86 @@ class _JournalsViewState extends State<JournalsView> {
     );
   }
 
-  Widget _buildJournalRow(Map<String, dynamic> journal) {
+  Widget _buildJournalCatalogList(List<Map<String, dynamic>> filteredJournals) {
+    if (_isLoading) {
+      return Container(
+        padding: const EdgeInsets.all(48),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null) {
+      return Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: Center(
+          child: Column(
+            children: [
+              const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
+              const SizedBox(height: 8),
+              Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: _loadAllData,
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: const Text('Thử lại'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (filteredJournals.isEmpty) {
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        child: _buildEmptyOrOpenAlexFallback(),
+      );
+    }
+
+    return Column(
+      children: [
+        for (final journal in filteredJournals)
+          _buildJournalCard(journal),
+        if (_openAlexResults.isNotEmpty) ...[
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                _buildOpenAlexHeaderBanner(),
+                for (int i = 0; i < _openAlexResults.length; i++) ...[
+                  _buildOpenAlexJournalRow(_openAlexResults[i]),
+                  if (i < _openAlexResults.length - 1)
+                    const Divider(height: 1, color: AppColors.borderSoft),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildJournalCard(Map<String, dynamic> journal) {
+    final journalId = journal['id'].toString();
     final title = journal['title'] ?? 'Chưa rõ';
     final publisher = journal['publisher'] ?? 'Chưa rõ nhà xuất bản';
     final issn = journal['issn_l'] ??
@@ -627,107 +1250,269 @@ class _JournalsViewState extends State<JournalsView> {
             ? journal['issns'][0].toString()
             : 'N/A');
     final worksCount = journal['works_count'] ?? 0;
-    final citedCount = journal['cited_by_count'] ?? 0;
+    final domain = _getDomainForJournal(journal);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 4,
-            child: Column(
+    final config = _getConfigForJournal(journalId);
+    final isConfigured = config != null;
+    final isSelected = _selectedJournal != null && _selectedJournal!['id'].toString() == journalId;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: isSelected ? AppColors.blue50 : AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isSelected ? AppColors.primary : AppColors.border,
+          width: isSelected ? 1.8 : 1,
+        ),
+        boxShadow: isSelected
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withAlpha(25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              _selectedJournal = journal;
+            });
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    fontFamily: 'Manrope',
+                // Radio/Check indicator
+                Container(
+                  width: 20,
+                  height: 20,
+                  margin: const EdgeInsets.only(top: 2, right: 10),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isSelected ? AppColors.primary : AppColors.surfaceSoft,
+                    border: Border.all(
+                      color: isSelected ? AppColors.primary : AppColors.border,
+                    ),
                   ),
+                  child: isSelected
+                      ? const Icon(Icons.check, size: 13, color: Colors.white)
+                      : null,
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  publisher,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMuted,
-                    fontFamily: 'Manrope',
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          if (isConfigured)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.green100,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: const Text(
+                                'Đã cấu hình',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.green700,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                            )
+                          else
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceSoft,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(color: AppColors.border),
+                              ),
+                              child: const Text(
+                                'Chưa cấu hình',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppColors.textMuted,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        publisher,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceSoft,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: Text(
+                              domain,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textPrimary,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'ISSN: $issn',
+                            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '$worksCount bài',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                          ),
+                          const SizedBox(width: 6),
+                          IconButton(
+                            onPressed: () => _showQuickConfigDialog(context, journal),
+                            icon: const Icon(Icons.tune_rounded, size: 14),
+                            tooltip: 'Cấu hình chi tiết',
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            color: AppColors.textMuted,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
           ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              issn,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyCommandCenterPlaceholder() {
+    return Container(
+      padding: const EdgeInsets.all(40),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSoft,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: const Icon(
+                Icons.auto_stories_rounded,
+                size: 28,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 18),
+            const Text(
+              'Trung Tâm Khai Phá & Hồ Sơ Phong Cách',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
                 color: AppColors.textPrimary,
                 fontFamily: 'Manrope',
+                letterSpacing: -0.3,
               ),
             ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              '$worksCount bài',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-                fontFamily: 'Manrope',
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 380),
+              child: const Text(
+                'Chọn một tạp chí từ danh sách bên trái để kích hoạt khai phá 1-chạm (300 bài), theo dõi chu trình 4 giai đoạn và xem hồ sơ phong cách NLP tức thì.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                  height: 1.4,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              '$citedCount lượt',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-                fontFamily: 'Manrope',
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 180,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+            const SizedBox(height: 22),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
               children: [
-                OutlinedButton(
-                  onPressed: () => widget.onNavigateToTab(2),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.textPrimary,
-                    side: const BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                  ),
-                  child: const Text('Cấu hình', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton(
-                  onPressed: () => widget.onNavigateToTab(3),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                  ),
-                  child: const Text('Khai phá', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
-                ),
+                _buildFeatureBadge(Icons.bolt_rounded, '1-Chạm Khai phá 300 bài'),
+                _buildFeatureBadge(Icons.account_tree_rounded, 'Bóc tách TEI XML & MinIO'),
+                _buildFeatureBadge(Icons.psychology_rounded, 'Phân tích Phong cách NLP'),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFeatureBadge(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: AppColors.primary),
+          const SizedBox(width: 5),
+          Text(
+            text,
+            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
           ),
         ],
       ),
@@ -760,6 +1545,31 @@ class _JournalsViewState extends State<JournalsView> {
               const Text(
                 'Hệ thống đang kết nối trực tiếp đến chỉ mục học thuật mở OpenAlex',
                 style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_openAlexSearchError != null) {
+      return Padding(
+        padding: const EdgeInsets.all(40),
+        child: Center(
+          child: Column(
+            children: [
+              const Icon(Icons.cloud_off_rounded, size: 40, color: AppColors.error),
+              const SizedBox(height: 12),
+              Text(
+                'Lỗi kết nối OpenAlex: $_openAlexSearchError',
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 13, color: AppColors.error, fontFamily: 'Manrope'),
+              ),
+              const SizedBox(height: 12),
+              OutlinedButton.icon(
+                onPressed: () => _searchOpenAlex(_searchQuery),
+                icon: const Icon(Icons.refresh_rounded, size: 16),
+                label: const Text('Thử lại'),
               ),
             ],
           ),
@@ -829,10 +1639,10 @@ class _JournalsViewState extends State<JournalsView> {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
+                    color: AppColors.textPrimary.withAlpha(20),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.travel_explore_rounded, color: AppColors.primary, size: 26),
+                  child: const Icon(Icons.travel_explore_rounded, color: AppColors.textPrimary, size: 26),
                 ),
                 const SizedBox(height: 14),
                 Text(
@@ -862,7 +1672,7 @@ class _JournalsViewState extends State<JournalsView> {
                   icon: const Icon(Icons.travel_explore_rounded, size: 16),
                   label: Text('Tra cứu "$_searchQuery" trên OpenAlex'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: AppColors.textPrimary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -897,8 +1707,8 @@ class _JournalsViewState extends State<JournalsView> {
               icon: const Icon(Icons.post_add_rounded, size: 16),
               label: const Text('Nhập thủ công', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
               style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.primary,
-                side: const BorderSide(color: AppColors.primary),
+                foregroundColor: AppColors.textPrimary,
+                side: const BorderSide(color: AppColors.border),
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
@@ -912,15 +1722,15 @@ class _JournalsViewState extends State<JournalsView> {
   Widget _buildOpenAlexHeaderBanner() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.06),
-        border: const Border(
+      decoration: const BoxDecoration(
+        color: AppColors.surfaceSoft,
+        border: Border(
           bottom: BorderSide(color: AppColors.borderSoft),
         ),
       ),
       child: Row(
         children: [
-          const Icon(Icons.travel_explore_rounded, size: 18, color: AppColors.primary),
+          const Icon(Icons.travel_explore_rounded, size: 18, color: AppColors.textPrimary),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -928,7 +1738,7 @@ class _JournalsViewState extends State<JournalsView> {
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
-                color: AppColors.primary,
+                color: AppColors.textPrimary,
                 fontFamily: 'Manrope',
               ),
             ),
@@ -963,7 +1773,7 @@ class _JournalsViewState extends State<JournalsView> {
     final isImporting = _importingIds.contains(openalexId);
 
     return Container(
-      color: Colors.blue.withOpacity(0.02),
+      color: AppColors.surfaceSoft.withAlpha(100),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
@@ -989,7 +1799,7 @@ class _JournalsViewState extends State<JournalsView> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.12),
+                        color: AppColors.textPrimary.withAlpha(20),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text(
@@ -997,7 +1807,7 @@ class _JournalsViewState extends State<JournalsView> {
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.primary,
+                          color: AppColors.textPrimary,
                           fontFamily: 'Manrope',
                         ),
                       ),
@@ -1028,32 +1838,44 @@ class _JournalsViewState extends State<JournalsView> {
               ),
             ),
           ),
-          Expanded(
-            flex: 2,
+          const Expanded(
+            flex: 3,
             child: Text(
-              '$worksCount bài',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+              'Chưa nạp CSDL',
+              style: TextStyle(
+                fontSize: 11,
+                color: AppColors.textMuted,
                 fontFamily: 'Manrope',
               ),
             ),
           ),
           Expanded(
             flex: 2,
-            child: Text(
-              '$citedCount lượt',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
-                fontFamily: 'Manrope',
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$worksCount bài',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+                Text(
+                  '$citedCount trích dẫn',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+              ],
             ),
           ),
           SizedBox(
-            width: 180,
+            width: 210,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -1061,9 +1883,9 @@ class _JournalsViewState extends State<JournalsView> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.green700.withOpacity(0.12),
+                      color: AppColors.green700.withAlpha(30),
                       borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.green700.withOpacity(0.3)),
+                      border: Border.all(color: AppColors.green700.withAlpha(75)),
                     ),
                     child: const Row(
                       mainAxisSize: MainAxisSize.min,
@@ -1089,7 +1911,7 @@ class _JournalsViewState extends State<JournalsView> {
                         ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                         : const Icon(Icons.add_rounded, size: 15),
                     label: Text(
-                      isImporting ? 'Đang nạp...' : 'Thêm vào CSDL',
+                      isImporting ? 'Đang nạp...' : 'Nạp vào CSDL',
                       style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
                     ),
                     style: ElevatedButton.styleFrom(
