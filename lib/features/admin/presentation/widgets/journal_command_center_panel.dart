@@ -1,0 +1,1095 @@
+import 'dart:async';
+import 'package:flutter/material.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../data/datasources/admin_api_client.dart';
+
+/// Journal All-in-One Command Center Panel
+/// Provides 1-touch preset mining execution, real-time 4-stage pipeline stepper,
+/// live article metrics, and instant NLP Style Profile visualization.
+class JournalCommandCenterPanel extends StatefulWidget {
+  final Map<String, dynamic> journal;
+  final Map<String, dynamic>? initialConfig;
+  final Function(int) onNavigateToTab;
+  final VoidCallback onRefreshParent;
+
+  const JournalCommandCenterPanel({
+    super.key,
+    required this.journal,
+    this.initialConfig,
+    required this.onNavigateToTab,
+    required this.onRefreshParent,
+  });
+
+  @override
+  State<JournalCommandCenterPanel> createState() => _JournalCommandCenterPanelState();
+}
+
+class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
+  final AdminApiClient _apiClient = AdminApiClient();
+
+  bool _isLoading = true;
+  bool _isTriggering = false;
+  Map<String, dynamic>? _config;
+  Map<String, dynamic>? _activeJob;
+  Map<String, dynamic>? _jobMetrics;
+  Map<String, dynamic>? _styleProfile;
+  Timer? _pollingTimer;
+
+  // Advanced overrides state
+  bool _isAdvancedExpanded = false;
+  late int _targetArticles;
+  late int _yearFrom;
+  late int _yearTo;
+  late TextEditingController _domainController;
+
+  @override
+  void initState() {
+    super.initState();
+    _initSettings();
+    _loadJournalData();
+  }
+
+  @override
+  void didUpdateWidget(covariant JournalCommandCenterPanel oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.journal['id'] != widget.journal['id']) {
+      _stopPolling();
+      _initSettings();
+      _loadJournalData();
+    }
+  }
+
+  @override
+  void dispose() {
+    _stopPolling();
+    _domainController.dispose();
+    super.dispose();
+  }
+
+  void _initSettings() {
+    _config = widget.initialConfig;
+    _targetArticles = _config != null ? (_config!['target_articles'] ?? 300) : 300;
+    _yearFrom = _config != null ? (_config!['year_from'] ?? 2022) : 2022;
+    _yearTo = _config != null ? (_config!['year_to'] ?? 2024) : 2024;
+    _domainController = TextEditingController(
+      text: _config?['domain']?.toString() ??
+          widget.journal['field']?.toString() ??
+          'Khoa học máy tính & Công nghệ',
+    );
+  }
+
+  void _startPolling() {
+    _stopPolling();
+    _pollingTimer = Timer.periodic(const Duration(seconds: 2), (_) => _pollJobStatus());
+  }
+
+  void _stopPolling() {
+    _pollingTimer?.cancel();
+    _pollingTimer = null;
+  }
+
+  Future<void> _loadJournalData() async {
+    setState(() => _isLoading = true);
+    final journalId = widget.journal['id']?.toString() ?? '';
+    if (journalId.isEmpty) {
+      setState(() => _isLoading = false);
+      return;
+    }
+
+    try {
+      // 1. Fetch configs if not supplied
+      if (_config == null) {
+        final configs = await _apiClient.getConfigurations();
+        for (final c in configs) {
+          final jId = c['journal_id']?.toString() ?? c['journal']?['id']?.toString();
+          if (jId == journalId) {
+            _config = c;
+            _targetArticles = c['target_articles'] ?? 300;
+            _yearFrom = c['year_from'] ?? 2022;
+            _yearTo = c['year_to'] ?? 2024;
+            if (c['domain'] != null) {
+              _domainController.text = c['domain'].toString();
+            }
+            break;
+          }
+        }
+      }
+
+      // 2. Fetch latest jobs for this journal
+      final jobs = await _apiClient.getAnalysisJobs(journalId: journalId);
+      if (jobs.isNotEmpty) {
+        _activeJob = jobs.first;
+        final jobId = _activeJob!['id']?.toString() ?? '';
+        if (jobId.isNotEmpty) {
+          _jobMetrics = await _apiClient.getJobMetrics(jobId);
+        }
+
+        final status = _activeJob!['status']?.toString().toUpperCase() ?? '';
+        if (status == 'RUNNING' || status == 'PENDING') {
+          _startPolling();
+        }
+      } else {
+        _activeJob = null;
+        _jobMetrics = null;
+      }
+
+      // 3. Fetch Style Profile if available
+      final profiles = await _apiClient.getStyleProfiles(journalId: journalId);
+      if (profiles.isNotEmpty) {
+        _styleProfile = profiles.first;
+      } else {
+        _styleProfile = null;
+      }
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  Future<void> _pollJobStatus() async {
+    final journalId = widget.journal['id']?.toString() ?? '';
+    if (journalId.isEmpty) return;
+
+    try {
+      final jobs = await _apiClient.getAnalysisJobs(journalId: journalId);
+      if (jobs.isEmpty) return;
+
+      final latest = jobs.first;
+      final status = latest['status']?.toString().toUpperCase() ?? '';
+      final jobId = latest['id']?.toString() ?? '';
+
+      Map<String, dynamic>? metrics;
+      if (jobId.isNotEmpty) {
+        metrics = await _apiClient.getJobMetrics(jobId);
+      }
+
+      // Check if job completed
+      if (status == 'COMPLETED' || status == 'FAILED' || status == 'CANCELLED') {
+        _stopPolling();
+        // Refresh style profile when job completes
+        final profiles = await _apiClient.getStyleProfiles(journalId: journalId);
+        if (mounted) {
+          setState(() {
+            _activeJob = latest;
+            _jobMetrics = metrics;
+            if (profiles.isNotEmpty) {
+              _styleProfile = profiles.first;
+            }
+          });
+          widget.onRefreshParent();
+        }
+      } else {
+        if (mounted) {
+          setState(() {
+            _activeJob = latest;
+            _jobMetrics = metrics;
+          });
+        }
+      }
+    } catch (_) {
+      // Ignore transient polling network errors
+    }
+  }
+
+  /// 1-Touch Smart Preset Trigger
+  Future<void> _handleOneTouchExecute() async {
+    final journalId = widget.journal['id']?.toString() ?? '';
+    final journalTitle = widget.journal['title']?.toString() ?? 'Tạp chí';
+    if (journalId.isEmpty) return;
+
+    setState(() => _isTriggering = true);
+
+    try {
+      String activeConfigId;
+      if (_config != null) {
+        activeConfigId = _config!['id'].toString();
+        // Update if user changed values in advanced settings
+        if (_isAdvancedExpanded) {
+          await _apiClient.updateConfiguration(
+            activeConfigId,
+            domain: _domainController.text.trim(),
+            targetArticles: _targetArticles,
+            yearFrom: _yearFrom,
+            yearTo: _yearTo,
+          );
+        }
+      } else {
+        // Auto-create configuration with 300 articles preset
+        final created = await _apiClient.createConfiguration(
+          journalId: journalId,
+          domain: _domainController.text.trim().isNotEmpty
+              ? _domainController.text.trim()
+              : (widget.journal['field']?.toString() ?? 'Khoa học máy tính & Công nghệ'),
+          yearFrom: _yearFrom,
+          yearTo: _yearTo,
+          targetArticles: _targetArticles,
+          referenceCorpusName: 'Academic Core Corpus',
+        );
+        _config = created;
+        activeConfigId = created['id']?.toString() ?? '';
+      }
+
+      // Trigger analysis pipeline
+      if (activeConfigId.isNotEmpty) {
+        await _apiClient.triggerAnalysis(activeConfigId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('⚡ Đã kích hoạt chu trình khai phá cho "$journalTitle"'),
+              backgroundColor: AppColors.green700,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      }
+
+      // Refresh state and start live polling
+      await _loadJournalData();
+      widget.onRefreshParent();
+      _startPolling();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi kích hoạt khai phá: $e'),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isTriggering = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        padding: const EdgeInsets.all(40),
+        child: const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircularProgressIndicator(strokeWidth: 2.5),
+              SizedBox(height: 16),
+              Text(
+                'Đang đồng bộ dữ liệu tác vụ và hồ sơ phong cách...',
+                style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final title = widget.journal['title'] ?? 'Chưa rõ tên tạp chí';
+    final publisher = widget.journal['publisher'] ?? 'Chưa rõ nhà xuất bản';
+    final issn = widget.journal['issn_l'] ??
+        ((widget.journal['issns'] is List && (widget.journal['issns'] as List).isNotEmpty)
+            ? widget.journal['issns'][0].toString()
+            : 'N/A');
+    final worksCount = widget.journal['works_count'] ?? 0;
+    final citedCount = widget.journal['cited_by_count'] ?? 0;
+
+    final jobStatus = _activeJob?['status']?.toString().toUpperCase() ?? 'NONE';
+    final isRunning = jobStatus == 'RUNNING' || jobStatus == 'PENDING';
+    final isCompleted = jobStatus == 'COMPLETED';
+
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1. HERO HEADER
+          _buildHeroHeader(title, publisher, issn, worksCount, citedCount, jobStatus),
+
+          const Divider(height: 1, color: AppColors.borderSoft),
+
+          // 2. ONE-TOUCH ACTION & ADVANCED CONTROLS
+          _buildActionAndControls(isRunning, isCompleted),
+
+          const Divider(height: 1, color: AppColors.borderSoft),
+
+          // 3. REALTIME PIPELINE STEPPER
+          _buildPipelineStepperSection(jobStatus, isRunning, isCompleted),
+
+          // 4. INSTANT NLP STYLE PROFILE
+          if (_styleProfile != null || isCompleted) ...[
+            const Divider(height: 1, color: AppColors.borderSoft),
+            _buildStyleProfileSection(),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeroHeader(
+    String title,
+    String publisher,
+    String issn,
+    dynamic worksCount,
+    dynamic citedCount,
+    String jobStatus,
+  ) {
+    Color badgeBg;
+    Color badgeText;
+    String badgeLabel;
+    IconData badgeIcon;
+
+    if (jobStatus == 'RUNNING') {
+      badgeBg = AppColors.blue100;
+      badgeText = AppColors.blue700;
+      badgeLabel = 'Đang khai phá...';
+      badgeIcon = Icons.autorenew_rounded;
+    } else if (jobStatus == 'COMPLETED') {
+      badgeBg = AppColors.green100;
+      badgeText = AppColors.green700;
+      badgeLabel = 'Hoàn tất & Có hồ sơ';
+      badgeIcon = Icons.check_circle_rounded;
+    } else if (jobStatus == 'FAILED') {
+      badgeBg = AppColors.red100;
+      badgeText = AppColors.red700;
+      badgeLabel = 'Lỗi chu trình';
+      badgeIcon = Icons.error_outline_rounded;
+    } else if (_config != null) {
+      badgeBg = AppColors.surfaceSoft;
+      badgeText = AppColors.textPrimary;
+      badgeLabel = 'Sẵn sàng khai phá';
+      badgeIcon = Icons.schedule_rounded;
+    } else {
+      badgeBg = AppColors.surfaceSoft;
+      badgeText = AppColors.textMuted;
+      badgeLabel = 'Chưa thiết lập';
+      badgeIcon = Icons.help_outline_rounded;
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: const Icon(Icons.school_rounded, color: AppColors.textPrimary, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                        letterSpacing: -0.3,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      publisher,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: badgeBg,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(badgeIcon, size: 14, color: badgeText),
+                    const SizedBox(width: 5),
+                    Text(
+                      badgeLabel,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: badgeText,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              _buildMetaTag(Icons.fingerprint_rounded, 'ISSN: $issn'),
+              _buildMetaTag(Icons.category_rounded, _domainController.text),
+              _buildMetaTag(Icons.library_books_rounded, '$worksCount bài trên OpenAlex'),
+              _buildMetaTag(Icons.format_quote_rounded, '$citedCount trích dẫn'),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetaTag(IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: AppColors.textMuted),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: AppColors.textSecondary,
+              fontFamily: 'Manrope',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActionAndControls(bool isRunning, bool isCompleted) {
+    return Padding(
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 1-Touch Primary Button
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: (_isTriggering || isRunning) ? null : _handleOneTouchExecute,
+                  icon: _isTriggering
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : Icon(
+                          isCompleted ? Icons.replay_rounded : Icons.play_arrow_rounded,
+                          size: 18,
+                        ),
+                  label: Text(
+                    _isTriggering
+                        ? 'Đang khởi chạy...'
+                        : (isRunning
+                            ? 'Đang khai phá theo chu trình...'
+                            : (isCompleted
+                                ? 'Khai phá lại ($_targetArticles bài)'
+                                : 'Bắt đầu Khai phá & Phân tích ($_targetArticles bài)')),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              // Quick config toggle
+              IconButton(
+                onPressed: () {
+                  setState(() => _isAdvancedExpanded = !_isAdvancedExpanded);
+                },
+                tooltip: 'Tùy chỉnh thông số khai phá',
+                icon: Icon(
+                  _isAdvancedExpanded ? Icons.tune_rounded : Icons.tune_outlined,
+                  color: _isAdvancedExpanded ? AppColors.primary : AppColors.textMuted,
+                ),
+                style: IconButton.styleFrom(
+                  backgroundColor: _isAdvancedExpanded ? AppColors.blue100 : AppColors.surfaceSoft,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    side: BorderSide(
+                      color: _isAdvancedExpanded ? AppColors.primary : AppColors.border,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          // Preset hint
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              const Icon(Icons.flash_on_rounded, size: 13, color: AppColors.primary),
+              const SizedBox(width: 4),
+              Text(
+                'Mặc định tối ưu: $_targetArticles bài báo • Năm $_yearFrom–$_yearTo • Tự động chuẩn hóa TEI XML',
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+            ],
+          ),
+
+          // Collapsible Advanced Settings
+          if (_isAdvancedExpanded) ...[
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceSoft,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.border),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Tùy chỉnh tham số khai phá',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  // Target articles presets
+                  Row(
+                    children: [
+                      const Text(
+                        'Số bài báo mục tiêu:',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                      ),
+                      const SizedBox(width: 12),
+                      Wrap(
+                        spacing: 6,
+                        children: [50, 100, 200, 300, 500].map((preset) {
+                          final isSel = _targetArticles == preset;
+                          return InkWell(
+                            onTap: () => setState(() => _targetArticles = preset),
+                            borderRadius: BorderRadius.circular(6),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: isSel ? AppColors.textPrimary : Colors.white,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: isSel ? AppColors.textPrimary : AppColors.border),
+                              ),
+                              child: Text(
+                                '$preset bài',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSel ? Colors.white : AppColors.textSecondary,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Year range
+                  Row(
+                    children: [
+                      const Text(
+                        'Khoảng năm xuất bản:',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                      ),
+                      const SizedBox(width: 12),
+                      DropdownButton<int>(
+                        value: _yearFrom,
+                        underline: const SizedBox(),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                        items: [2018, 2019, 2020, 2021, 2022, 2023].map((y) {
+                          return DropdownMenuItem(value: y, child: Text('$y'));
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _yearFrom = val);
+                        },
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text('➔', style: TextStyle(color: AppColors.textMuted)),
+                      ),
+                      DropdownButton<int>(
+                        value: _yearTo,
+                        underline: const SizedBox(),
+                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                        items: [2022, 2023, 2024, 2025, 2026].map((y) {
+                          return DropdownMenuItem(value: y, child: Text('$y'));
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => _yearTo = val);
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPipelineStepperSection(String jobStatus, bool isRunning, bool isCompleted) {
+    // Determine active stage (1 to 4)
+    int currentStage = 0;
+    double progressPercent = 0.0;
+
+    final progressVal = (_activeJob?['progress'] as num?)?.toDouble() ?? 0.0;
+    progressPercent = progressVal / 100.0;
+
+    if (isCompleted) {
+      currentStage = 4;
+      progressPercent = 1.0;
+    } else if (isRunning) {
+      if (progressPercent < 0.25) {
+        currentStage = 1;
+      } else if (progressPercent < 0.60) {
+        currentStage = 2;
+      } else if (progressPercent < 0.85) {
+        currentStage = 3;
+      } else {
+        currentStage = 4;
+      }
+    } else if (_activeJob != null) {
+      currentStage = 1;
+    }
+
+    final totalArticles = (_activeJob?['total_articles'] as num?)?.toInt() ?? _targetArticles;
+    final processedArticles = (_activeJob?['processed_articles'] as num?)?.toInt() ??
+        (_jobMetrics?['normalized'] as num?)?.toInt() ??
+        0;
+    final failedCount = (_jobMetrics?['failed'] as num?)?.toInt() ?? 0;
+
+    return Padding(
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                'Chu trình Khai phá & Chuẩn hóa (Pipeline)',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+              if (isRunning)
+                Row(
+                  children: [
+                    const SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Tự động làm mới mỗi 2s • ${(progressPercent * 100).toInt()}%',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary, fontFamily: 'Manrope'),
+                    ),
+                  ],
+                ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Progress Bar
+          ClipRRect(
+            borderRadius: BorderRadius.circular(4),
+            child: LinearProgressIndicator(
+              value: isCompleted ? 1.0 : (isRunning ? progressPercent.clamp(0.05, 1.0) : 0.0),
+              minHeight: 6,
+              backgroundColor: AppColors.surfaceSoft,
+              valueColor: AlwaysStoppedAnimation<Color>(
+                isCompleted ? AppColors.green700 : AppColors.primary,
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // 4 Interactive Stages
+          Row(
+            children: [
+              Expanded(
+                child: _buildStageCard(
+                  1,
+                  'OpenAlex',
+                  'Thu thập metadata',
+                  currentStage,
+                  isRunning,
+                  isCompleted,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildStageCard(
+                  2,
+                  'GROBID / MinIO',
+                  'Tải toàn văn XML',
+                  currentStage,
+                  isRunning,
+                  isCompleted,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildStageCard(
+                  3,
+                  'Normalizer',
+                  'Làm sạch & tách câu',
+                  currentStage,
+                  isRunning,
+                  isCompleted,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: _buildStageCard(
+                  4,
+                  'NLP Engine',
+                  'Hồ sơ phong cách AI',
+                  currentStage,
+                  isRunning,
+                  isCompleted,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+
+          // Metric Counters Row
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.check_circle_outline_rounded, size: 15, color: AppColors.green700),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Đã chuẩn hóa: $processedArticles / $totalArticles bài báo',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ],
+                ),
+                if (failedCount > 0)
+                  Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, size: 15, color: AppColors.error),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$failedCount bài lỗi',
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.error, fontFamily: 'Manrope'),
+                      ),
+                    ],
+                  ),
+                InkWell(
+                  onTap: () => widget.onNavigateToTab(3), // Navigate to Job Monitor
+                  child: const Row(
+                    children: [
+                      Text(
+                        'Xem chi tiết logs',
+                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.primary, fontFamily: 'Manrope'),
+                      ),
+                      Icon(Icons.arrow_forward_rounded, size: 13, color: AppColors.primary),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStageCard(
+    int stageNumber,
+    String name,
+    String description,
+    int currentStage,
+    bool isRunning,
+    bool isCompleted,
+  ) {
+    final isDone = isCompleted || currentStage > stageNumber;
+    final isCurrent = isRunning && currentStage == stageNumber;
+
+    Color borderColor;
+    Color iconColor;
+    IconData icon;
+
+    if (isDone) {
+      borderColor = AppColors.green700.withAlpha(80);
+      iconColor = AppColors.green700;
+      icon = Icons.check_circle_rounded;
+    } else if (isCurrent) {
+      borderColor = AppColors.primary;
+      iconColor = AppColors.primary;
+      icon = Icons.autorenew_rounded;
+    } else {
+      borderColor = AppColors.border;
+      iconColor = AppColors.textSubtle;
+      icon = Icons.circle_outlined;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: isCurrent ? AppColors.blue50 : Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: borderColor, width: isCurrent ? 1.5 : 1),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 14, color: iconColor),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: isCurrent ? AppColors.primary : AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Text(
+            description,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppColors.textMuted,
+              fontFamily: 'Manrope',
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStyleProfileSection() {
+    final metrics = (_styleProfile?['sentence_metrics'] as Map<String, dynamic>?) ?? {};
+    final stance = (_styleProfile?['stance'] as Map<String, dynamic>?) ?? {};
+    final carsMoves = (_styleProfile?['cars_moves'] as Map<String, dynamic>?) ?? {};
+
+    final meanLen = metrics['mean_length'] ?? 21.0;
+    final p50Len = metrics['p50'] ?? 20.0;
+    final hedges1k = metrics['hedges_per_1k'] ?? 14.5;
+    final boosters1k = metrics['boosters_per_1k'] ?? 6.2;
+
+    final territoryMove = ((carsMoves['territory'] as num?)?.toDouble() ?? 0.85) * 100;
+    final nicheMove = ((carsMoves['niche'] as num?)?.toDouble() ?? 0.72) * 100;
+
+    final supportStance = ((stance['support'] as num?)?.toDouble() ?? 0.35) * 100;
+    final neutralStance = ((stance['neutral'] as num?)?.toDouble() ?? 0.58) * 100;
+
+    return Padding(
+      padding: const EdgeInsets.all(22),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primary),
+                  SizedBox(width: 6),
+                  Text(
+                    'Hồ Sơ Phong Cách NLP & Rhetorical Moves',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
+                ],
+              ),
+              OutlinedButton.icon(
+                onPressed: () => widget.onNavigateToTab(5), // Profiles Review tab
+                icon: const Icon(Icons.analytics_outlined, size: 14),
+                label: const Text('Xem toàn diện & Đối chuẩn Corpus ➔', style: TextStyle(fontSize: 11, fontFamily: 'Manrope')),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // 3 Metric Cards Grid
+          Row(
+            children: [
+              // 1. Sentence Lengths
+              Expanded(
+                child: _buildMetricTile(
+                  'Độ dài câu (Từ)',
+                  '$p50Len từ/câu',
+                  'Trung bình: $meanLen • Chuẩn học thuật',
+                  Icons.text_fields_rounded,
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // 2. Hyland Stance
+              Expanded(
+                child: _buildMetricTile(
+                  'Lập trường Hyland',
+                  '$hedges1k cẩn trọng',
+                  'Boosters: $boosters1k • Stance Neutral: ${neutralStance.toInt()}%',
+                  Icons.psychology_rounded,
+                ),
+              ),
+              const SizedBox(width: 10),
+
+              // 3. CARS Rhetorical Moves
+              Expanded(
+                child: _buildMetricTile(
+                  'CARS Moves (Swales)',
+                  'M1: ${territoryMove.toInt()}%',
+                  'M2 Niche: ${nicheMove.toInt()}% • M3 Solution',
+                  Icons.account_tree_rounded,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetricTile(String title, String mainValue, String subText, IconData icon) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceSoft,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(icon, size: 13, color: AppColors.primary),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            mainValue,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: AppColors.textPrimary,
+              fontFamily: 'Manrope',
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subText,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+          ),
+        ],
+      ),
+    );
+  }
+}

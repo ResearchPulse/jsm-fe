@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
-import '../views/configurations_view.dart';
 import '../views/job_monitor_view.dart';
 import '../views/journals_view.dart';
 import '../views/overview_view.dart';
@@ -176,11 +175,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
           onTriggerNewAnalysis: _showTriggerAnalysisDialog,
         );
       case 1:
-        return JournalsView(
-          onNavigateToTab: _navigateToTab,
-        );
       case 2:
-        return ConfigurationsView(
+        return JournalsView(
           onNavigateToTab: _navigateToTab,
           onTriggerNewAnalysis: _showTriggerAnalysisDialog,
         );

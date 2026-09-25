@@ -38,5 +38,85 @@
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1",
     "priority": "P1"
+  },
+  {
+    "id": "phase-01-master-detail-layout",
+    "title": "Master-Detail Layout in JournalsView",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "JournalsView splits into 40% Left Catalog and 60% Right Command Center with active card selection.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-command-center-controls",
+    "title": "1-Touch Preset Execution & Advanced Overrides",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "1-click action triggers auto-configuration and pipeline start with 300 articles preset and collapsible overrides.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-realtime-stepper-and-polling",
+    "title": "Real-Time 4-Stage Stepper & Live Polling",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "Interactive 4-stage animated stepper with percentage bar, article counters, and auto-polling.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-04-nlp-style-profile-card",
+    "title": "Instant NLP Style Profile Overview",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "Automatic display of sentence length distribution, Hyland stance, and CARS rhetorical moves upon completion.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P3",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-sidebar-three-tabs",
+    "title": "Minimalist 3-Item Sidebar & Default Landing View",
+    "status": "not_started",
+    "evidence": "",
+    "user_visible_behavior": "Sidebar renders exactly 3 items and boots directly into Trung tâm Tạp chí.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-style-corpus-composite-view",
+    "title": "Unified Style & Corpus Analytics Hub",
+    "status": "not_started",
+    "evidence": "",
+    "user_visible_behavior": "Tab 1 combines Profiles Review and Snapshots View with top segmented switcher.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-system-debug-composite-view",
+    "title": "Unified System Monitor & Settings Hub",
+    "status": "not_started",
+    "evidence": "",
+    "user_visible_behavior": "Tab 2 combines Job Monitor and Settings/Users with top segmented switcher.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-04-dashboard-routing-and-deep-links",
+    "title": "Dashboard Routing & Deep-Link Synchronization",
+    "status": "not_started",
+    "evidence": "",
+    "user_visible_behavior": "Router maps 0..2 cleanly and all deep links from Command Center work seamlessly.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
   }
 ]
