@@ -52,8 +52,11 @@ class AdminApiClient {
       if (res.statusCode == 200) {
         final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
-        if (data is Map<String, dynamic> && data['results'] is List) {
-          return (data['results'] as List).whereType<Map<String, dynamic>>().toList();
+        if (data is Map<String, dynamic>) {
+          final list = data['items'] ?? data['results'];
+          if (list is List) {
+            return list.whereType<Map<String, dynamic>>().toList();
+          }
         }
       }
       return [];

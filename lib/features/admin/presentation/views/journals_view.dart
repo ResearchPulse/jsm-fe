@@ -18,6 +18,7 @@ class JournalsView extends StatefulWidget {
 
 class _JournalsViewState extends State<JournalsView> {
   final AdminApiClient _apiClient = AdminApiClient();
+  final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   String _selectedDomain = 'Tất cả';
 
@@ -25,10 +26,102 @@ class _JournalsViewState extends State<JournalsView> {
   bool _isLoading = true;
   String? _error;
 
+  // OpenAlex live fallback search state
+  List<Map<String, dynamic>> _openAlexResults = [];
+  bool _isSearchingOpenAlex = false;
+  String? _openAlexSearchError;
+  String? _lastSearchedOpenAlexQuery;
+  final Set<String> _importingIds = {};
+
   @override
   void initState() {
     super.initState();
     _loadJournals();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _searchOpenAlex([String? query]) async {
+    final q = (query ?? _searchQuery).trim();
+    if (q.isEmpty) return;
+
+    setState(() {
+      _isSearchingOpenAlex = true;
+      _openAlexSearchError = null;
+      _lastSearchedOpenAlexQuery = q;
+      _openAlexResults = [];
+    });
+
+    try {
+      final results = await _apiClient.searchOpenAlexJournals(q);
+      if (!mounted) return;
+      setState(() {
+        _openAlexResults = results;
+        _isSearchingOpenAlex = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _openAlexSearchError = e.toString();
+        _isSearchingOpenAlex = false;
+      });
+    }
+  }
+
+  Future<void> _importOpenAlexJournal(Map<String, dynamic> journal) async {
+    final openalexId = journal['openalex_id']?.toString() ?? '';
+    final title = journal['title']?.toString() ?? '';
+    final issnL = journal['issn_l']?.toString();
+    final issns = (journal['issns'] is List)
+        ? (journal['issns'] as List).map((e) => e.toString()).toList()
+        : (issnL != null ? [issnL] : <String>[]);
+    final publisher = journal['publisher']?.toString();
+    final homepage = journal['homepage_url']?.toString();
+
+    setState(() {
+      _importingIds.add(openalexId);
+    });
+
+    try {
+      await _apiClient.importJournal(
+        openalexId: openalexId,
+        title: title,
+        issnL: issnL,
+        issns: issns,
+        publisher: publisher,
+        homepageUrl: homepage,
+      );
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Đã nạp "$title" vào cơ sở dữ liệu thành công.'),
+          backgroundColor: AppColors.green700,
+        ),
+      );
+
+      setState(() {
+        journal['is_imported'] = true;
+        _importingIds.remove(openalexId);
+      });
+
+      await _loadJournals();
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _importingIds.remove(openalexId);
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Lỗi khi nạp tạp chí: $e'),
+          backgroundColor: AppColors.error,
+        ),
+      );
+    }
   }
 
   Future<void> _loadJournals() async {
@@ -312,12 +405,27 @@ class _JournalsViewState extends State<JournalsView> {
               children: [
                 Expanded(
                   child: TextField(
+                    controller: _searchController,
                     onChanged: (val) => setState(() => _searchQuery = val),
+                    onSubmitted: (val) => _searchOpenAlex(val),
                     style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
                     decoration: InputDecoration(
                       hintText: 'Tìm kiếm theo tên tạp chí, mã ISSN, nhà xuất bản...',
                       hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
                       prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
+                      suffixIcon: _searchQuery.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear_rounded, size: 16, color: AppColors.textSubtle),
+                              onPressed: () {
+                                _searchController.clear();
+                                setState(() {
+                                  _searchQuery = '';
+                                  _openAlexResults = [];
+                                  _lastSearchedOpenAlexQuery = null;
+                                });
+                              },
+                            )
+                          : null,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                       fillColor: AppColors.surfaceSoft,
                       filled: true,
@@ -332,8 +440,27 @@ class _JournalsViewState extends State<JournalsView> {
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 _buildFilterChip('Tất cả'),
+                const SizedBox(width: 8),
+                ElevatedButton.icon(
+                  onPressed: _searchQuery.trim().isEmpty || _isSearchingOpenAlex
+                      ? null
+                      : () => _searchOpenAlex(_searchQuery),
+                  icon: _isSearchingOpenAlex
+                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.travel_explore_rounded, size: 16),
+                  label: const Text(
+                    'Tra cứu OpenAlex',
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
               ],
             ),
           ),
@@ -427,21 +554,23 @@ class _JournalsViewState extends State<JournalsView> {
                     ),
                   )
                 else if (filteredJournals.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(48),
-                    child: Center(
-                      child: Text(
-                        'Không tìm thấy tạp chí nào phù hợp trong cơ sở dữ liệu.',
-                        style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
-                      ),
-                    ),
-                  )
-                else
+                  _buildEmptyOrOpenAlexFallback()
+                else ...[
                   for (int i = 0; i < filteredJournals.length; i++) ...[
                     _buildJournalRow(filteredJournals[i]),
                     if (i < filteredJournals.length - 1)
                       const Divider(height: 1, color: AppColors.borderSoft),
                   ],
+                  if (_openAlexResults.isNotEmpty) ...[
+                    const Divider(height: 1, color: AppColors.border),
+                    _buildOpenAlexHeaderBanner(),
+                    for (int i = 0; i < _openAlexResults.length; i++) ...[
+                      _buildOpenAlexJournalRow(_openAlexResults[i]),
+                      if (i < _openAlexResults.length - 1)
+                        const Divider(height: 1, color: AppColors.borderSoft),
+                    ],
+                  ],
+                ],
               ],
             ),
           ),
@@ -582,6 +711,376 @@ class _JournalsViewState extends State<JournalsView> {
                   ),
                   child: const Text('Khai phá', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
                 ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEmptyOrOpenAlexFallback() {
+    if (_isSearchingOpenAlex) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+        child: Center(
+          child: Column(
+            children: [
+              const SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Đang tra cứu "$_searchQuery" trên OpenAlex toàn cầu...',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+              const SizedBox(height: 4),
+              const Text(
+                'Hệ thống đang kết nối trực tiếp đến chỉ mục học thuật mở OpenAlex',
+                style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_openAlexResults.isNotEmpty) {
+      return Column(
+        children: [
+          _buildOpenAlexHeaderBanner(),
+          for (int i = 0; i < _openAlexResults.length; i++) ...[
+            _buildOpenAlexJournalRow(_openAlexResults[i]),
+            if (i < _openAlexResults.length - 1)
+              const Divider(height: 1, color: AppColors.borderSoft),
+          ],
+        ],
+      );
+    }
+
+    if (_lastSearchedOpenAlexQuery != null &&
+        _lastSearchedOpenAlexQuery == _searchQuery.trim() &&
+        _openAlexResults.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(40),
+        child: Center(
+          child: Column(
+            children: [
+              const Icon(Icons.search_off_rounded, size: 40, color: AppColors.textSubtle),
+              const SizedBox(height: 12),
+              Text(
+                'Không tìm thấy tạp chí nào có tên hoặc ISSN "$_searchQuery" trên OpenAlex.',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Vui lòng thử từ khóa khác (ví dụ: "IEEE", "Finance", "Nature") hoặc mã ISSN.',
+                style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_searchQuery.trim().isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+        child: Center(
+          child: Container(
+            constraints: const BoxConstraints(maxWidth: 580),
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.travel_explore_rounded, color: AppColors.primary, size: 26),
+                ),
+                const SizedBox(height: 14),
+                Text(
+                  'Không tìm thấy "$_searchQuery" trong CSDL nội bộ',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Tạp chí này chưa được lưu trữ trong hệ thống. Bạn có muốn tra cứu trực tiếp từ kho học thuật toàn cầu OpenAlex để nạp vào không?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                    fontFamily: 'Manrope',
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                ElevatedButton.icon(
+                  onPressed: () => _searchOpenAlex(_searchQuery),
+                  icon: const Icon(Icons.travel_explore_rounded, size: 16),
+                  label: Text('Tra cứu "$_searchQuery" trên OpenAlex'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.all(48),
+      child: Center(
+        child: Column(
+          children: [
+            const Icon(Icons.menu_book_outlined, size: 40, color: AppColors.textSubtle),
+            const SizedBox(height: 8),
+            const Text(
+              'Chưa có tạp chí nào trong cơ sở dữ liệu.',
+              style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+            ),
+            const SizedBox(height: 12),
+            ElevatedButton.icon(
+              onPressed: () => _showAddJournalDialog(context),
+              icon: const Icon(Icons.add_rounded, size: 16),
+              label: const Text('Đăng ký tạp chí mới'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOpenAlexHeaderBanner() {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.06),
+        border: const Border(
+          bottom: BorderSide(color: AppColors.borderSoft),
+        ),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.travel_explore_rounded, size: 18, color: AppColors.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Kết quả tra cứu từ OpenAlex (${_openAlexResults.length} tạp chí phù hợp):',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ),
+          TextButton.icon(
+            onPressed: () {
+              setState(() {
+                _openAlexResults = [];
+                _lastSearchedOpenAlexQuery = null;
+              });
+            },
+            icon: const Icon(Icons.close_rounded, size: 14),
+            label: const Text('Ẩn kết quả OpenAlex', style: TextStyle(fontSize: 11)),
+            style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOpenAlexJournalRow(Map<String, dynamic> journal) {
+    final title = journal['title'] ?? 'Chưa rõ';
+    final publisher = journal['publisher'] ?? 'Chưa rõ nhà xuất bản';
+    final issn = journal['issn_l'] ??
+        ((journal['issns'] is List && (journal['issns'] as List).isNotEmpty)
+            ? journal['issns'][0].toString()
+            : 'N/A');
+    final worksCount = journal['works_count'] ?? 0;
+    final citedCount = journal['cited_by_count'] ?? 0;
+    final openalexId = journal['openalex_id']?.toString() ?? '';
+    final isImported = journal['is_imported'] == true;
+    final isImporting = _importingIds.contains(openalexId);
+
+    return Container(
+      color: Colors.blue.withOpacity(0.02),
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'OpenAlex',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  publisher,
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              issn,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '$worksCount bài',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '$citedCount lượt',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textSecondary,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 180,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                if (isImported)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.green700.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppColors.green700.withOpacity(0.3)),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green700),
+                        SizedBox(width: 4),
+                        Text(
+                          'Đã trong CSDL',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.green700,
+                            fontFamily: 'Manrope',
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                else
+                  ElevatedButton.icon(
+                    onPressed: isImporting ? null : () => _importOpenAlexJournal(journal),
+                    icon: isImporting
+                        ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        : const Icon(Icons.add_rounded, size: 15),
+                    label: Text(
+                      isImporting ? 'Đang nạp...' : 'Thêm vào CSDL',
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    ),
+                  ),
               ],
             ),
           ),
