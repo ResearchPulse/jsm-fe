@@ -10,6 +10,7 @@ import '../features/home/presentation/cubit/home_cubit.dart';
 import '../features/home/domain/usecases/get_featured_journals_usecase.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
 import '../features/users/presentation/pages/user_info_page.dart';
+import '../features/student_manuscript_checker/presentation/pages/student_manuscript_checker_page.dart';
 
 class App extends StatelessWidget {
   const App({super.key});
@@ -44,6 +45,8 @@ class App extends StatelessWidget {
             '/home': (context) => const HomePage(),
             '/admin': (context) => const AdminDashboardPage(),
             '/user-info': (context) => const UserInfoPage(),
+            '/student-checker': (context) =>
+                const StudentManuscriptCheckerPage(),
           },
 
           debugShowCheckedModeBanner: false,

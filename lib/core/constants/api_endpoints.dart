@@ -50,5 +50,9 @@ class ApiEndpoints {
 
   // Users (admin account management; BE users module contract).
   static String get users => '$baseUrl/users';
+
+  // Student Manuscript Checker
+  static String get studentManuscriptCheck => '$baseUrl/student/manuscript/check';
+  static String get adminJournals => '$baseUrl/admin/journals';
 }
 
