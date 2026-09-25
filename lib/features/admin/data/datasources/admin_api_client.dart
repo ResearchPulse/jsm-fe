@@ -290,6 +290,26 @@ class AdminApiClient {
     }
   }
 
+  Future<bool> cancelJob(String jobId) async {
+    try {
+      final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}/$jobId/cancel');
+      final res = await _client.post(uri, headers: await _headers());
+      return res.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> deleteJob(String jobId) async {
+    try {
+      final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}/$jobId');
+      final res = await _client.delete(uri, headers: await _headers());
+      return res.statusCode == 200;
+    } catch (_) {
+      return false;
+    }
+  }
+
   // ── 4. Corpus Snapshots ───────────────────────────────────────
   Future<List<Map<String, dynamic>>> getSnapshots() async {
     try {

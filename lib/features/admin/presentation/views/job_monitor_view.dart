@@ -98,6 +98,8 @@ class _JobMonitorViewState extends State<JobMonitorView> {
         return 'Hàng đợi';
       case 'FAILED':
         return 'Thất bại';
+      case 'CANCELLED':
+        return 'Đã hủy';
       default:
         return status;
     }
@@ -113,8 +115,130 @@ class _JobMonitorViewState extends State<JobMonitorView> {
         return const Color(0xFFD97706);
       case 'FAILED':
         return AppColors.error;
+      case 'CANCELLED':
+        return AppColors.textMuted;
       default:
         return AppColors.textSecondary;
+    }
+  }
+
+  Future<void> _confirmCancelJob(String jobId, String journalTitle) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Xác nhận hủy tác vụ',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            fontFamily: 'Manrope',
+          ),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn dừng tác vụ khai phá của tạp chí "$journalTitle" không? Quá trình tải bài báo sẽ dừng lại.',
+          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Bỏ qua', style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Hủy tác vụ ngay', style: TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await _apiClient.cancelJob(jobId);
+      if (!mounted) return;
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã hủy tác vụ thành công.'),
+            backgroundColor: AppColors.textPrimary,
+          ),
+        );
+        _loadJobs();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể hủy tác vụ. Vui lòng thử lại.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _confirmDeleteJob(String jobId, String journalTitle) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          'Xác nhận xóa / hủy tác vụ',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+            fontFamily: 'Manrope',
+          ),
+        ),
+        content: Text(
+          'Bạn có chắc chắn muốn hủy và xóa tác vụ của tạp chí "$journalTitle" khỏi danh sách không? Toàn bộ dữ liệu thu thập của tác vụ này sẽ được dọn dẹp.',
+          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Bỏ qua', style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            child: const Text('Xóa tác vụ', style: TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      final success = await _apiClient.deleteJob(jobId);
+      if (!mounted) return;
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã xóa tác vụ thành công khỏi hệ thống.'),
+            backgroundColor: AppColors.textPrimary,
+          ),
+        );
+        _loadJobs();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Không thể xóa tác vụ. Vui lòng thử lại.'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
     }
   }
 
@@ -132,6 +256,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
   String _stageDescription(int stageNum, String step, String status) {
     if (status.toUpperCase() == 'COMPLETED') {
       return 'Giai đoạn 6/6: Đóng gói Snapshot & Profile hoàn tất';
+    }
+    if (status.toUpperCase() == 'CANCELLED') {
+      return 'Tác vụ đã dừng lại (Đã hủy bởi quản trị viên)';
     }
     switch (stageNum) {
       case 1:
@@ -282,6 +409,8 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               _buildFilterTab('Hoàn thành'),
               const SizedBox(width: 8),
               _buildFilterTab('Thất bại'),
+              const SizedBox(width: 8),
+              _buildFilterTab('Đã hủy'),
             ],
           ),
           const SizedBox(height: 20),
@@ -545,6 +674,50 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       ),
                     ),
                   ],
+                  if (status == 'RUNNING' || status == 'PENDING') ...[
+                    const SizedBox(width: 8),
+                    OutlinedButton.icon(
+                      onPressed: () => _confirmCancelJob(jobId, journalTitle),
+                      icon: const Icon(Icons.stop_circle_outlined, size: 14, color: AppColors.error),
+                      label: const Text(
+                        'Hủy job',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.error,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: AppColors.error.withAlpha(120)),
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => _confirmDeleteJob(jobId, journalTitle),
+                    icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
+                    label: const Text(
+                      'Hủy / Xóa',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.error,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: AppColors.border),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    ),
+                  ),
                 ],
               ),
             ],
@@ -642,7 +815,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   ],
                 ),
                 OutlinedButton.icon(
-                  onPressed: () => _showJobArticlesDialog(context, jobId, journalTitle, metrics),
+                  onPressed: () => _showJobArticlesDialog(context, jobId, journalTitle, metrics, status: status),
                   icon: const Icon(Icons.format_list_bulleted_rounded, size: 14, color: AppColors.textSecondary),
                   label: const Text(
                     'Chi tiết từng bài báo',
@@ -702,8 +875,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     BuildContext context,
     String jobId,
     String journalTitle,
-    Map<String, dynamic>? metrics,
-  ) {
+    Map<String, dynamic>? metrics, {
+    String status = '',
+  }) {
     showDialog(
       context: context,
       builder: (ctx) {
@@ -810,7 +984,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
 
                           return ListView.separated(
                             itemCount: filtered.length,
-                            separatorBuilder: (_, __) => const Divider(height: 1, color: AppColors.border),
+                            separatorBuilder: (ctx, i) => const Divider(height: 1, color: AppColors.border),
                             itemBuilder: (context, index) {
                               final art = filtered[index];
                               final artStatus = (art['status'] ?? '').toString().toUpperCase();
@@ -894,6 +1068,22 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     ),
                   ),
+                OutlinedButton.icon(
+                  onPressed: () {
+                    Navigator.of(ctx).pop();
+                    _confirmDeleteJob(jobId, journalTitle);
+                  },
+                  icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
+                  label: const Text(
+                    'Xóa tác vụ',
+                    style: TextStyle(fontFamily: 'Manrope', color: AppColors.error, fontSize: 13, fontWeight: FontWeight.w600),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    side: BorderSide(color: AppColors.error.withAlpha(120)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                ),
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
                   child: const Text('Đóng', style: TextStyle(fontFamily: 'Manrope')),
