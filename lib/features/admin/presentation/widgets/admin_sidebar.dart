@@ -145,7 +145,7 @@ class AdminSidebar extends StatelessWidget {
     required IconData activeIcon,
     required String title,
   }) {
-    final bool isSelected = selectedIndex == index || (index == 1 && selectedIndex == 2);
+    final bool isSelected = selectedIndex == index;
 
     Widget item = Container(
       margin: EdgeInsets.symmetric(
