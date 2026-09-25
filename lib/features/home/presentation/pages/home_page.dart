@@ -20,6 +20,30 @@ class HomePage extends StatelessWidget {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
+                    builder: (_) => const AdminDashboardPage(initialIndex: 8),
+                  ),
+                );
+              },
+              icon: const Icon(
+                Icons.science_rounded,
+                size: 16,
+              ),
+              label: const Text('Pipeline & AI Studio'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF7C3AED),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
                     builder: (_) => const AdminDashboardPage(),
                   ),
                 );
@@ -77,6 +101,25 @@ class HomePage extends StatelessWidget {
                 ),
               ),
               child: const Text('admin'),
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => const AdminDashboardPage(initialIndex: 8),
+                  ),
+                );
+              },
+              icon: const Icon(Icons.science_rounded, size: 16),
+              label: const Text('Pipeline & AI Studio'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF7C3AED),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
             ),
           ],
         ),

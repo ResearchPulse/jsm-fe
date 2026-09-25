@@ -4,6 +4,7 @@ import '../views/configurations_view.dart';
 import '../views/job_monitor_view.dart';
 import '../views/journals_view.dart';
 import '../views/overview_view.dart';
+import '../views/pipeline_studio_view.dart';
 import '../views/profiles_review_view.dart';
 import '../views/settings_view.dart';
 import '../views/snapshots_view.dart';
@@ -12,15 +13,23 @@ import '../widgets/admin_header.dart';
 import '../widgets/admin_sidebar.dart';
 
 class AdminDashboardPage extends StatefulWidget {
-  const AdminDashboardPage({super.key});
+  final int initialIndex;
+
+  const AdminDashboardPage({super.key, this.initialIndex = 0});
 
   @override
   State<AdminDashboardPage> createState() => _AdminDashboardPageState();
 }
 
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
   bool _isSidebarCollapsed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex;
+  }
 
   void _navigateToTab(int index) {
     setState(() {
@@ -197,6 +206,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         return const SettingsView();
       case 7:
         return const UsersView();
+      case 8:
+        return PipelineStudioView(
+          onNavigateToTab: _navigateToTab,
+        );
       default:
         return OverviewView(
           onNavigateToTab: _navigateToTab,

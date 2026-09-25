@@ -31,6 +31,8 @@ class AdminHeader extends StatelessWidget {
         return 'Tài Khoản Cá Nhân';
       case 7:
         return 'Quản Lý Người Dùng';
+      case 8:
+        return 'Pipeline & AI Studio';
       default:
         return 'Không Gian Làm Việc';
     }
@@ -54,6 +56,8 @@ class AdminHeader extends StatelessWidget {
         return 'Hệ thống / Tài khoản';
       case 7:
         return 'Hệ thống / Người dùng';
+      case 8:
+        return 'R&D / Pipeline Member 2 & 3';
       default:
         return 'Hệ thống';
     }
