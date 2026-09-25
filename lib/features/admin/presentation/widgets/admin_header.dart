@@ -16,46 +16,46 @@ class AdminHeader extends StatelessWidget {
   String _getTitle() {
     switch (selectedIndex) {
       case 0:
-        return 'Bản Thảo Của Tôi';
+        return 'Tổng Quan Pipeline';
       case 1:
-        return 'Kho Bài Báo Khoa Học';
+        return 'Danh Mục Tạp Chí';
       case 2:
-        return 'Cấu Hình Tạp Chí';
+        return 'Cấu Hình Khai Phá';
       case 3:
-        return 'Hàng Đợi Thẩm Định';
+        return 'Giám Sát Tác Vụ';
       case 4:
-        return 'Kho Lưu Trữ Snapshot';
+        return 'Kho Corpus Snapshots';
       case 5:
         return 'Hồ Sơ Phong Cách';
       case 6:
-        return 'Tài Khoản Cá Nhân';
+        return 'Cài Đặt Hệ Thống';
       case 7:
         return 'Quản Lý Người Dùng';
       default:
-        return 'Không Gian Làm Việc';
+        return 'Bảng Điều Khiển Quản Trị';
     }
   }
 
   String _getBreadcrumb() {
     switch (selectedIndex) {
       case 0:
-        return 'Giảng viên / Bản thảo';
+        return 'Quản trị / Tổng quan';
       case 1:
-        return 'Giảng viên / Kho bài báo';
+        return 'Khai phá dữ liệu / Tạp chí khoa học';
       case 2:
-        return 'Giảng viên / Cấu hình';
+        return 'Khai phá dữ liệu / Cấu hình';
       case 3:
-        return 'Thẩm định / Hàng đợi';
+        return 'Khai phá dữ liệu / Giám sát tác vụ';
       case 4:
-        return 'Thẩm định / Snapshots';
+        return 'Khai phá dữ liệu / Kho Snapshots';
       case 5:
-        return 'Thẩm định / Phong cách';
+        return 'Khai phá dữ liệu / Hồ sơ phong cách';
       case 6:
-        return 'Hệ thống / Tài khoản';
+        return 'Hệ thống / Cài đặt';
       case 7:
         return 'Hệ thống / Người dùng';
       default:
-        return 'Hệ thống';
+        return 'Quản trị';
     }
   }
 
@@ -110,7 +110,7 @@ class AdminHeader extends StatelessWidget {
               onChanged: onSearchChanged,
               style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm không gian...',
+                hintText: 'Tìm kiếm tạp chí, snapshot, jobs...',
                 hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
                 prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -134,11 +134,11 @@ class AdminHeader extends StatelessWidget {
 
           const SizedBox(width: 16),
 
-          // Primary confident action button in #0071bc
+          // Primary action button
           ElevatedButton.icon(
             onPressed: onNewJobPressed,
-            icon: const Icon(Icons.add_rounded, size: 18),
-            label: const Text('Tạo mới'),
+            icon: const Icon(Icons.bolt_rounded, size: 18),
+            label: const Text('Kích hoạt phân tích'),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.onPrimary,

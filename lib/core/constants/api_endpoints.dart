@@ -53,6 +53,19 @@ class ApiEndpoints {
 
   // Student Manuscript Checker
   static String get studentManuscriptCheck => '$baseUrl/student/manuscript/check';
+
+  // Admin Module Endpoints
   static String get adminJournals => '$baseUrl/admin/journals';
+  static String get adminOpenAlexJournals => '$baseUrl/admin/journals/openalex';
+  static String get adminImportJournal => '$baseUrl/admin/journals/import';
+  static String get adminConfigurations => '$baseUrl/admin/journal-configurations';
+  static String get adminAnalysisJobs => '$baseUrl/admin/analysis-jobs';
+  static String get adminSnapshots => '$baseUrl/admin/snapshots';
+  static String get adminStyleProfiles => '$baseUrl/admin/style-profiles';
+  static String get monitorStats => '$baseUrl/monitor/stats';
+  static String get systemHealth {
+    final uri = Uri.parse(baseUrl);
+    return '${uri.scheme}://${uri.host}:${uri.port}/health';
+  }
 }
 

@@ -1,123 +1,342 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../data/datasources/admin_api_client.dart';
 
-class SnapshotsView extends StatelessWidget {
+class SnapshotsView extends StatefulWidget {
   final Function(int) onNavigateToTab;
 
   const SnapshotsView({super.key, required this.onNavigateToTab});
 
   @override
+  State<SnapshotsView> createState() => _SnapshotsViewState();
+}
+
+class _SnapshotsViewState extends State<SnapshotsView> {
+  final AdminApiClient _apiClient = AdminApiClient();
+  String _searchQuery = '';
+  List<Map<String, dynamic>> _snapshots = [];
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSnapshots();
+  }
+
+  Future<void> _loadSnapshots() async {
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+
+    try {
+      final list = await _apiClient.getSnapshots();
+      if (!mounted) return;
+      setState(() {
+        _snapshots = list;
+        _isLoading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  String _formatHash(dynamic hash) {
+    if (hash == null) return 'N/A';
+    final s = hash.toString();
+    if (s.length > 20) {
+      return '${s.substring(0, 8)}...${s.substring(s.length - 8)}';
+    }
+    return s;
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final filtered = _snapshots.where((s) {
+      final journal = (s['journal'] ?? '').toString().toLowerCase();
+      final id = (s['id'] ?? '').toString().toLowerCase();
+      final issn = (s['issn'] ?? '').toString().toLowerCase();
+      final q = _searchQuery.toLowerCase();
+      return journal.contains(q) || id.contains(q) || issn.contains(q);
+    }).toList();
+
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(32),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1080),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(36),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: AppColors.border),
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.ink900.withAlpha(8),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.blue50,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Text(
-                    'Corpus archives',
+      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Kho Lưu Trữ Corpus Snapshots (Bất Biến)',
                     style: TextStyle(
-                      color: AppColors.primary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      fontFamily: 'Manrope',
+                      letterSpacing: -0.4,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'Tập hợp bài báo đã qua bóc tách cấu trúc bằng Grobid và làm sạch, được đóng băng phục vụ đối chiếu phong cách.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textMuted,
                       fontFamily: 'Manrope',
                     ),
                   ),
-                ),
-                const SizedBox(height: 16),
-
-                const Text(
-                  'Corpus snapshots',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    fontFamily: 'Manrope',
-                    letterSpacing: -0.5,
+                ],
+              ),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: _loadSnapshots,
+                    icon: const Icon(Icons.refresh_rounded),
+                    tooltip: 'Tải lại danh sách snapshot',
+                    color: AppColors.primary,
                   ),
-                ),
-                const SizedBox(height: 8),
-
-                const Text(
-                  'Immutable paper archives captured per year range. Snapshots guarantee scientific auditability and cannot be overwritten.',
-                  style: TextStyle(
-                    fontSize: 15,
-                    color: AppColors.textMuted,
-                    fontFamily: 'Manrope',
-                    height: 1.5,
+                  const SizedBox(width: 8),
+                  OutlinedButton.icon(
+                    onPressed: () => widget.onNavigateToTab(3),
+                    icon: const Icon(Icons.bolt_rounded, size: 18),
+                    label: const Text('Xem tiến trình tạo Snapshot'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary),
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 28),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
 
+          // Search Toolbar
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: TextField(
+              onChanged: (val) => setState(() => _searchQuery = val),
+              style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm theo tên tạp chí, mã Snapshot, SHA-256 Hash...',
+                hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                fillColor: AppColors.surfaceSoft,
+                filled: true,
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+              ),
+            ),
+          ),
+          const SizedBox(height: 20),
+
+          // Snapshots Table
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: Column(
+              children: [
+                // Header
                 Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                  decoration: BoxDecoration(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                  decoration: const BoxDecoration(
                     color: AppColors.surfaceSoft,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.border),
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
                   ),
                   child: const Row(
                     children: [
-                      Icon(Icons.lock_outline_rounded, size: 18, color: AppColors.textMuted),
-                      SizedBox(width: 12),
                       Expanded(
-                        child: Text(
-                          'No snapshot archives selected. Execute an analysis job to generate an audit-ready snapshot.',
-                          style: TextStyle(
-                            fontSize: 13,
-                            color: AppColors.textMuted,
-                            fontFamily: 'Manrope',
-                          ),
-                        ),
+                        flex: 3,
+                        child: Text('TẠP CHÍ & MÃ SNAPSHOT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                       ),
+                      Expanded(
+                        flex: 2,
+                        child: Text('GIAI ĐOẠN NĂM', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text('SỐ LƯỢNG BÀI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: Text('MÃ HASH BẢO MẬT (SHA-256)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text('NGÀY ĐÓNG BĂNG', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                      ),
+                      SizedBox(width: 90, child: Text('THAO TÁC', textAlign: TextAlign.right, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'))),
                     ],
                   ),
                 ),
-                const SizedBox(height: 28),
 
-                Row(
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: () => onNavigateToTab(3),
-                      icon: const Icon(Icons.sync_rounded, size: 18),
-                      label: const Text('Execute pipeline'),
+                // Table state
+                if (_isLoading)
+                  const Padding(
+                    padding: EdgeInsets.all(48),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.all(32),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
+                          const SizedBox(height: 8),
+                          Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+                          const SizedBox(height: 12),
+                          OutlinedButton.icon(
+                            onPressed: _loadSnapshots,
+                            icon: const Icon(Icons.refresh_rounded, size: 16),
+                            label: const Text('Thử lại'),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(width: 16),
-                    OutlinedButton.icon(
-                      onPressed: () => onNavigateToTab(5),
-                      icon: const Icon(Icons.analytics_outlined, size: 18),
-                      label: const Text('Review style profiles'),
+                  )
+                else if (filtered.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(48),
+                    child: Center(
+                      child: Text(
+                        'Chưa có Snapshot bất biến nào được khởi tạo.',
+                        style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+                      ),
                     ),
+                  )
+                else
+                  for (int i = 0; i < filtered.length; i++) ...[
+                    _buildSnapshotRow(filtered[i]),
+                    if (i < filtered.length - 1)
+                      const Divider(height: 1, color: AppColors.borderSoft),
                   ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSnapshotRow(Map<String, dynamic> s) {
+    final journal = s['journal'] ?? 'Chưa rõ';
+    final id = s['id'] ?? 'N/A';
+    final yearRange = s['yearRange'] ?? '2021 - 2024';
+    final paperCount = s['paperCount'] ?? 0;
+    final createdAt = s['createdAt'] ?? '24/09/2026';
+    final hash = s['hash'] ?? '';
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  journal,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  id,
+                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
                 ),
               ],
             ),
           ),
-        ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              yearRange,
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              '$paperCount bài báo',
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Tooltip(
+              message: hash,
+              child: Row(
+                children: [
+                  const Icon(Icons.fingerprint_rounded, size: 14, color: AppColors.primary),
+                  const SizedBox(width: 6),
+                  Text(
+                    _formatHash(hash),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontFamily: 'monospace',
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              createdAt,
+              style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+            ),
+          ),
+          SizedBox(
+            width: 90,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () => widget.onNavigateToTab(4),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  ),
+                  child: const Text('Xem hồ sơ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
