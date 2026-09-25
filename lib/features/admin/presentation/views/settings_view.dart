@@ -148,7 +148,7 @@ class _SettingsViewState extends State<SettingsView> {
                   title: const Text('Enforce automatic draft purge', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
                   subtitle: Text('Purge temporary files after ${_retentionDays.toInt()} days (maximum: 30 days)', style: const TextStyle(fontSize: 12, fontFamily: 'Manrope')),
                   value: _autoPurge,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) => setState(() => _autoPurge = val),
                 ),
                 Slider(
@@ -170,7 +170,7 @@ class _SettingsViewState extends State<SettingsView> {
                   title: const Text('Enable CrossRef polite pool', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
                   subtitle: const Text('Attaches lab email header to prevent HTTP 429 rate limit errors', style: TextStyle(fontSize: 12, fontFamily: 'Manrope')),
                   value: _politePool,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) => setState(() => _politePool = val),
                 ),
 

@@ -170,4 +170,46 @@ void main() {
       );
     });
   });
+
+  group('parseIdToken', () {
+    test('extracts sub, email, name, and picture from valid JWT payload', () {
+      final payload = base64Url.encode(utf8.encode(jsonEncode({
+        'sub': 'sub-42',
+        'email': 'user@example.com',
+        'name': 'Test User',
+        'picture': 'https://example.com/avatar.png',
+      }))).replaceAll('=', '');
+      final idToken = 'header.$payload.signature';
+
+      final user = OidcApiClient.parseIdToken(idToken);
+      expect(user, isNotNull);
+      expect(user!.sub, 'sub-42');
+      expect(user.email, 'user@example.com');
+      expect(user.name, 'Test User');
+      expect(user.picture, 'https://example.com/avatar.png');
+    });
+
+    test('extracts claims with alias keys (preferred_username, avatar)', () {
+      final payload = base64Url.encode(utf8.encode(jsonEncode({
+        'sub': 'sub-99',
+        'preferred_username': 'john_doe',
+        'avatar': 'https://example.com/pic.jpg',
+      }))).replaceAll('=', '');
+      final idToken = 'header.$payload.sig';
+
+      final user = OidcApiClient.parseIdToken(idToken);
+      expect(user, isNotNull);
+      expect(user!.sub, 'sub-99');
+      expect(user.name, 'john_doe');
+      expect(user.picture, 'https://example.com/pic.jpg');
+    });
+
+    test('returns null for null, empty, non-JWT, or malformed payload', () {
+      expect(OidcApiClient.parseIdToken(null), isNull);
+      expect(OidcApiClient.parseIdToken(''), isNull);
+      expect(OidcApiClient.parseIdToken('not-a-jwt'), isNull);
+      expect(OidcApiClient.parseIdToken('a.notbase64!@@#.c'), isNull);
+      expect(OidcApiClient.parseIdToken('a.e30.c'), isNull); // empty json {} has no sub
+    });
+  });
 }

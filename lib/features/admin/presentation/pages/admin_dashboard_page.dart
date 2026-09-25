@@ -82,7 +82,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               const Text('Start year', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
-                                value: yearStart,
+                                initialValue: yearStart,
                                 decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
                                 items: [2018, 2019, 2020, 2021, 2022].map((y) {
                                   return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
@@ -102,7 +102,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                               const Text('End year', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
-                                value: yearEnd,
+                                initialValue: yearEnd,
                                 decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
                                 items: [2023, 2024, 2025].map((y) {
                                   return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));

@@ -1,11 +1,11 @@
 {
-    "name": "jsm_fe",
-    "short_name": "jsm_fe",
+    "name": "journal system miner - HyperDataLab",
+    "short_name": "journal system miner",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0071BC",
+    "theme_color": "#0071BC",
+    "description": "journal system miner - HyperDataLab",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

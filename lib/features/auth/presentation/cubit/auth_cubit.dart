@@ -60,7 +60,13 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoading());
     try {
       await loginUseCase(provider);
-      // No navigation away (e.g. non-web): nothing more to do here.
+      // Web: the browser navigated away — nothing more to do here.
+      // Desktop: the full flow (browser + loopback callback + exchange)
+      // already finished inside the repository; pick up the session.
+      final session = await restoreSessionUseCase();
+      if (session != null) {
+        emit(AuthAuthenticated(user: session.user));
+      }
     } catch (e) {
       emit(AuthFailure(message: _sanitize(e)));
     }

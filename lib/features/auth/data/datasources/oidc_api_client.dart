@@ -63,10 +63,11 @@ class SsoUserInfo {
       };
 
   factory SsoUserInfo.fromJson(Map<String, dynamic> json) => SsoUserInfo(
-        sub: json['sub'] as String,
+        sub: (json['sub'] ?? json['id'] ?? '').toString(),
         email: json['email'] as String?,
-        name: json['name'] as String?,
-        picture: json['picture'] as String?,
+        name: (json['name'] ?? json['preferred_username'] ?? json['username'])
+            as String?,
+        picture: (json['picture'] ?? json['avatar']) as String?,
       );
 }
 
@@ -77,6 +78,27 @@ class OidcApiClient {
 
   OidcApiClient({http.Client? client})
       : _client = client ?? http.Client();
+
+  /// Decodes the OIDC id_token payload (JWT) to extract user profile
+  /// claims without an extra network call (Method 1 in quickstart doc).
+  static SsoUserInfo? parseIdToken(String? idToken) {
+    if (idToken == null || idToken.isEmpty) return null;
+    final parts = idToken.split('.');
+    if (parts.length != 3) return null;
+    try {
+      final payload = parts[1];
+      final normalized = base64Url.normalize(payload);
+      final decoded = utf8.decode(base64Url.decode(normalized));
+      final map = jsonDecode(decoded) as Map<String, dynamic>;
+      final sub = (map['sub'] ?? map['id'])?.toString();
+      if (sub != null && sub.isNotEmpty) {
+        return SsoUserInfo.fromJson(map);
+      }
+    } catch (_) {
+      // In case of invalid JWT payload, fall through to userinfo endpoint.
+    }
+    return null;
+  }
 
   /// Exchanges the authorization code (Authorization Code + PKCE flow).
   Future<SsoTokens> exchangeCode({

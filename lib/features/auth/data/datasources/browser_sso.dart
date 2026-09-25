@@ -8,19 +8,19 @@ import '../../../../core/constants/api_endpoints.dart';
 /// actually served from the configured origin we use the live origin so
 /// dev ports other than the default still work.
 String currentRedirectUri() {
-  final configured = ApiEndpoints.ssoRedirectUri;
   final origin = web.window.location.origin;
-  final configuredOrigin = Uri.parse(configured).origin;
-  return origin == configuredOrigin
-      ? '$origin/auth/callback'
-      : configured;
+  if (origin.isNotEmpty && origin != 'null') {
+    return '$origin/auth/callback';
+  }
+  return ApiEndpoints.ssoRedirectUri;
 }
 
 Uri currentBrowserUri() => Uri.parse(web.window.location.href);
 
-/// Replaces the callback query parameters in the browser history.
+/// Replaces the callback query parameters and path in browser history
+/// so reloading (F5) does not re-trigger the callback flow.
 void cleanCallbackFromHistory() {
-  web.window.history.replaceState(null, '', web.window.location.pathname);
+  web.window.history.replaceState(null, '', '/');
 }
 
 /// Full-page navigation to the SSO authorize URL.

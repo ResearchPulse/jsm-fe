@@ -79,6 +79,7 @@ void main() {
           jsonDecode(store.read(SsoSessionKeys.pendingRequest)!)
               as Map<String, dynamic>;
       expect(pending['state'], q['state']);
+      expect(pending['redirect_uri'], q['redirect_uri']);
       final verifier = pending['code_verifier'] as String;
       expect(verifier.length, 64);
       // challenge must equal BASE64URL(SHA256(verifier)).
@@ -229,6 +230,41 @@ void main() {
 
       await expectLater(
           launcher.completeFromCallback(), throwsA(isA<ServerException>()));
+    });
+
+    test('Method 1: decodes profile from id_token directly when userinfo fails',
+        () async {
+      final payload = base64Url.encode(utf8.encode(jsonEncode({
+        'sub': 'fast-user',
+        'email': 'fast@example.com',
+        'name': 'Fast User',
+      }))).replaceAll('=', '');
+      final jwt = 'h.$payload.s';
+
+      final client = MockClient((req) async {
+        if (req.url.path.endsWith('/oidc/token')) {
+          return http.Response(
+              jsonEncode({
+                'access_token': 'at-fast',
+                'token_type': 'Bearer',
+                'expires_in': 3600,
+                'id_token': jwt,
+              }),
+              200);
+        }
+        if (req.url.path.endsWith('/oidc/userinfo')) {
+          return http.Response('server error', 500);
+        }
+        fail('unexpected request');
+      });
+
+      final launcher = launcherWith(client);
+      await seedPending(launcher);
+      final result = await launcher.completeFromCallback();
+
+      expect(result.user.sub, 'fast-user');
+      expect(result.user.email, 'fast@example.com');
+      expect(result.user.name, 'Fast User');
     });
 
     test('non-callback page: throws (nothing to complete)', () async {
