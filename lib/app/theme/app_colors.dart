@@ -17,6 +17,7 @@ class AppColors {
   static const Color ink900 = Color(0xFF122331);
   static const Color slate600 = Color(0xFF647381);
   static const Color slate400 = Color(0xFF8B9AA4);
+  static const Color slate300 = Color(0xFFC5D1D9);
   static const Color slate200 = Color(0xFFDCE4E9);
   static const Color slate100 = Color(0xFFE8EEF2);
   static const Color paper50 = Color(0xFFF7F9FA); // Page background

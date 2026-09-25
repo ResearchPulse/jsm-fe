@@ -1,0 +1,42 @@
+[
+  {
+    "id": "phase-01-sidebar-and-header",
+    "title": "Sidebar, Header & Navigation Reorganization",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.0s)",
+    "user_visible_behavior": "Sidebar is reorganized into 3 groups with authentic Vietnamese Admin labels and matching header breadcrumbs.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-overview-pipeline-dashboard",
+    "title": "Pipeline Overview Dashboard Overhaul",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.1s)",
+    "user_visible_behavior": "Tab 0 displays an interactive 5-stage pipeline diagram, 4 KPI cards, and recent jobs list.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-pipeline-views-modernization",
+    "title": "Data Pipeline Subviews Modernization",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.0s)",
+    "user_visible_behavior": "Subviews for Journals, Configs, Job Monitor, Snapshots, and Profiles are un-constrained and feature actionable data lists.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-04-system-views-and-qa",
+    "title": "System Views, Language Harmonization & QA",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 11.6s)",
+    "user_visible_behavior": "Users and Settings views modernized; 100% unified Vietnamese terminology across entire Admin console.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  }
+]

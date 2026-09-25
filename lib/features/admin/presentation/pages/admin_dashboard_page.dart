@@ -21,10 +21,14 @@ class AdminDashboardPage extends StatefulWidget {
 class _AdminDashboardPageState extends State<AdminDashboardPage> {
   int _selectedIndex = 0;
   bool _isSidebarCollapsed = false;
+  String? _targetJournalIdForProfile;
 
-  void _navigateToTab(int index) {
+  void _navigateToTab(int index, {String? journalId}) {
     setState(() {
       _selectedIndex = index;
+      if (journalId != null) {
+        _targetJournalIdForProfile = journalId;
+      }
     });
   }
 
@@ -45,7 +49,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                 borderRadius: BorderRadius.circular(20), // --ds-radius-panel
               ),
               title: const Text(
-                'Analyze journal',
+                'Kích hoạt Khai phá Tạp chí',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -60,16 +64,16 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text(
-                      'Queue a background pipeline job to extract style profiles and synthesis evidence.',
+                      'Tạo tác vụ chạy nền để cào bài, bóc tách cấu trúc bằng Grobid và trích xuất hồ sơ phong cách.',
                       style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Journal ISSN or name', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                    const Text('Mã ISSN hoặc Tên tạp chí', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                     const SizedBox(height: 6),
                     TextField(
                       controller: journalController,
                       decoration: const InputDecoration(
-                        hintText: 'e.g. 0098-5589 or IEEE TSE',
+                        hintText: 'Ví dụ: 0098-5589 hoặc IEEE TSE',
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -79,7 +83,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Start year', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                              const Text('Từ năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearStart,
@@ -99,12 +103,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('End year', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                              const Text('Đến năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearEnd,
                                 decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
-                                items: [2023, 2024, 2025].map((y) {
+                                items: [2023, 2024, 2025, 2026].map((y) {
                                   return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
                                 }).toList(),
                                 onChanged: (val) {
@@ -120,9 +124,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Target paper sample count', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                        const Text('Số lượng bài báo mục tiêu', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                         Text(
-                          '${targetPapers.toInt()} papers',
+                          '${targetPapers.toInt()} bài',
                           style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
                         ),
                       ],
@@ -141,7 +145,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               actions: [
                 OutlinedButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Cancel'),
+                  child: const Text('Hủy bỏ'),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -149,12 +153,12 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     _navigateToTab(3); // Navigate to Job Monitor
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Analysis job queued successfully.'),
+                        content: Text('Đã kích hoạt tác vụ phân tích tạp chí thành công.'),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   },
-                  child: const Text('Start analysis'),
+                  child: const Text('Bắt đầu phân tích'),
                 ),
               ],
             );
@@ -192,6 +196,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
       case 5:
         return ProfilesReviewView(
           onNavigateToTab: _navigateToTab,
+          selectedJournalId: _targetJournalIdForProfile,
         );
       case 6:
         return const SettingsView();

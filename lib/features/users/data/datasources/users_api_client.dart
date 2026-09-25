@@ -82,4 +82,43 @@ class UsersApiClient {
     }
     return null;
   }
+
+  Future<List<Map<String, dynamic>>> getUsers({String? role}) async {
+    try {
+      final token = await tokenProvider();
+      final qs = role != null ? '?role=$role' : '';
+      final uri = Uri.parse('${ApiEndpoints.users}$qs');
+      final response = await _client.get(
+        uri,
+        headers: {
+          'Content-Type': 'application/json',
+          if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        final body = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+        final data = body['data'];
+        if (data is List) {
+          return data.whereType<Map<String, dynamic>>().toList();
+        }
+      }
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> deleteUser(String userId) async {
+    try {
+      final token = await tokenProvider();
+      final uri = Uri.parse('${ApiEndpoints.users}/$userId');
+      await _client.delete(
+        uri,
+        headers: {
+          if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+        },
+      );
+    } catch (_) {}
+  }
 }
+

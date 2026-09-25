@@ -3,12 +3,16 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'theme/app_theme.dart';
 import 'auth_gate.dart';
+import 'auth_cubit_scope.dart';
 
+import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/home/presentation/pages/home_page.dart';
 import '../features/admin/presentation/pages/admin_dashboard_page.dart';
 import '../features/home/presentation/cubit/home_cubit.dart';
 import '../features/home/domain/usecases/get_featured_journals_usecase.dart';
 import '../features/home/data/repositories/home_repository_impl.dart';
+import '../features/users/data/repositories/users_repository_impl.dart';
+import '../features/users/domain/usecases/create_account_usecase.dart';
 import '../features/users/presentation/pages/user_info_page.dart';
 import '../features/student_manuscript_checker/presentation/pages/student_manuscript_checker_page.dart';
 
@@ -17,39 +21,48 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dependency Injection for Home feature.
-    return MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<HomeRepositoryImpl>(
-          create: (_) => HomeRepositoryImpl(),
-        ),
-      ],
-      child: MultiBlocProvider(
+    return AuthCubitScope(
+      child: MultiRepositoryProvider(
         providers: [
-          BlocProvider<HomeCubit>(
-            create: (context) => HomeCubit(
-              getFeaturedJournalsUseCase: GetFeaturedJournalsUseCase(
-                context.read<HomeRepositoryImpl>(),
-              ),
-            ),
+          RepositoryProvider<HomeRepositoryImpl>(
+            create: (_) => HomeRepositoryImpl(),
+          ),
+          RepositoryProvider<CreateAccountUseCase>(
+            create: (context) {
+              final authRepo = context.read<AuthRepository>();
+              return CreateAccountUseCase(
+                UsersRepositoryImpl(authRepository: authRepo),
+              );
+            },
           ),
         ],
-        child: MaterialApp(
-          title: 'journal system miner - HyperDataLab',
-          theme: AppTheme.lightTheme,
+        child: MultiBlocProvider(
+          providers: [
+            BlocProvider<HomeCubit>(
+              create: (context) => HomeCubit(
+                getFeaturedJournalsUseCase: GetFeaturedJournalsUseCase(
+                  context.read<HomeRepositoryImpl>(),
+                ),
+              ),
+            ),
+          ],
+          child: MaterialApp(
+            title: 'journal system miner - HyperDataLab',
+            theme: AppTheme.lightTheme,
 
-          // Authentication is now the entry point of the application.
-          home: const AuthGate(),
+            // Authentication is now the entry point of the application.
+            home: const AuthGate(),
 
-          routes: {
-            '/home': (context) => const HomePage(),
-            '/admin': (context) => const AdminDashboardPage(),
-            '/user-info': (context) => const UserInfoPage(),
-            '/student-checker': (context) =>
-                const StudentManuscriptCheckerPage(),
-          },
+            routes: {
+              '/home': (context) => const HomePage(),
+              '/admin': (context) => const AdminDashboardPage(),
+              '/user-info': (context) => const UserInfoPage(),
+              '/student-checker': (context) =>
+                  const StudentManuscriptCheckerPage(),
+            },
 
-          debugShowCheckedModeBanner: false,
+            debugShowCheckedModeBanner: false,
+          ),
         ),
       ),
     );
