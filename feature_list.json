@@ -198,5 +198,15 @@
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1",
     "priority": "P1"
+  },
+  {
+    "id": "phase-04-radar-point-hover-tooltip",
+    "title": "Interactive Radar Chart Point Hover & Tooltip",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.6s)",
+    "user_visible_behavior": "Hovering near any radar chart vertex highlights the point with a colored halo and shows a floating tooltip badge displaying journal name, metric title, raw value, and percentage.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
   }
 ]

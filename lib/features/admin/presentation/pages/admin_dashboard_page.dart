@@ -201,6 +201,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
     }
   }
 
+  static const double _minDashboardWidth = 1024.0;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -208,7 +210,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
         final isNarrow = constraints.maxWidth < 1100;
         final effectiveCollapsed = isNarrow || _isSidebarCollapsed;
 
-        return Scaffold(
+        final dashboardScaffold = Scaffold(
           backgroundColor: AppColors.background,
           body: Row(
             children: [
@@ -241,6 +243,19 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             ],
           ),
         );
+
+        if (constraints.maxWidth < _minDashboardWidth) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: _minDashboardWidth,
+              height: constraints.hasBoundedHeight ? constraints.maxHeight : null,
+              child: dashboardScaffold,
+            ),
+          );
+        }
+
+        return dashboardScaffold;
       },
     );
   }

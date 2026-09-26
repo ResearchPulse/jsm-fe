@@ -85,35 +85,33 @@ class AdminHeader extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 24),
 
           // Search input
-          ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 280, minWidth: 160),
-            child: SizedBox(
-              height: 44,
-              child: TextField(
-                onChanged: onSearchChanged,
-                style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
-                decoration: InputDecoration(
-                  hintText: 'Tìm kiếm tạp chí, snapshot, jobs...',
-                  hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                  prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  fillColor: AppColors.surfaceSoft,
-                  filled: true,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                  ),
+          SizedBox(
+            width: 280,
+            height: 44,
+            child: TextField(
+              onChanged: onSearchChanged,
+              style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
+              decoration: InputDecoration(
+                hintText: 'Tìm kiếm tạp chí, snapshot, jobs...',
+                hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                fillColor: AppColors.surfaceSoft,
+                filled: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
                 ),
               ),
             ),

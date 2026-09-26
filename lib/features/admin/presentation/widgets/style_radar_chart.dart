@@ -51,19 +51,20 @@ class RadarDataset {
       color: color,
       values: [normLen, normLex, normHedge, normBooster, normNeutral, normCars],
       rawDisplayValues: [
-        '${meanLen.toStringAsFixed(1)} từ',
-        '${(lexDensity * 100).toStringAsFixed(0)}%',
-        '${hedges.toStringAsFixed(1)}/1k',
-        '${boosters.toStringAsFixed(1)}/1k',
-        '${(neutral * 100).toStringAsFixed(0)}%',
-        '${(carsScore * 100).toStringAsFixed(0)}%',
+        '${meanLen.toStringAsFixed(1)} từ/câu',
+        '${(lexDensity * 100).toStringAsFixed(0)}% mật độ',
+        '${hedges.toStringAsFixed(1)}/1k từ',
+        '${boosters.toStringAsFixed(1)}/1k từ',
+        '${(neutral * 100).toStringAsFixed(0)}% trung tính',
+        '${(carsScore * 100).toStringAsFixed(0)}% hoàn thiện',
       ],
     );
   }
 }
 
-/// Interactive 6-Axis Multi-Series Radar Chart for style fingerprint comparison.
-class StyleRadarChart extends StatelessWidget {
+/// Interactive 6-Axis Multi-Series Radar Chart for style fingerprint comparison
+/// with hover inspection and floating tooltip badges.
+class StyleRadarChart extends StatefulWidget {
   final List<RadarDataset> datasets;
   final double height;
   final bool showLegend;
@@ -94,11 +95,85 @@ class StyleRadarChart extends StatelessWidget {
   });
 
   @override
+  State<StyleRadarChart> createState() => _StyleRadarChartState();
+}
+
+class _StyleRadarChartState extends State<StyleRadarChart> {
+  int? _hoveredDatasetIndex;
+  int? _hoveredAxisIndex;
+  Offset? _hoverPosition;
+
+  @override
+  void didUpdateWidget(covariant StyleRadarChart oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_hoveredDatasetIndex != null &&
+        _hoveredDatasetIndex! >= widget.datasets.length) {
+      _hoveredDatasetIndex = null;
+      _hoveredAxisIndex = null;
+      _hoverPosition = null;
+    }
+  }
+
+  void _handleHover(Offset localPos, double width, double height) {
+    if (widget.datasets.isEmpty) return;
+
+    final center = Offset(width / 2, height / 2);
+    final maxRadius = (math.min(width, height) / 2) - 44.0;
+    if (maxRadius <= 20) return;
+
+    const totalAxes = 6;
+    final angleStep = (2 * math.pi) / totalAxes;
+    const startAngle = -math.pi / 2;
+
+    int? bestDs;
+    int? bestAxis;
+    double minDistance = double.infinity;
+    const hitRadius = 18.0;
+
+    for (int dsIdx = 0; dsIdx < widget.datasets.length; dsIdx++) {
+      final dataset = widget.datasets[dsIdx];
+      if (dataset.values.length < totalAxes) continue;
+
+      for (int i = 0; i < totalAxes; i++) {
+        final angle = startAngle + i * angleStep;
+        final val = dataset.values[i].clamp(0.05, 1.0);
+        final r = maxRadius * val;
+        final pt = Offset(center.dx + r * math.cos(angle), center.dy + r * math.sin(angle));
+
+        final dist = (localPos - pt).distance;
+        if (dist <= hitRadius && dist < minDistance) {
+          minDistance = dist;
+          bestDs = dsIdx;
+          bestAxis = i;
+        }
+      }
+    }
+
+    if (bestDs != _hoveredDatasetIndex || bestAxis != _hoveredAxisIndex || localPos != _hoverPosition) {
+      setState(() {
+        _hoveredDatasetIndex = bestDs;
+        _hoveredAxisIndex = bestAxis;
+        _hoverPosition = (bestDs != null) ? localPos : null;
+      });
+    }
+  }
+
+  void _handleExit() {
+    if (_hoveredDatasetIndex != null) {
+      setState(() {
+        _hoveredDatasetIndex = null;
+        _hoveredAxisIndex = null;
+        _hoverPosition = null;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (datasets.isEmpty) {
+    if (widget.datasets.isEmpty) {
       return SizedBox(
-        height: height,
-        child: Center(
+        height: widget.height,
+        child: const Center(
           child: Text(
             'Chọn tạp chí để hiển thị biểu đồ Radar',
             style: TextStyle(color: AppColors.textSubtle, fontSize: 13),
@@ -110,16 +185,18 @@ class StyleRadarChart extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final chartWidth = constraints.maxWidth;
+
         return Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (showLegend) ...[
+            // Legend
+            if (widget.showLegend) ...[
               Wrap(
                 spacing: 16,
                 runSpacing: 8,
                 alignment: WrapAlignment.center,
-                children: datasets.map((ds) {
+                children: widget.datasets.map((ds) {
                   return Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
@@ -141,7 +218,7 @@ class StyleRadarChart extends StatelessWidget {
                         const SizedBox(width: 6),
                         Text(
                           ds.name,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
@@ -156,14 +233,35 @@ class StyleRadarChart extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
+
+            // Radar Chart with Interactive Hover & Floating Tooltip
             SizedBox(
               width: chartWidth,
-              height: height,
-              child: CustomPaint(
-                painter: _StyleRadarPainter(
-                  datasets: datasets,
-                  axisTitles: axisTitles,
-                  axisSubtitles: axisSubtitles,
+              height: widget.height,
+              child: MouseRegion(
+                onHover: (event) => _handleHover(event.localPosition, chartWidth, widget.height),
+                onExit: (_) => _handleExit(),
+                cursor: _hoveredDatasetIndex != null ? SystemMouseCursors.click : MouseCursor.defer,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    CustomPaint(
+                      size: Size(chartWidth, widget.height),
+                      painter: _StyleRadarPainter(
+                        datasets: widget.datasets,
+                        axisTitles: StyleRadarChart.axisTitles,
+                        axisSubtitles: StyleRadarChart.axisSubtitles,
+                        hoveredDatasetIndex: _hoveredDatasetIndex,
+                        hoveredAxisIndex: _hoveredAxisIndex,
+                      ),
+                    ),
+                    // Floating Tooltip Badge
+                    if (_hoveredDatasetIndex != null &&
+                        _hoveredAxisIndex != null &&
+                        _hoverPosition != null &&
+                        _hoveredDatasetIndex! < widget.datasets.length)
+                      _buildFloatingTooltip(chartWidth, widget.height),
+                  ],
                 ),
               ),
             ),
@@ -172,17 +270,162 @@ class StyleRadarChart extends StatelessWidget {
       },
     );
   }
+
+  Widget _buildFloatingTooltip(double chartWidth, double chartHeight) {
+    final ds = widget.datasets[_hoveredDatasetIndex!];
+    final axisIdx = _hoveredAxisIndex!;
+    final pos = _hoverPosition!;
+
+    const tooltipWidth = 230.0;
+    const tooltipHeight = 92.0;
+
+    // Boundary aware positioning
+    double left = pos.dx + 16.0;
+    if (left + tooltipWidth > chartWidth - 10) {
+      left = pos.dx - tooltipWidth - 16.0;
+    }
+    if (left < 10) left = 10;
+
+    double top = pos.dy - tooltipHeight - 12.0;
+    if (top < 10) {
+      top = pos.dy + 18.0;
+    }
+    if (top + tooltipHeight > chartHeight - 10) {
+      top = chartHeight - tooltipHeight - 10;
+    }
+
+    final rawVal = (axisIdx < ds.rawDisplayValues.length)
+        ? ds.rawDisplayValues[axisIdx]
+        : '-';
+    final normPct = (axisIdx < ds.values.length)
+        ? '${(ds.values[axisIdx] * 100).toStringAsFixed(0)}%'
+        : '-';
+    final title = StyleRadarChart.axisTitles[axisIdx];
+    final subtitle = StyleRadarChart.axisSubtitles[axisIdx];
+
+    return Positioned(
+      left: left,
+      top: top,
+      child: IgnorePointer(
+        child: Container(
+          width: tooltipWidth,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: ds.color.withAlpha(140), width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withAlpha(24),
+                blurRadius: 14,
+                offset: const Offset(0, 5),
+              ),
+              BoxShadow(
+                color: ds.color.withAlpha(20),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Header: Journal Color Dot + Name + Normalized Score Badge
+              Row(
+                children: [
+                  Container(
+                    width: 9,
+                    height: 9,
+                    decoration: BoxDecoration(color: ds.color, shape: BoxShape.circle),
+                  ),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      ds.name,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: ds.color.withAlpha(24),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      normPct,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: ds.color,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              // Axis Name
+              Text(
+                '$title ($subtitle)',
+                style: const TextStyle(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 3),
+              // Raw Value
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  const Text(
+                    'Đo được: ',
+                    style: TextStyle(fontSize: 11, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                  ),
+                  Text(
+                    rawVal,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: ds.color,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _StyleRadarPainter extends CustomPainter {
   final List<RadarDataset> datasets;
   final List<String> axisTitles;
   final List<String> axisSubtitles;
+  final int? hoveredDatasetIndex;
+  final int? hoveredAxisIndex;
 
   _StyleRadarPainter({
     required this.datasets,
     required this.axisTitles,
     required this.axisSubtitles,
+    this.hoveredDatasetIndex,
+    this.hoveredAxisIndex,
   });
 
   @override
@@ -238,7 +481,8 @@ class _StyleRadarPainter extends CustomPainter {
     }
 
     // 3. Draw dataset polygons & vertices
-    for (final dataset in datasets) {
+    for (int dsIdx = 0; dsIdx < datasets.length; dsIdx++) {
+      final dataset = datasets[dsIdx];
       if (dataset.values.length < totalAxes) continue;
 
       final polyPath = Path();
@@ -283,9 +527,37 @@ class _StyleRadarPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2.0;
 
-      for (final pt in points) {
-        canvas.drawCircle(pt, 4.0, dotFill);
-        canvas.drawCircle(pt, 4.0, dotStroke);
+      for (int i = 0; i < points.length; i++) {
+        final pt = points[i];
+        final isHovered = (hoveredDatasetIndex == dsIdx && hoveredAxisIndex == i);
+
+        if (isHovered) {
+          // Draw outer halo glow
+          final haloPaint = Paint()
+            ..color = dataset.color.withAlpha(50)
+            ..style = PaintingStyle.fill;
+          canvas.drawCircle(pt, 12.0, haloPaint);
+
+          final haloRing = Paint()
+            ..color = dataset.color.withAlpha(160)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 1.6;
+          canvas.drawCircle(pt, 9.0, haloRing);
+
+          // Enlarge point
+          canvas.drawCircle(pt, 5.5, dotFill);
+          canvas.drawCircle(
+            pt,
+            5.5,
+            Paint()
+              ..color = dataset.color
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 2.8,
+          );
+        } else {
+          canvas.drawCircle(pt, 4.0, dotFill);
+          canvas.drawCircle(pt, 4.0, dotStroke);
+        }
       }
     }
   }
@@ -298,7 +570,7 @@ class _StyleRadarPainter extends CustomPainter {
       children: [
         TextSpan(
           text: '$title\n',
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -307,7 +579,7 @@ class _StyleRadarPainter extends CustomPainter {
         ),
         TextSpan(
           text: subtitle,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 9.5,
             fontWeight: FontWeight.w400,
             color: AppColors.textSubtle,
@@ -339,6 +611,10 @@ class _StyleRadarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _StyleRadarPainter oldDelegate) {
+    if (oldDelegate.hoveredDatasetIndex != hoveredDatasetIndex ||
+        oldDelegate.hoveredAxisIndex != hoveredAxisIndex) {
+      return true;
+    }
     if (oldDelegate.datasets.length != datasets.length) return true;
     for (int i = 0; i < datasets.length; i++) {
       if (oldDelegate.datasets[i].id != datasets[i].id ||
