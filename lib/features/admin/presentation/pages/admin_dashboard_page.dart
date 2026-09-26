@@ -58,89 +58,94 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   color: AppColors.textPrimary,
                 ),
               ),
-              content: SizedBox(
-                width: 480,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Tạo tác vụ chạy nền để cào bài, bóc tách cấu trúc bằng Grobid và trích xuất hồ sơ phong cách.',
-                      style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text('Mã ISSN hoặc Tên tạp chí', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
-                    const SizedBox(height: 6),
-                    TextField(
-                      controller: journalController,
-                      decoration: const InputDecoration(
-                        hintText: 'Ví dụ: 0098-5589 hoặc IEEE TSE',
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 480,
+                  maxHeight: MediaQuery.of(context).size.height * 0.8,
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Tạo tác vụ chạy nền để cào bài, bóc tách cấu trúc bằng Grobid và trích xuất hồ sơ phong cách.',
+                        style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                       ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Từ năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
-                              const SizedBox(height: 6),
-                              DropdownButtonFormField<int>(
-                                initialValue: yearStart,
-                                decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
-                                items: [2018, 2019, 2020, 2021, 2022].map((y) {
-                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
-                                }).toList(),
-                                onChanged: (val) {
-                                  if (val != null) setModalState(() => yearStart = val);
-                                },
-                              ),
-                            ],
+                      const SizedBox(height: 20),
+                      const Text('Mã ISSN hoặc Tên tạp chí', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                      const SizedBox(height: 6),
+                      TextField(
+                        controller: journalController,
+                        decoration: const InputDecoration(
+                          hintText: 'Ví dụ: 0098-5589 hoặc IEEE TSE',
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Từ năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                                const SizedBox(height: 6),
+                                DropdownButtonFormField<int>(
+                                  initialValue: yearStart,
+                                  decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
+                                  items: [2018, 2019, 2020, 2021, 2022].map((y) {
+                                    return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    if (val != null) setModalState(() => yearStart = val);
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text('Đến năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
-                              const SizedBox(height: 6),
-                              DropdownButtonFormField<int>(
-                                initialValue: yearEnd,
-                                decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
-                                items: [2023, 2024, 2025, 2026].map((y) {
-                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
-                                }).toList(),
-                                onChanged: (val) {
-                                  if (val != null) setModalState(() => yearEnd = val);
-                                },
-                              ),
-                            ],
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text('Đến năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                                const SizedBox(height: 6),
+                                DropdownButtonFormField<int>(
+                                  initialValue: yearEnd,
+                                  decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
+                                  items: [2023, 2024, 2025, 2026].map((y) {
+                                    return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    if (val != null) setModalState(() => yearEnd = val);
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Số lượng bài báo mục tiêu', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
-                        Text(
-                          '${targetPapers.toInt()} bài',
-                          style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
-                        ),
-                      ],
-                    ),
-                    Slider(
-                      value: targetPapers,
-                      min: 50,
-                      max: 500,
-                      divisions: 9,
-                      activeColor: AppColors.primary,
-                      onChanged: (val) => setModalState(() => targetPapers = val),
-                    ),
-                  ],
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text('Số lượng bài báo mục tiêu', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                          Text(
+                            '${targetPapers.toInt()} bài',
+                            style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
+                          ),
+                        ],
+                      ),
+                      Slider(
+                        value: targetPapers,
+                        min: 50,
+                        max: 500,
+                        divisions: 9,
+                        activeColor: AppColors.primary,
+                        onChanged: (val) => setModalState(() => targetPapers = val),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [
@@ -198,38 +203,45 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Row(
-        children: [
-          // Sidebar on the left
-          AdminSidebar(
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _navigateToTab,
-            isCollapsed: _isSidebarCollapsed,
-            onToggleCollapse: () {
-              setState(() {
-                _isSidebarCollapsed = !_isSidebarCollapsed;
-              });
-            },
-          ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 1100;
+        final effectiveCollapsed = isNarrow || _isSidebarCollapsed;
 
-          // Main Content Area (Header + Subview)
-          Expanded(
-            child: Column(
-              children: [
-                AdminHeader(
-                  selectedIndex: _selectedIndex,
-                  onNewJobPressed: _showTriggerAnalysisDialog,
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: Row(
+            children: [
+              // Sidebar on the left
+              AdminSidebar(
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: _navigateToTab,
+                isCollapsed: effectiveCollapsed,
+                onToggleCollapse: () {
+                  setState(() {
+                    _isSidebarCollapsed = !_isSidebarCollapsed;
+                  });
+                },
+              ),
+
+              // Main Content Area (Header + Subview)
+              Expanded(
+                child: Column(
+                  children: [
+                    AdminHeader(
+                      selectedIndex: _selectedIndex,
+                      onNewJobPressed: _showTriggerAnalysisDialog,
+                    ),
+                    Expanded(
+                      child: _buildActiveView(),
+                    ),
+                  ],
                 ),
-                Expanded(
-                  child: _buildActiveView(),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

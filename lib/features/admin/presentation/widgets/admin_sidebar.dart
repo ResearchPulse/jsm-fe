@@ -122,23 +122,6 @@ class AdminSidebar extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    if (isCollapsed) return const SizedBox(height: 6);
-    return Padding(
-      padding: const EdgeInsets.only(left: 20, right: 20, top: 4, bottom: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          color: AppColors.sidebarSectionText, // #8b9aa4
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          fontFamily: 'Manrope',
-          letterSpacing: 0.6,
-        ),
-      ),
-    );
-  }
-
   Widget _buildNavItem({
     required int index,
     required IconData icon,

@@ -148,5 +148,55 @@
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1",
     "priority": "P1"
+  },
+  {
+    "id": "phase-01-radar-chart-painter",
+    "title": "Multi-Series Radar Chart Component",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 17.2s)",
+    "user_visible_behavior": "Interactive 6-axis polygonal radar chart displaying overlapping journal style fingerprints with vertex dots and legend.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-comparison-view-integration",
+    "title": "Comparison Mode & Side-by-Side Layout",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 13.7s)",
+    "user_visible_behavior": "Toggle between single-journal view and side-by-side comparison mode for 2–3 selected journals with live metric cards.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-responsive-and-verification",
+    "title": "Responsive Polish & QA Verification",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 13.2s)",
+    "user_visible_behavior": "Polished, responsive side-by-side layout with zero pixel overflow and passing flutter analyze.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-backend-user-crud",
+    "title": "Backend User CRUD & Safety Guards",
+    "status": "passing",
+    "evidence": "docker compose exec api pytest tests/integration/test_users_crud.py: 21 passed in 4.93s",
+    "user_visible_behavior": "REST API supports PATCH /api/v1/users/{user_id} and DELETE /api/v1/users/{user_id} with admin lockout prevention.",
+    "verification_command": "pytest tests/ -k user",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-frontend-user-inline-crud",
+    "title": "Frontend User Inline CRUD UI & API Client",
+    "status": "passing",
+    "evidence": "flutter analyze lib/features/users: No issues found! (ran in 1.1s)",
+    "user_visible_behavior": "Inline dropdowns for Role and Status, confirm save button on changes, and delete with confirmation dialog on user rows.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
   }
 ]
