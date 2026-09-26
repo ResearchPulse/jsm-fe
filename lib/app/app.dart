@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'theme/app_theme.dart';
 import 'auth_gate.dart';
 import 'auth_cubit_scope.dart';
+import '../core/localization/app_localizations.dart';
+import '../core/localization/locale_cubit.dart';
 
 import '../features/auth/domain/repositories/auth_repository.dart';
 import '../features/home/presentation/pages/home_page.dart';
@@ -38,6 +42,9 @@ class App extends StatelessWidget {
         ],
         child: MultiBlocProvider(
           providers: [
+            BlocProvider<LocaleCubit>(
+              create: (_) => LocaleCubit(),
+            ),
             BlocProvider<HomeCubit>(
               create: (context) => HomeCubit(
                 getFeaturedJournalsUseCase: GetFeaturedJournalsUseCase(
@@ -46,22 +53,37 @@ class App extends StatelessWidget {
               ),
             ),
           ],
-          child: MaterialApp(
-            title: 'journal system miner - HyperDataLab',
-            theme: AppTheme.lightTheme,
+          child: BlocBuilder<LocaleCubit, Locale>(
+            builder: (context, locale) {
+              return MaterialApp(
+                title: 'journal system miner - HyperDataLab',
+                theme: AppTheme.lightTheme,
+                locale: locale,
+                supportedLocales: const [
+                  Locale('en'),
+                  Locale('vi'),
+                ],
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
 
-            // Authentication is now the entry point of the application.
-            home: const AuthGate(),
+                // Authentication is now the entry point of the application.
+                home: const AuthGate(),
 
-            routes: {
-              '/home': (context) => const HomePage(),
-              '/admin': (context) => const AdminDashboardPage(),
-              '/user-info': (context) => const UserInfoPage(),
-              '/student-checker': (context) =>
-                  const StudentManuscriptCheckerPage(),
+                routes: {
+                  '/home': (context) => const HomePage(),
+                  '/admin': (context) => const AdminDashboardPage(),
+                  '/user-info': (context) => const UserInfoPage(),
+                  '/student-checker': (context) =>
+                      const StudentManuscriptCheckerPage(),
+                },
+
+                debugShowCheckedModeBanner: false,
+              );
             },
-
-            debugShowCheckedModeBanner: false,
           ),
         ),
       ),

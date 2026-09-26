@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/language_switcher.dart';
 
 class UserHeader extends StatelessWidget {
   final int selectedIndex;
@@ -66,6 +67,8 @@ class UserHeader extends StatelessWidget {
               ),
             ),
           ),
+          const Spacer(),
+          const LanguageSwitcher(),
         ],
       ),
     );

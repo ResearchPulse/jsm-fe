@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/search_input_box.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/widgets/language_switcher.dart';
+
 class AdminHeader extends StatelessWidget {
   final int selectedIndex;
   final VoidCallback? onNewJobPressed;
@@ -14,29 +17,29 @@ class AdminHeader extends StatelessWidget {
     this.onSearchChanged,
   });
 
-  String _getTitle() {
+  String _getTitle(BuildContext context) {
     switch (selectedIndex) {
       case 0:
-        return 'Trung Tâm Tạp Chí & Khai Phá';
+        return context.l10n.titleJournalsMining;
       case 1:
-        return 'Hồ Sơ & Đối Chuẩn NLP';
+        return context.l10n.titleNlpProfiles;
       case 2:
-        return 'Hệ Thống & Kỹ Thuật';
+        return context.l10n.titleSystemDebug;
       default:
-        return 'Bảng Điều Khiển Quản Trị';
+        return context.l10n.titleAdminDashboard;
     }
   }
 
-  String _getBreadcrumb() {
+  String _getBreadcrumb(BuildContext context) {
     switch (selectedIndex) {
       case 0:
-        return 'Nghiên cứu / Khai phá & Pipeline';
+        return context.l10n.breadcrumbResearch;
       case 1:
-        return 'Học thuật / Hồ sơ phong cách & Corpus';
+        return context.l10n.breadcrumbAcademic;
       case 2:
-        return 'Hệ thống / Giám sát & Cài đặt';
+        return context.l10n.breadcrumbSystem;
       default:
-        return 'Quản trị';
+        return context.l10n.breadcrumbAdmin;
     }
   }
 
@@ -60,7 +63,7 @@ class AdminHeader extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  _getBreadcrumb(),
+                  _getBreadcrumb(context),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -72,7 +75,7 @@ class AdminHeader extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  _getTitle(),
+                  _getTitle(context),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
@@ -89,13 +92,17 @@ class AdminHeader extends StatelessWidget {
           const SizedBox(width: 16),
           // Sleek animated search input (ResearchPulse FE style)
           SearchInputBox(
-            hintText: 'Tìm kiếm tạp chí, snapshot, jobs...',
+            hintText: context.l10n.searchPlaceholder,
             height: 38,
             expandOnFocus: true,
             width: 270,
             expandedWidth: 320,
             onChanged: onSearchChanged,
           ),
+          const SizedBox(width: 14),
+
+          // Language Switcher on navbar right
+          const LanguageSwitcher(),
         ],
       ),
     );

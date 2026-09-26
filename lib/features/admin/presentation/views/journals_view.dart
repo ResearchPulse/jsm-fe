@@ -2,6 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/search_input_box.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/admin_api_client.dart';
 import '../widgets/journal_command_center_panel.dart';
 
@@ -981,13 +982,13 @@ class _JournalsViewState extends State<JournalsView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Expanded(
+        Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Danh Mục & Trung Tâm Khai Phá Tạp Chí',
-                style: TextStyle(
+                context.l10n.journalsCatalogTitle,
+                style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
@@ -995,10 +996,10 @@ class _JournalsViewState extends State<JournalsView> {
                   letterSpacing: -0.4,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Text(
-                'Chọn tạp chí để kích hoạt khai phá 1-chạm (300 bài), giám sát bóc tách TEI XML và xem hồ sơ phong cách NLP tức thì.',
-                style: TextStyle(
+                context.l10n.journalsCatalogSubtitle,
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textMuted,
                   fontFamily: 'Manrope',
@@ -1014,14 +1015,14 @@ class _JournalsViewState extends State<JournalsView> {
             IconButton(
               onPressed: _loadAllData,
               icon: const Icon(Icons.refresh_rounded),
-              tooltip: 'Tải lại danh sách',
+              tooltip: context.l10n.reloadList,
               color: AppColors.primary,
             ),
             const SizedBox(width: 8),
             OutlinedButton.icon(
               onPressed: () => _showAddJournalDialog(context),
               icon: const Icon(Icons.post_add_rounded, size: 18),
-              label: const Text('Nhập tạp chí thủ công', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+              label: Text(context.l10n.addJournalManual, style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textPrimary,
                 side: const BorderSide(color: AppColors.border),
@@ -1051,7 +1052,7 @@ class _JournalsViewState extends State<JournalsView> {
                 child: SearchInputBox(
                   controller: _searchController,
                   height: 38,
-                  hintText: 'Tìm theo tên, ISSN, nhà xuất bản...',
+                  hintText: context.l10n.searchJournalPlaceholder,
                   onChanged: (val) => setState(() {
                     _searchQuery = val;
                     _currentPage = 1;
@@ -1088,9 +1089,9 @@ class _JournalsViewState extends State<JournalsView> {
               runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                _buildStatusFilterChip('all', 'Tất cả (${_journals.length})'),
-                _buildStatusFilterChip('configured', 'Đã cấu hình ($configuredCount)'),
-                _buildStatusFilterChip('unconfigured', 'Chưa có ($unconfiguredCount)'),
+                _buildStatusFilterChip('all', '${context.l10n.filterAll} (${_journals.length})'),
+                _buildStatusFilterChip('configured', '${context.l10n.filterConfigured} ($configuredCount)'),
+                _buildStatusFilterChip('unconfigured', '${context.l10n.filterUnconfigured} ($unconfiguredCount)'),
                 if (domains.isNotEmpty) ...[
                   _buildDomainFilterMenu(domains),
                 ],
@@ -1615,10 +1616,10 @@ class _JournalsViewState extends State<JournalsView> {
               ),
             ),
             const SizedBox(height: 18),
-            const Text(
-              'Trung Tâm Khai Phá & Hồ Sơ Phong Cách',
+            Text(
+              context.l10n.miningCenterTitle,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w800,
                 color: AppColors.textPrimary,
@@ -1629,10 +1630,10 @@ class _JournalsViewState extends State<JournalsView> {
             const SizedBox(height: 8),
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 380),
-              child: const Text(
-                'Chọn một tạp chí từ danh sách bên trái để kích hoạt khai phá 1-chạm (300 bài), theo dõi chu trình 4 giai đoạn và xem hồ sơ phong cách NLP tức thì.',
+              child: Text(
+                context.l10n.miningCenterDesc,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 13,
                   color: AppColors.textMuted,
                   fontFamily: 'Manrope',
@@ -1646,9 +1647,9 @@ class _JournalsViewState extends State<JournalsView> {
               runSpacing: 8,
               alignment: WrapAlignment.center,
               children: [
-                _buildFeatureBadge(Icons.bolt_rounded, '1-Chạm Khai phá 300 bài'),
-                _buildFeatureBadge(Icons.account_tree_rounded, 'Bóc tách TEI XML & MinIO'),
-                _buildFeatureBadge(Icons.psychology_rounded, 'Phân tích Phong cách NLP'),
+                _buildFeatureBadge(Icons.bolt_rounded, context.l10n.badge1Touch),
+                _buildFeatureBadge(Icons.account_tree_rounded, context.l10n.badgeTeiXml),
+                _buildFeatureBadge(Icons.psychology_rounded, context.l10n.badgeNlpStyle),
               ],
             ),
           ],

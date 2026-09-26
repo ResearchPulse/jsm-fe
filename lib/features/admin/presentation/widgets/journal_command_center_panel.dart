@@ -954,7 +954,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     ),
                   ],
                 ),
-                if (failedCount > 0)
+                if (failedCount > 0 && processedArticles < totalArticles)
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

@@ -5,6 +5,8 @@ import '../../../auth/domain/entities/auth_user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+
 class AdminSidebar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onDestinationSelected;
@@ -51,7 +53,7 @@ class AdminSidebar extends StatelessWidget {
                   isCollapsed: isCollapsed,
                   icon: Icons.auto_stories_outlined,
                   activeIcon: Icons.auto_stories_rounded,
-                  title: 'Trung tâm Tạp chí',
+                  title: context.l10n.navJournalsCenter,
                   onTap: onDestinationSelected,
                 ),
                 const SizedBox(height: 3),
@@ -61,7 +63,7 @@ class AdminSidebar extends StatelessWidget {
                   isCollapsed: isCollapsed,
                   icon: Icons.psychology_outlined,
                   activeIcon: Icons.psychology_rounded,
-                  title: 'Hồ sơ & Đối chuẩn NLP',
+                  title: context.l10n.navNlpProfiles,
                   onTap: onDestinationSelected,
                 ),
                 const SizedBox(height: 3),
@@ -71,7 +73,7 @@ class AdminSidebar extends StatelessWidget {
                   isCollapsed: isCollapsed,
                   icon: Icons.tune_outlined,
                   activeIcon: Icons.tune_rounded,
-                  title: 'Hệ thống & Kỹ thuật',
+                  title: context.l10n.navSystemTechnical,
                   onTap: onDestinationSelected,
                 ),
               ],

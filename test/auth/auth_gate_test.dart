@@ -8,6 +8,10 @@ import 'package:jsm_fe/features/auth/domain/entities/auth_provider.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_result.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_user.dart';
 import 'package:jsm_fe/features/auth/domain/repositories/auth_repository.dart';
+import 'package:jsm_fe/features/auth/domain/usecases/login_usecase.dart';
+import 'package:jsm_fe/features/auth/domain/usecases/logout_usecase.dart';
+import 'package:jsm_fe/features/auth/domain/usecases/restore_session_usecase.dart';
+import 'package:jsm_fe/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:jsm_fe/features/auth/presentation/pages/login_page.dart';
 
 /// Stub repository: never touches a browser or the SSO network.
@@ -49,11 +53,17 @@ class _StubRepo implements AuthRepository {
   }
 }
 
-Widget _gate(AuthRepository repo) => MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<AuthRepository>(create: (_) => repo),
-      ],
-      child: const MaterialApp(home: AuthGate()),
+Widget _gate(AuthRepository repo) => RepositoryProvider<AuthRepository>.value(
+      value: repo,
+      child: BlocProvider<AuthCubit>(
+        create: (_) => AuthCubit(
+          loginUseCase: LoginUseCase(repo),
+          logoutUseCase: LogoutUseCase(repo),
+          restoreSessionUseCase: RestoreSessionUseCase(repo),
+          repository: repo,
+        )..checkSession(),
+        child: const MaterialApp(home: AuthGate()),
+      ),
     );
 
 void main() {
