@@ -51,26 +51,26 @@ class _StyleAndCorpusViewState extends State<StyleAndCorpusView> {
             color: AppColors.surface,
             border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
           ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            physics: const BouncingScrollPhysics(),
-            child: Row(
-              children: [
-                _buildSegmentItem(
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildSegmentItem(
                   index: 0,
                   icon: Icons.psychology_rounded,
                   title: 'Hồ Sơ Phong Cách NLP & CARS Moves',
                   subtitle: 'Hyland Stance, CARS Rhetorical Moves, Phân phối câu',
                 ),
-                const SizedBox(width: 12),
-                _buildSegmentItem(
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: _buildSegmentItem(
                   index: 1,
                   icon: Icons.layers_rounded,
                   title: 'Kho Corpus Snapshots & Dữ Liệu',
                   subtitle: 'Reference Corpus, Phiên bản kho bài, Tải JSON/CSV',
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
 
@@ -106,6 +106,7 @@ class _StyleAndCorpusViewState extends State<StyleAndCorpusView> {
       borderRadius: BorderRadius.circular(10),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
+        height: 64,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.blue50 : AppColors.surfaceSoft,
@@ -116,36 +117,42 @@ class _StyleAndCorpusViewState extends State<StyleAndCorpusView> {
           ),
         ),
         child: Row(
-          mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
               icon,
               size: 20,
               color: isSelected ? AppColors.primary : AppColors.textMuted,
             ),
-            const SizedBox(width: 10),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                    color: isSelected ? AppColors.primary : AppColors.textPrimary,
-                    fontFamily: 'Manrope',
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                      color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
-                ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMuted,
-                    fontFamily: 'Manrope',
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: AppColors.textMuted,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),

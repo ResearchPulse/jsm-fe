@@ -415,50 +415,19 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
             ],
           ),
           const SizedBox(height: 16),
-          Wrap(
-            spacing: 14,
-            runSpacing: 14,
-            crossAxisAlignment: WrapCrossAlignment.center,
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              for (int i = 0; i < _selectedCompareIds.length; i++)
-                _buildDropdownSlot(i, _selectedCompareIds[i], _profiles),
-              if (_selectedCompareIds.length < 3)
-                InkWell(
-                  onTap: _addJournalSlot,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    height: 72,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    decoration: BoxDecoration(
-                      color: AppColors.blue50,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary.withAlpha(140), width: 1.5),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.add_rounded, size: 16, color: Colors.white),
-                        ),
-                        const SizedBox(width: 10),
-                        const Text(
-                          'Thêm tạp chí',
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.primary,
-                            fontFamily: 'Manrope',
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+              for (int i = 0; i < _selectedCompareIds.length; i++) ...[
+                if (i > 0) const SizedBox(width: 14),
+                Expanded(
+                  child: _buildDropdownSlot(i, _selectedCompareIds[i], _profiles),
                 ),
+              ],
+              if (_selectedCompareIds.length < 3) ...[
+                const SizedBox(width: 14),
+                _buildAddJournalButton(),
+              ],
             ],
           ),
         ],
@@ -466,11 +435,45 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
     );
   }
 
+  Widget _buildAddJournalButton() {
+    return Tooltip(
+      message: 'Thêm tạp chí so sánh (tối đa 3)',
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: _addJournalSlot,
+          borderRadius: BorderRadius.circular(22),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.blue50,
+              shape: BoxShape.circle,
+              border: Border.all(color: AppColors.primary.withAlpha(160), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withAlpha(20),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.add_rounded,
+              size: 24,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildDropdownSlot(int index, String currentId, List<Map<String, dynamic>> profiles) {
     final color = _compareColors[index % _compareColors.length];
     return Container(
-      width: 320,
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      height: 76,
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
@@ -485,13 +488,13 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
             children: [
               Container(
-                width: 10,
-                height: 10,
+                width: 9,
+                height: 9,
                 decoration: BoxDecoration(color: color, shape: BoxShape.circle),
               ),
               const SizedBox(width: 8),
@@ -520,13 +523,14 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
                 ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
               value: profiles.any((p) => p['journal_id']?.toString() == currentId)
                   ? currentId
                   : (profiles.isNotEmpty ? profiles.first['journal_id']?.toString() : null),
               isExpanded: true,
+              isDense: true,
               icon: Icon(Icons.keyboard_arrow_down_rounded, color: color, size: 20),
               style: const TextStyle(
                 fontSize: 13,
