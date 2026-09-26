@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/admin_api_client.dart';
 
 class SnapshotsView extends StatefulWidget {
@@ -74,13 +75,13 @@ class _SnapshotsViewState extends State<SnapshotsView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Kho Lưu Trữ Corpus Snapshots (Bất Biến)',
-                      style: TextStyle(
+                      context.l10n.snapshotsTitle,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -88,10 +89,10 @@ class _SnapshotsViewState extends State<SnapshotsView> {
                         letterSpacing: -0.4,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Tập hợp bài báo đã qua bóc tách cấu trúc bằng Grobid và làm sạch, được đóng băng phục vụ đối chiếu phong cách.',
-                      style: TextStyle(
+                      context.l10n.snapshotsSubtitle,
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textMuted,
                         fontFamily: 'Manrope',
@@ -107,14 +108,14 @@ class _SnapshotsViewState extends State<SnapshotsView> {
                   IconButton(
                     onPressed: _loadSnapshots,
                     icon: const Icon(Icons.refresh_rounded),
-                    tooltip: 'Tải lại danh sách snapshot',
+                    tooltip: context.l10n.reloadSnapshots,
                     color: AppColors.primary,
                   ),
                   const SizedBox(width: 8),
                   OutlinedButton.icon(
                     onPressed: () => widget.onNavigateToTab(3),
                     icon: const Icon(Icons.bolt_rounded, size: 18),
-                    label: const Text('Xem tiến trình tạo Snapshot'),
+                    label: Text(context.l10n.viewSnapshotProgress),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.primary,
                       side: const BorderSide(color: AppColors.primary),
@@ -140,7 +141,7 @@ class _SnapshotsViewState extends State<SnapshotsView> {
               onChanged: (val) => setState(() => _searchQuery = val),
               style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm theo tên tạp chí, mã Snapshot, SHA-256 Hash...',
+                hintText: context.l10n.searchSnapshotHint,
                 hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
                 prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -181,32 +182,32 @@ class _SnapshotsViewState extends State<SnapshotsView> {
                               topRight: Radius.circular(16),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
                               Expanded(
                                 flex: 3,
-                                child: Text('TẠP CHÍ & MÃ SNAPSHOT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(context.l10n.colJournalSnapshot, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
-                      Expanded(
-                        flex: 2,
-                        child: Text('GIAI ĐOẠN NĂM', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text('SỐ LƯỢNG BÀI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
-                      ),
-                      Expanded(
-                        flex: 3,
-                        child: Text('MÃ HASH BẢO MẬT (SHA-256)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text('NGÀY ĐÓNG BĂNG', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
-                      ),
-                      SizedBox(width: 90, child: Text('THAO TÁC', textAlign: TextAlign.right, style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'))),
-                    ],
-                  ),
-                ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(context.l10n.colYearRange, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(context.l10n.colArticleCount, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(context.l10n.colHash, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Text(context.l10n.colFrozenDate, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                              ),
+                              SizedBox(width: 90, child: Text(context.l10n.colActions, textAlign: TextAlign.right, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'))),
+                            ],
+                          ),
+                        ),
 
                 // Table state
                 if (_isLoading)

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 
+import '../../../../core/localization/app_localizations.dart';
+
 class AdminSidebar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onDestinationSelected;
@@ -42,21 +44,21 @@ class AdminSidebar extends StatelessWidget {
                   index: 0,
                   icon: Icons.auto_stories_outlined,
                   activeIcon: Icons.auto_stories_rounded,
-                  title: 'Trung tâm Tạp chí',
+                  title: context.l10n.navJournalsCenter,
                 ),
                 const SizedBox(height: 6),
                 _buildNavItem(
                   index: 1,
                   icon: Icons.psychology_outlined,
                   activeIcon: Icons.psychology_rounded,
-                  title: 'Hồ sơ & Đối chuẩn NLP',
+                  title: context.l10n.navNlpProfiles,
                 ),
                 const SizedBox(height: 6),
                 _buildNavItem(
                   index: 2,
                   icon: Icons.tune_outlined,
                   activeIcon: Icons.tune_rounded,
-                  title: 'Hệ thống & Kỹ thuật',
+                  title: context.l10n.navSystemTechnical,
                 ),
               ],
             ),
@@ -216,14 +218,14 @@ class AdminSidebar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: AppColors.sidebarBorder),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.arrow_back_rounded, size: 16, color: AppColors.sidebarIconInactive),
-                    SizedBox(width: 8),
+                    const Icon(Icons.arrow_back_rounded, size: 16, color: AppColors.sidebarIconInactive),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Quay về trang chủ',
-                        style: TextStyle(
+                        context.l10n.backToHome,
+                        style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.sidebarTextInactive,
                           fontWeight: FontWeight.w600,
@@ -244,7 +246,7 @@ class AdminSidebar extends StatelessWidget {
               color: AppColors.sidebarIconInactive,
               size: 20,
             ),
-            tooltip: isCollapsed ? 'Mở rộng thanh menu' : 'Thu gọn thanh menu',
+            tooltip: isCollapsed ? context.l10n.expandSidebar : context.l10n.collapseSidebar,
             style: IconButton.styleFrom(
               hoverColor: AppColors.sidebarHover,
             ),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/widgets/error_view.dart';
+import '../../../../core/widgets/language_switcher.dart';
 import '../../../../core/widgets/loading_view.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../data/repositories/student_manuscript_repository_impl.dart';
@@ -73,7 +75,7 @@ class _StudentManuscriptCheckerView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Student Manuscript Checker'),
+        title: Text(context.l10n.studentCheckerTitle),
         actions: [
           BlocBuilder<StudentManuscriptCheckerCubit,
               StudentManuscriptCheckerState>(
@@ -88,7 +90,7 @@ class _StudentManuscriptCheckerView extends StatelessWidget {
                       context.read<StudentManuscriptCheckerCubit>().reset();
                     },
                     icon: const Icon(Icons.refresh_rounded, size: 16),
-                    label: const Text('New Check'),
+                    label: Text(context.l10n.newCheck),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 8),
@@ -99,6 +101,8 @@ class _StudentManuscriptCheckerView extends StatelessWidget {
               return const SizedBox.shrink();
             },
           ),
+          const LanguageSwitcher(),
+          const SizedBox(width: 12),
         ],
       ),
       body: SafeArea(

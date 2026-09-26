@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../data/datasources/users_api_client.dart';
 import '../../domain/entities/user_profile.dart';
@@ -110,19 +111,19 @@ class _UsersViewState extends State<UsersView> {
     }
   }
 
-  String _roleLabel(String role) {
+  String _roleLabel(BuildContext context, String role) {
     switch (role.toLowerCase()) {
       case 'admin':
-        return 'Quản trị viên (Admin)';
+        return context.l10n.roleAdminLabel;
       case 'lecturer':
-        return 'Giảng viên (Lecturer)';
+        return context.l10n.roleLecturerLabel;
       case 'student':
       default:
-        return 'Sinh viên (Student)';
+        return context.l10n.roleStudentLabel;
     }
   }
 
-  Widget _buildRoleBadge(String role) {
+  Widget _buildRoleBadge(BuildContext context, String role) {
     final color = _roleColor(role);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -131,7 +132,7 @@ class _UsersViewState extends State<UsersView> {
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
-        _roleLabel(role),
+        _roleLabel(context, role),
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w700,
@@ -157,8 +158,8 @@ class _UsersViewState extends State<UsersView> {
       final isDemotingOrDeactivating = (newStatus == false) || (newRole != null && newRole != 'admin');
       if (isDemotingOrDeactivating && _activeAdminCount <= 1) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Không thể khóa hoặc hạ quyền Quản trị viên duy nhất của hệ thống.'),
+          SnackBar(
+            content: Text(context.l10n.cannotDemoteLastAdmin),
             backgroundColor: AppColors.error,
             behavior: SnackBarBehavior.floating,
           ),
@@ -228,8 +229,8 @@ class _UsersViewState extends State<UsersView> {
   void _confirmDeleteUser(String userId, String fullName, String email, bool isAdmin) {
     if (isAdmin && _activeAdminCount <= 1) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Không thể xóa Quản trị viên duy nhất của hệ thống.'),
+        SnackBar(
+          content: Text(context.l10n.cannotDeleteLastAdmin),
           backgroundColor: AppColors.error,
           behavior: SnackBarBehavior.floating,
         ),
@@ -242,13 +243,13 @@ class _UsersViewState extends State<UsersView> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 24),
-            SizedBox(width: 8),
+            const Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 24),
+            const SizedBox(width: 8),
             Text(
-              'Xác nhận xóa tài khoản',
-              style: TextStyle(
+              context.l10n.confirmDeleteUserTitle,
+              style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -264,7 +265,7 @@ class _UsersViewState extends State<UsersView> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản sau?',
+                context.l10n.confirmDeleteUserDesc,
                 style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
               ),
               const SizedBox(height: 12),
@@ -280,7 +281,7 @@ class _UsersViewState extends State<UsersView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      fullName.isNotEmpty ? fullName : 'Người dùng',
+                      fullName.isNotEmpty ? fullName : 'User',
                       style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 2),
@@ -292,9 +293,9 @@ class _UsersViewState extends State<UsersView> {
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Hành động này không thể hoàn tác. Mọi quyền truy cập của người dùng này sẽ bị hủy bỏ ngay lập tức.',
-                style: TextStyle(fontSize: 12, color: AppColors.error, fontFamily: 'Manrope', height: 1.4),
+              Text(
+                context.l10n.confirmDeleteUserWarning,
+                style: const TextStyle(fontSize: 12, color: AppColors.error, fontFamily: 'Manrope', height: 1.4),
               ),
             ],
           ),
@@ -302,7 +303,7 @@ class _UsersViewState extends State<UsersView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Hủy bỏ', style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
+            child: Text(context.l10n.cancel, style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -341,7 +342,7 @@ class _UsersViewState extends State<UsersView> {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Xóa vĩnh viễn', style: TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
+            child: Text(context.l10n.deletePermanently, style: const TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
           ),
         ],
       ),
@@ -359,12 +360,12 @@ class _UsersViewState extends State<UsersView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Quản Lý Tài Khoản Người Dùng',
-                    style: TextStyle(
+                    context.l10n.usersViewTitle,
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
                       fontFamily: 'Manrope',
@@ -372,10 +373,10 @@ class _UsersViewState extends State<UsersView> {
                       letterSpacing: -0.4,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Cấp phát và quản lý quyền truy cập cho Giảng viên (khảo sát tạp chí) và Sinh viên (kiểm tra bản thảo).',
-                    style: TextStyle(
+                    context.l10n.usersViewSubtitle,
+                    style: const TextStyle(
                       fontSize: 14,
                       color: AppColors.textMuted,
                       fontFamily: 'Manrope',
@@ -386,7 +387,7 @@ class _UsersViewState extends State<UsersView> {
               IconButton(
                 onPressed: _loadUsers,
                 icon: const Icon(Icons.refresh_rounded),
-                tooltip: 'Tải lại danh sách tài khoản',
+                tooltip: context.l10n.reloadUsers,
                 color: AppColors.primary,
               ),
             ],
@@ -402,18 +403,18 @@ class _UsersViewState extends State<UsersView> {
                   children: [
                     _ActionCard(
                       icon: Icons.school_outlined,
-                      title: 'Tạo tài khoản Sinh viên',
-                      subtitle: 'Cấp quyền truy cập module kiểm tra bản thảo bài báo (.docx / .pdf)',
-                      badgeText: 'Vai trò Student',
+                      title: context.l10n.createStudentTitle,
+                      subtitle: context.l10n.createStudentSubtitle,
+                      badgeText: context.l10n.roleBadgeStudent,
                       onTap: () => _open(context, UserRole.student),
                       isExpanded: false,
                     ),
                     const SizedBox(height: 14),
                     _ActionCard(
                       icon: Icons.co_present_outlined,
-                      title: 'Tạo tài khoản Giảng viên',
-                      subtitle: 'Cấp quyền xem hồ sơ phong cách, cấu hình tạp chí và xuất dữ liệu',
-                      badgeText: 'Vai trò Lecturer',
+                      title: context.l10n.createLecturerTitle,
+                      subtitle: context.l10n.createLecturerSubtitle,
+                      badgeText: context.l10n.roleBadgeLecturer,
                       onTap: () => _open(context, UserRole.lecturer),
                       isExpanded: false,
                     ),
@@ -425,17 +426,17 @@ class _UsersViewState extends State<UsersView> {
                 children: [
                   _ActionCard(
                     icon: Icons.school_outlined,
-                    title: 'Tạo tài khoản Sinh viên',
-                    subtitle: 'Cấp quyền truy cập module kiểm tra bản thảo bài báo (.docx / .pdf)',
-                    badgeText: 'Vai trò Student',
+                    title: context.l10n.createStudentTitle,
+                    subtitle: context.l10n.createStudentSubtitle,
+                    badgeText: context.l10n.roleBadgeStudent,
                     onTap: () => _open(context, UserRole.student),
                   ),
                   const SizedBox(width: 20),
                   _ActionCard(
                     icon: Icons.co_present_outlined,
-                    title: 'Tạo tài khoản Giảng viên',
-                    subtitle: 'Cấp quyền xem hồ sơ phong cách, cấu hình tạp chí và xuất dữ liệu',
-                    badgeText: 'Vai trò Lecturer',
+                    title: context.l10n.createLecturerTitle,
+                    subtitle: context.l10n.createLecturerSubtitle,
+                    badgeText: context.l10n.roleBadgeLecturer,
                     onTap: () => _open(context, UserRole.lecturer),
                   ),
                 ],
@@ -472,30 +473,30 @@ class _UsersViewState extends State<UsersView> {
                               topRight: Radius.circular(16),
                             ),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
                               Expanded(
                                 flex: 3,
-                                child: Text('HỌ VÀ TÊN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(context.l10n.colFullName, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
                               Expanded(
                                 flex: 4,
-                                child: Text('EMAIL TÀI KHOẢN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(context.l10n.colAccountEmail, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
                               Expanded(
                                 flex: 3,
-                                child: Text('VAI TRÒ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(context.l10n.colRole, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
                               Expanded(
                                 flex: 2,
-                                child: Text('TRẠNG THÁI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(context.l10n.colStatus, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
                               SizedBox(
                                 width: 80,
                                 child: Text(
-                                  'THAO TÁC',
+                                  context.l10n.colActions,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
                                 ),
                               ),
                             ],
@@ -520,19 +521,19 @@ class _UsersViewState extends State<UsersView> {
                                   OutlinedButton.icon(
                                     onPressed: _loadUsers,
                                     icon: const Icon(Icons.refresh_rounded, size: 16),
-                                    label: const Text('Thử lại'),
+                                    label: Text(context.l10n.retry),
                                   ),
                                 ],
                               ),
                             ),
                           )
                         else if (_users.isEmpty)
-                          const Padding(
-                            padding: EdgeInsets.all(48),
+                          Padding(
+                            padding: const EdgeInsets.all(48),
                             child: Center(
                               child: Text(
-                                'Chưa có tài khoản người dùng nào được tạo.',
-                                style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+                                context.l10n.noUsersFound,
+                                style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
                               ),
                             ),
                           )
@@ -601,7 +602,7 @@ class _UsersViewState extends State<UsersView> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Tham gia: ${_formatDate(user['created_at'] ?? user['createdAt'])}',
+                  '${context.l10n.joined}: ${_formatDate(user['created_at'] ?? user['createdAt'])}',
                   style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
                 ),
               ],
@@ -628,15 +629,15 @@ class _UsersViewState extends State<UsersView> {
                     items: [
                       DropdownMenuItem(
                         value: 'student',
-                        child: _buildRoleBadge('student'),
+                        child: _buildRoleBadge(context, 'student'),
                       ),
                       DropdownMenuItem(
                         value: 'lecturer',
-                        child: _buildRoleBadge('lecturer'),
+                        child: _buildRoleBadge(context, 'lecturer'),
                       ),
                       DropdownMenuItem(
                         value: 'admin',
-                        child: _buildRoleBadge('admin'),
+                        child: _buildRoleBadge(context, 'admin'),
                       ),
                     ],
                     onChanged: (newRole) {
@@ -673,15 +674,15 @@ class _UsersViewState extends State<UsersView> {
                     borderRadius: BorderRadius.circular(8),
                     dropdownColor: AppColors.surface,
                     icon: const Icon(Icons.arrow_drop_down_rounded, size: 18, color: AppColors.textSubtle),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: true,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green700),
-                            SizedBox(width: 6),
-                            Text('Hoạt động', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.green700, fontFamily: 'Manrope')),
+                            const Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green700),
+                            const SizedBox(width: 6),
+                            Text(context.l10n.activeStatus, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.green700, fontFamily: 'Manrope')),
                           ],
                         ),
                       ),
@@ -690,9 +691,9 @@ class _UsersViewState extends State<UsersView> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.cancel_rounded, size: 14, color: AppColors.error),
-                            SizedBox(width: 6),
-                            Text('Tạm khóa', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.error, fontFamily: 'Manrope')),
+                            const Icon(Icons.cancel_rounded, size: 14, color: AppColors.error),
+                            const SizedBox(width: 6),
+                            Text(context.l10n.inactiveStatus, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.error, fontFamily: 'Manrope')),
                           ],
                         ),
                       ),
@@ -730,7 +731,7 @@ class _UsersViewState extends State<UsersView> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Tooltip(
-                            message: 'Lưu thay đổi',
+                            message: context.l10n.saveChanges,
                             child: InkWell(
                               onTap: () => _saveUserChanges(userId, email, fullName),
                               borderRadius: BorderRadius.circular(6),
@@ -747,7 +748,7 @@ class _UsersViewState extends State<UsersView> {
                           ),
                           const SizedBox(width: 6),
                           Tooltip(
-                            message: 'Hủy thay đổi',
+                            message: context.l10n.cancelChanges,
                             child: InkWell(
                               onTap: () => _discardUserChanges(userId),
                               borderRadius: BorderRadius.circular(6),
@@ -771,8 +772,8 @@ class _UsersViewState extends State<UsersView> {
                           onPressed: isLastAdmin
                               ? () {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Không thể xóa Quản trị viên duy nhất của hệ thống.'),
+                                    SnackBar(
+                                      content: Text(context.l10n.cannotDeleteLastAdmin),
                                       backgroundColor: AppColors.error,
                                       behavior: SnackBarBehavior.floating,
                                     ),
@@ -881,18 +882,18 @@ class _ActionCard extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Row(
-              children: const [
+              children: [
                 Text(
-                  'Khởi tạo ngay',
-                  style: TextStyle(
+                  context.l10n.initiateNow,
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
                     color: AppColors.primary,
                     fontFamily: 'Manrope',
                   ),
                 ),
-                SizedBox(width: 4),
-                Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primary),
+                const SizedBox(width: 4),
+                const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primary),
               ],
             ),
           ],
@@ -930,7 +931,7 @@ class _SubtleDeleteButtonState extends State<_SubtleDeleteButton> {
         onPressed: widget.onPressed,
         icon: const Icon(Icons.delete_outline_rounded, size: 18),
         color: AppColors.slate300,
-        tooltip: 'Không thể xóa Quản trị viên duy nhất',
+        tooltip: context.l10n.cannotDeleteLastAdmin,
         splashRadius: 18,
         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
         padding: EdgeInsets.zero,
@@ -944,7 +945,7 @@ class _SubtleDeleteButtonState extends State<_SubtleDeleteButton> {
         onPressed: widget.onPressed,
         icon: const Icon(Icons.delete_outline_rounded, size: 18),
         color: _isHovered ? AppColors.error : AppColors.textSubtle,
-        tooltip: 'Xóa tài khoản',
+        tooltip: context.l10n.deleteAccountTooltip,
         splashRadius: 18,
         constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
         padding: EdgeInsets.zero,

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/widgets/language_switcher.dart';
 import '../../domain/entities/auth_provider.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
@@ -26,8 +28,6 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView>
     with SingleTickerProviderStateMixin {
-  static const _signInLabel = 'Sign in';
-
   late final AnimationController _controller;
   late final Animation<double> _cardFade;
   late final Animation<Offset> _cardSlide;
@@ -224,6 +224,8 @@ class _LoginViewState extends State<LoginView>
                         ],
                       ),
                     ),
+                    const SizedBox(width: 12),
+                    const LanguageSwitcher(),
                   ],
                 ),
               ),
@@ -325,9 +327,9 @@ class _LoginViewState extends State<LoginView>
                                   const SizedBox(height: 18),
 
                                   // Title
-                                  const Text(
-                                    _signInLabel,
-                                    style: TextStyle(
+                                  Text(
+                                    context.l10n.signIn,
+                                    style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w800,
                                       fontFamily: 'Manrope',
@@ -338,10 +340,12 @@ class _LoginViewState extends State<LoginView>
                                   const SizedBox(height: 6),
 
                                   // Subtitle
-                                  const Text(
-                                    'Cổng xác thực tập trung cho nghiên cứu & xuất bản tạp chí khoa học',
+                                  Text(
+                                    context.l10n.isVietnamese
+                                        ? 'Cổng xác thực tập trung cho nghiên cứu & xuất bản tạp chí khoa học'
+                                        : 'Central authentication portal for scientific research & journal publication',
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 13,
                                       color: AppColors.textSecondary,
                                       fontFamily: 'Manrope',
@@ -395,7 +399,7 @@ class _LoginViewState extends State<LoginView>
                                     height: 48,
                                     child: Semantics(
                                       button: true,
-                                      label: _signInLabel,
+                                      label: context.l10n.signIn,
                                       child: ElevatedButton(
                                         onPressed: busy
                                             ? null
@@ -432,19 +436,19 @@ class _LoginViewState extends State<LoginView>
                                                     color: Colors.white,
                                                   ),
                                                 )
-                                              : const Row(
-                                                  key: ValueKey('content'),
+                                              : Row(
+                                                  key: const ValueKey('content'),
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
-                                                    Icon(
+                                                    const Icon(
                                                       Icons.login_rounded,
                                                       size: 18,
                                                     ),
-                                                    SizedBox(width: 8),
+                                                    const SizedBox(width: 8),
                                                     Text(
-                                                      _signInLabel,
-                                                      style: TextStyle(
+                                                      context.l10n.signIn,
+                                                      style: const TextStyle(
                                                         fontSize: 14.5,
                                                         fontWeight:
                                                             FontWeight.w700,
@@ -471,20 +475,20 @@ class _LoginViewState extends State<LoginView>
                                         color: AppColors.borderSoft,
                                       ),
                                     ),
-                                    child: const Row(
+                                    child: Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.info_outline_rounded,
                                           size: 15,
                                           color: AppColors.slate600,
                                         ),
-                                        SizedBox(width: 8),
+                                        const SizedBox(width: 8),
                                         Expanded(
                                           child: Text(
-                                            'Tài khoản được xác thực qua cổng Central SSO chung của HyperDataLab.',
-                                            style: TextStyle(
+                                            context.l10n.ssoNote,
+                                            style: const TextStyle(
                                               fontSize: 11.5,
                                               color: AppColors.slate600,
                                               fontFamily: 'Manrope',
@@ -507,16 +511,16 @@ class _LoginViewState extends State<LoginView>
                               crossAxisAlignment: WrapCrossAlignment.center,
                               spacing: 6,
                               runSpacing: 4,
-                              children: const [
-                                Icon(
+                              children: [
+                                const Icon(
                                   Icons.verified_user_rounded,
                                   size: 13,
                                   color: AppColors.textSubtle,
                                 ),
                                 Text(
-                                  'Bảo mật tiêu chuẩn OpenID Connect & OAuth 2.0',
+                                  context.l10n.securityStandard,
                                   textAlign: TextAlign.center,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 11.5,
                                     color: AppColors.textSubtle,
                                     fontFamily: 'Manrope',

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/admin_api_client.dart';
 
 class JobMonitorView extends StatefulWidget {
@@ -19,7 +20,7 @@ class JobMonitorView extends StatefulWidget {
 
 class _JobMonitorViewState extends State<JobMonitorView> {
   final AdminApiClient _apiClient = AdminApiClient();
-  String _selectedFilter = 'Tất cả';
+  String _selectedFilter = 'ALL';
   List<Map<String, dynamic>> _jobs = [];
   bool _isLoading = true;
   String? _error;
@@ -88,18 +89,18 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     }
   }
 
-  String _mapStatusText(String status) {
+  String _mapStatusText(BuildContext context, String status) {
     switch (status.toUpperCase()) {
       case 'RUNNING':
-        return 'Đang xử lý';
+        return context.l10n.statusRunning;
       case 'COMPLETED':
-        return 'Hoàn thành';
+        return context.l10n.statusCompleted;
       case 'PENDING':
-        return 'Hàng đợi';
+        return context.l10n.statusPending;
       case 'FAILED':
-        return 'Thất bại';
+        return context.l10n.statusFailed;
       case 'CANCELLED':
-        return 'Đã hủy';
+        return context.l10n.statusCancelled;
       default:
         return status;
     }
@@ -128,9 +129,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Xác nhận hủy tác vụ',
-          style: TextStyle(
+        title: Text(
+          context.l10n.confirmCancelTitle,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -138,13 +139,13 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           ),
         ),
         content: Text(
-          'Bạn có chắc chắn muốn dừng tác vụ khai phá của tạp chí "$journalTitle" không? Quá trình tải bài báo sẽ dừng lại.',
+          context.l10n.confirmCancelDesc(journalTitle),
           style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Bỏ qua', style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+            child: Text(context.l10n.dismiss, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -154,7 +155,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Hủy tác vụ ngay', style: TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
+            child: Text(context.l10n.stopTask, style: const TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -188,9 +189,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       builder: (ctx) => AlertDialog(
         backgroundColor: AppColors.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
-          'Xác nhận xóa / hủy tác vụ',
-          style: TextStyle(
+        title: Text(
+          context.l10n.deleteJob,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             color: AppColors.textPrimary,
@@ -198,13 +199,13 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           ),
         ),
         content: Text(
-          'Bạn có chắc chắn muốn hủy và xóa tác vụ của tạp chí "$journalTitle" khỏi danh sách không? Toàn bộ dữ liệu thu thập của tác vụ này sẽ được dọn dẹp.',
+          context.l10n.confirmCancelDesc(journalTitle),
           style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Bỏ qua', style: TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+            child: Text(context.l10n.dismiss, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -214,7 +215,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               elevation: 0,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Xóa tác vụ', style: TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
+            child: Text(context.l10n.deleteJob, style: const TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -253,35 +254,35 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     return 6;
   }
 
-  String _stageDescription(int stageNum, String step, String status) {
+  String _stageDescription(BuildContext context, int stageNum, String step, String status) {
     if (status.toUpperCase() == 'COMPLETED') {
-      return 'Giai đoạn 6/6: Đóng gói Snapshot & Profile hoàn tất';
+      return context.l10n.stageCompleted;
     }
     if (status.toUpperCase() == 'CANCELLED') {
-      return 'Tác vụ đã dừng lại (Đã hủy bởi quản trị viên)';
+      return context.l10n.stageCancelled;
     }
     switch (stageNum) {
       case 1:
-        return 'Giai đoạn 1/6: Thu thập metadata bài báo (OpenAlex)';
+        return context.l10n.stage1;
       case 2:
-        return 'Giai đoạn 2/6: Tải toàn văn PDF từ nguồn Open Access';
+        return context.l10n.stage2;
       case 3:
-        return 'Giai đoạn 3/6: Grobid engine parsing TEI XML';
+        return context.l10n.stage3;
       case 4:
-        return 'Giai đoạn 4/6: Chuẩn hóa Schema & Checksum SHA-256';
+        return context.l10n.stage4;
       case 5:
-        return 'Giai đoạn 5/6: Trích xuất Stance & Rhetorical Moves NLP';
+        return context.l10n.stage5;
       case 6:
       default:
-        return 'Giai đoạn 6/6: Đóng gói Corpus Snapshot & Hồ sơ';
+        return context.l10n.stage6;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final filteredJobs = _jobs.where((job) {
-      if (_selectedFilter == 'Tất cả') return true;
-      final st = _mapStatusText(job['status'] ?? '');
+      if (_selectedFilter == 'ALL') return true;
+      final st = (job['status'] ?? '').toString().toUpperCase();
       return st == _selectedFilter;
     }).toList();
 
@@ -294,13 +295,13 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Giám Sát Tác Vụ Khai Phá',
-                      style: TextStyle(
+                      context.l10n.jobMonitorTitle,
+                      style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,
@@ -308,10 +309,10 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         letterSpacing: -0.4,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      'Giám sát trạng thái các tác vụ khai phá dữ liệu, tra cứu nhật ký và xử lý lại bài lỗi.',
-                      style: TextStyle(
+                      context.l10n.jobMonitorSubtitle,
+                      style: const TextStyle(
                         fontSize: 14,
                         color: AppColors.textMuted,
                         fontFamily: 'Manrope',
@@ -324,7 +325,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               IconButton(
                 onPressed: () => _loadJobs(),
                 icon: const Icon(Icons.refresh_rounded),
-                tooltip: 'Cập nhật trạng thái tác vụ',
+                tooltip: context.l10n.reloadJobs,
                 color: AppColors.primary,
               ),
             ],
@@ -337,17 +338,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
             physics: const BouncingScrollPhysics(),
             child: Row(
               children: [
-                _buildFilterTab('Tất cả'),
+                _buildFilterTab('ALL', context.l10n.filterAll),
                 const SizedBox(width: 8),
-                _buildFilterTab('Đang xử lý'),
+                _buildFilterTab('RUNNING', context.l10n.statusRunning),
                 const SizedBox(width: 8),
-                _buildFilterTab('Hàng đợi'),
+                _buildFilterTab('PENDING', context.l10n.statusPending),
                 const SizedBox(width: 8),
-                _buildFilterTab('Hoàn thành'),
+                _buildFilterTab('COMPLETED', context.l10n.statusCompleted),
                 const SizedBox(width: 8),
-                _buildFilterTab('Thất bại'),
+                _buildFilterTab('FAILED', context.l10n.statusFailed),
                 const SizedBox(width: 8),
-                _buildFilterTab('Đã hủy'),
+                _buildFilterTab('CANCELLED', context.l10n.statusCancelled),
               ],
             ),
           ),
@@ -372,7 +373,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                     OutlinedButton.icon(
                       onPressed: () => _loadJobs(),
                       icon: const Icon(Icons.refresh_rounded, size: 16),
-                      label: const Text('Thử lại'),
+                      label: Text(context.l10n.retry),
                     ),
                   ],
                 ),
@@ -386,9 +387,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   children: [
                     const Icon(Icons.monitor_heart_outlined, size: 48, color: AppColors.slate300),
                     const SizedBox(height: 12),
-                    const Text(
-                      'Không có tác vụ nào trong trạng thái đã chọn.',
-                      style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope', fontSize: 14),
+                    Text(
+                      context.l10n.noJobsFound,
+                      style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope', fontSize: 14),
                     ),
                   ],
                 ),
@@ -408,10 +409,10 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     );
   }
 
-  Widget _buildFilterTab(String label) {
-    final isSelected = _selectedFilter == label;
+  Widget _buildFilterTab(String code, String label) {
+    final isSelected = _selectedFilter == code;
     return InkWell(
-      onTap: () => setState(() => _selectedFilter = label),
+      onTap: () => setState(() => _selectedFilter = code),
       borderRadius: BorderRadius.circular(8),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -440,13 +441,13 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     final status = (job['status'] ?? 'PENDING').toString();
     final step = (job['current_step'] ?? 'QUEUED').toString();
     final stageNum = _currentStageNumber(step, status);
-    final stageText = _stageDescription(stageNum, step, status);
+    final stageText = _stageDescription(context, stageNum, step, status);
 
     double progress = ((job['progress'] as num?)?.toDouble() ?? 0.0);
     if (progress > 1.0) progress = progress / 100.0;
     progress = progress.clamp(0.0, 1.0);
 
-    final statusText = _mapStatusText(status);
+    final statusText = _mapStatusText(context, status);
     final statusColor = _mapStatusColor(status);
     final jobId = job['id'].toString();
 
@@ -516,7 +517,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Mã Job: $jobId',
+                    '${context.l10n.jobIdLabel}: $jobId',
                     style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
                   ),
                 ],
@@ -547,7 +548,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                     ElevatedButton.icon(
                       onPressed: () => _retryJob(jobId),
                       icon: const Icon(Icons.refresh_rounded, size: 14),
-                      label: Text(failed > 0 ? 'Thử lại $failed bài lỗi' : 'Thử lại'),
+                      label: Text(failed > 0 ? context.l10n.retryFailedArticles(failed) : context.l10n.retry),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.error,
                         foregroundColor: Colors.white,
@@ -562,9 +563,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                     OutlinedButton.icon(
                       onPressed: () => _confirmCancelJob(jobId, journalTitle),
                       icon: const Icon(Icons.stop_circle_outlined, size: 14, color: AppColors.error),
-                      label: const Text(
-                        'Hủy job',
-                        style: TextStyle(
+                      label: Text(
+                        context.l10n.cancelJob,
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.error,
@@ -582,9 +583,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   OutlinedButton.icon(
                     onPressed: () => _confirmDeleteJob(jobId, journalTitle),
                     icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
-                    label: const Text(
-                      'Hủy / Xóa',
-                      style: TextStyle(
+                    label: Text(
+                      context.l10n.deleteJob,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppColors.error,
@@ -592,7 +593,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       ),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: AppColors.border),
+                      side: const BorderSide(color: AppColors.border),
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -649,7 +650,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   if (totalArticles > 0) ...[
                     const SizedBox(width: 8),
                     Text(
-                      '•  $successCount/$totalArticles bài báo',
+                      '•  $successCount/$totalArticles ${context.l10n.papers}',
                       style: const TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -695,28 +696,28 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   children: [
                     _buildMetricBadge(
                       icon: Icons.article_outlined,
-                      label: 'Tổng mục tiêu',
+                      label: context.l10n.totalTarget,
                       value: '$totalArticles',
                     ),
                     _buildMetricBadge(
                       icon: Icons.download_done_rounded,
-                      label: 'Đã tải PDF',
+                      label: context.l10n.downloadedPdf,
                       value: '$fetched',
                     ),
                     _buildMetricBadge(
                       icon: Icons.integration_instructions_outlined,
-                      label: 'Parse TEI XML',
+                      label: context.l10n.parsedTeiXml,
                       value: '$parsed',
                     ),
                     _buildMetricBadge(
                       icon: Icons.verified_outlined,
-                      label: 'Chuẩn hóa DB',
+                      label: context.l10n.normalizedDb,
                       value: '$normalized',
                     ),
                     if (failed > 0)
                       _buildMetricBadge(
                         icon: Icons.warning_amber_rounded,
-                        label: 'Bài lỗi',
+                        label: context.l10n.failedArticles,
                         value: '$failed',
                         color: AppColors.error,
                       ),
@@ -725,9 +726,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                 OutlinedButton.icon(
                   onPressed: () => _showJobArticlesDialog(context, jobId, journalTitle, metrics, status: status),
                   icon: const Icon(Icons.format_list_bulleted_rounded, size: 14, color: AppColors.textSecondary),
-                  label: const Text(
-                    'Chi tiết từng bài báo',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                  label: Text(
+                    context.l10n.articleDetails,
+                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                   ),
                   style: OutlinedButton.styleFrom(
                     backgroundColor: AppColors.surface,

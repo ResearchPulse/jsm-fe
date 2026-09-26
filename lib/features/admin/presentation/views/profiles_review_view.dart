@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/admin_api_client.dart';
 import '../widgets/style_radar_chart.dart';
 
@@ -105,8 +106,8 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
   void _addJournalSlot() {
     if (_selectedCompareIds.length >= 3) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Chỉ có thể so sánh tối đa 3 tạp chí cùng một lúc.'),
+        SnackBar(
+          content: Text(context.l10n.compareMaxLimit),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -164,12 +165,12 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
       builder: (context, constraints) {
         final isNarrow = constraints.maxWidth < 900;
 
-        final titleCol = const Column(
+        final titleCol = Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Kiểm Duyệt Hồ Sơ Phong Cách Tạp Chí',
-              style: TextStyle(
+              context.l10n.profilesReviewTitle,
+              style: const TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
@@ -177,10 +178,10 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
                 letterSpacing: -0.4,
               ),
             ),
-            SizedBox(height: 4),
+            const SizedBox(height: 4),
             Text(
-              'So sánh và đánh giá phong cách học thuật qua biểu đồ Radar đa chiều và bảng chỉ số chi tiết.',
-              style: TextStyle(
+              context.l10n.profilesReviewSubtitle,
+              style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.textMuted,
                 fontFamily: 'Manrope',
@@ -197,21 +198,21 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
             IconButton(
               onPressed: _loadProfiles,
               icon: const Icon(Icons.refresh_rounded),
-              tooltip: 'Tải lại hồ sơ',
+              tooltip: context.l10n.reloadProfiles,
               color: AppColors.primary,
             ),
             ElevatedButton.icon(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Hồ sơ phong cách đã được xuất bản làm tiêu chuẩn đối chiếu cho sinh viên.'),
+                  SnackBar(
+                    content: Text(context.l10n.publishSuccess),
                     backgroundColor: AppColors.green700,
                     behavior: SnackBarBehavior.floating,
                   ),
                 );
               },
               icon: const Icon(Icons.verified_rounded, size: 18),
-              label: const Text('Xuất bản Tiêu chuẩn'),
+              label: Text(context.l10n.publishStandard),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.green700,
                 foregroundColor: Colors.white,
