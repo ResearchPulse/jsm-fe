@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/manuscript_check_result.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class ScoreRatingCard extends StatelessWidget {
   final ManuscriptCheckResult result;
@@ -98,7 +99,7 @@ class ScoreRatingCard extends StatelessWidget {
                           const SizedBox(width: 6),
                           Expanded(
                             child: Text(
-                              'Target Profile: $journalTitle',
+                              '${context.l10n.targetProfile}: $journalTitle',
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textMuted,
@@ -128,7 +129,7 @@ class ScoreRatingCard extends StatelessWidget {
                     Icon(_getRatingIcon(), size: 16, color: ratingColor),
                     const SizedBox(width: 6),
                     Text(
-                      result.ratingLabel,
+                      context.l10n.ratingLevelLabel(result.ratingLevel),
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -174,9 +175,9 @@ class ScoreRatingCard extends StatelessWidget {
                         letterSpacing: -0.5,
                       ),
                     ),
-                    const Text(
-                      'OUT OF 100',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.outOf100,
+                      style: const TextStyle(
                         fontSize: 9,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSubtle,
@@ -195,9 +196,9 @@ class ScoreRatingCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Suitability Assessment',
-                      style: TextStyle(
+                    Text(
+                      context.l10n.suitabilityAssessment,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textPrimary,

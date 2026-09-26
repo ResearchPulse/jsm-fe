@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/admin_api_client.dart';
 
@@ -72,18 +73,19 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     try {
       final retried = await _apiClient.retryFailedArticles(jobId);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Đã gửi lại $retried bài báo vào hàng đợi xử lý.'),
-            backgroundColor: AppColors.green700,
-          ),
+        AppNotification.showSuccess(
+          context,
+          context.l10n.retriedArticles(retried),
+          title: context.l10n.retrySuccess,
         );
         _loadJobs();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+        AppNotification.showError(
+          context,
+          'Lỗi: $e',
+          title: context.l10n.retryFailed,
         );
       }
     }
@@ -165,19 +167,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       final success = await _apiClient.cancelJob(jobId);
       if (!mounted) return;
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đã hủy tác vụ thành công.'),
-            backgroundColor: AppColors.textPrimary,
-          ),
+        AppNotification.showSuccess(
+          context,
+          context.l10n.jobCancelledSuccess,
+          title: context.l10n.jobCancelledTitle,
         );
         _loadJobs();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Không thể hủy tác vụ. Vui lòng thử lại.'),
-            backgroundColor: AppColors.error,
-          ),
+        AppNotification.showError(
+          context,
+          context.l10n.jobCancelFailed,
+          title: context.l10n.jobCancelFailedTitle,
         );
       }
     }
@@ -225,19 +225,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       final success = await _apiClient.deleteJob(jobId);
       if (!mounted) return;
       if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đã xóa tác vụ thành công khỏi hệ thống.'),
-            backgroundColor: AppColors.textPrimary,
-          ),
+        AppNotification.showSuccess(
+          context,
+          context.l10n.jobDeletedSuccess,
+          title: context.l10n.jobDeletedTitle,
         );
         _loadJobs();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Không thể xóa tác vụ. Vui lòng thử lại.'),
-            backgroundColor: AppColors.error,
-          ),
+        AppNotification.showError(
+          context,
+          context.l10n.jobDeleteFailed,
+          title: context.l10n.jobDeleteFailedTitle,
         );
       }
     }
@@ -436,7 +434,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
 
   Widget _buildJobCard(Map<String, dynamic> job) {
     final journal = job['journal'] as Map<String, dynamic>?;
-    final journalTitle = journal?['title'] ?? 'Tạp chí khai phá';
+    final journalTitle = journal?['title'] ?? context.l10n.miningJournal;
     final issn = journal?['issn_l'] ?? 'N/A';
     final status = (job['status'] ?? 'PENDING').toString();
     final step = (job['current_step'] ?? 'QUEUED').toString();
@@ -529,75 +527,97 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    height: 26,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
                     decoration: BoxDecoration(
                       color: statusColor.withAlpha(24),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      statusText,
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: statusColor,
-                        fontFamily: 'Manrope',
-                      ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          statusText,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: statusColor,
+                            fontFamily: 'Manrope',
+                            height: 1.1,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   if (failed > 0 || status == 'FAILED')
-                    ElevatedButton.icon(
-                      onPressed: () => _retryJob(jobId),
-                      icon: const Icon(Icons.refresh_rounded, size: 14),
-                      label: Text(failed > 0 ? context.l10n.retryFailedArticles(failed) : context.l10n.retry),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.error,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                        elevation: 0,
+                    SizedBox(
+                      height: 26,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _retryJob(jobId),
+                        icon: const Icon(Icons.refresh_rounded, size: 14),
+                        label: Text(failed > 0 ? context.l10n.retryFailedArticles(failed) : context.l10n.retry),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.error,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          elevation: 0,
+                        ),
                       ),
                     ),
                   if (status == 'RUNNING' || status == 'PENDING')
-                    OutlinedButton.icon(
-                      onPressed: () => _confirmCancelJob(jobId, journalTitle),
-                      icon: const Icon(Icons.stop_circle_outlined, size: 14, color: AppColors.error),
+                    SizedBox(
+                      height: 26,
+                      child: OutlinedButton.icon(
+                        onPressed: () => _confirmCancelJob(jobId, journalTitle),
+                        icon: const Icon(Icons.stop_circle_outlined, size: 14, color: AppColors.error),
+                        label: Text(
+                          context.l10n.cancelJob,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.error,
+                            fontFamily: 'Manrope',
+                            height: 1.1,
+                          ),
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: AppColors.error.withAlpha(120)),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          visualDensity: VisualDensity.compact,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                      ),
+                    ),
+                  SizedBox(
+                    height: 26,
+                    child: OutlinedButton.icon(
+                      onPressed: () => _confirmDeleteJob(jobId, journalTitle),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
                       label: Text(
-                        context.l10n.cancelJob,
+                        context.l10n.deleteJob,
                         style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                           color: AppColors.error,
                           fontFamily: 'Manrope',
+                          height: 1.1,
                         ),
                       ),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: AppColors.error.withAlpha(120)),
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        backgroundColor: AppColors.error.withAlpha(10), // Subtle red tint
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                        visualDensity: VisualDensity.compact,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                       ),
-                    ),
-                  OutlinedButton.icon(
-                    onPressed: () => _confirmDeleteJob(jobId, journalTitle),
-                    icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
-                    label: Text(
-                      context.l10n.deleteJob,
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.error,
-                        fontFamily: 'Manrope',
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: AppColors.border),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                     ),
                   ),
                 ],
@@ -806,7 +826,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Chi tiết bài báo: $journalTitle',
+                          context.l10n.articleDetailsFor(journalTitle),
                           style: const TextStyle(
                             fontSize: 17,
                             fontWeight: FontWeight.w700,
@@ -818,7 +838,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Mã Job: $jobId • Tổng ${(metrics?['total_articles'] as num?)?.toInt() ?? 0} bài',
+                          context.l10n.jobMetricsSummary(jobId, (metrics?['total_articles'] as num?)?.toInt() ?? 0),
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textMuted,
@@ -849,13 +869,13 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         physics: const BouncingScrollPhysics(),
                         child: Row(
                           children: [
-                            _buildDialogFilterChip('Tất cả', 'ALL', filter, (val) => setDialogState(() => filter = val)),
+                            _buildDialogFilterChip(context.l10n.filterAll, 'ALL', filter, (val) => setDialogState(() => filter = val)),
                             const SizedBox(width: 8),
-                            _buildDialogFilterChip('Đã chuẩn hóa TEI', 'NORMALIZED', filter, (val) => setDialogState(() => filter = val)),
+                            _buildDialogFilterChip(context.l10n.filterNormalizedTEI, 'NORMALIZED', filter, (val) => setDialogState(() => filter = val)),
                             const SizedBox(width: 8),
-                            _buildDialogFilterChip('Đã tải PDF', 'FETCHED', filter, (val) => setDialogState(() => filter = val)),
+                            _buildDialogFilterChip(context.l10n.filterFetchedPDF, 'FETCHED', filter, (val) => setDialogState(() => filter = val)),
                             const SizedBox(width: 8),
-                            _buildDialogFilterChip('Lỗi', 'FAILED', filter, (val) => setDialogState(() => filter = val), isError: true),
+                            _buildDialogFilterChip(context.l10n.filterError, 'FAILED', filter, (val) => setDialogState(() => filter = val), isError: true),
                           ],
                         ),
                       ),
@@ -870,7 +890,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                           if (snapshot.hasError) {
                             return Center(
                               child: Text(
-                                'Lỗi tải danh sách bài báo: ${snapshot.error}',
+                                context.l10n.errorLoadingArticles + snapshot.error.toString(),
                                 style: const TextStyle(color: AppColors.error, fontFamily: 'Manrope'),
                               ),
                             );
@@ -890,8 +910,8 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                                   const SizedBox(height: 8),
                                   Text(
                                     allArticles.isEmpty
-                                        ? 'Chưa có bài báo nào được ghi nhận trong job này.'
-                                        : 'Không có bài báo nào với trạng thái này.',
+                                        ? context.l10n.noArticlesInJob
+                                        : context.l10n.noArticlesWithStatus,
                                     style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope', fontSize: 13),
                                   ),
                                 ],
@@ -905,7 +925,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                             itemBuilder: (context, index) {
                               final art = filtered[index];
                               final artStatus = (art['status'] ?? '').toString().toUpperCase();
-                              final artTitle = (art['title'] ?? 'Bài báo không tiêu đề').toString();
+                              final artTitle = (art['title'] ?? context.l10n.untitledArticle).toString();
                               final doi = (art['doi'] ?? 'N/A').toString();
                               final year = art['year']?.toString() ?? 'N/A';
                               final errorMsg = art['error_message']?.toString();
@@ -941,7 +961,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                                               ),
                                               const SizedBox(width: 12),
                                               Text(
-                                                'Năm: $year',
+                                                context.l10n.yearLabel + year.toString(),
                                                 style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
                                               ),
                                             ],
@@ -978,7 +998,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       _retryJob(jobId);
                     },
                     icon: const Icon(Icons.refresh_rounded, size: 14),
-                    label: Text('Thử lại ${(metrics?['failed'] as num?)?.toInt()} bài lỗi'),
+                    label: Text(context.l10n.retryFailedArticlesBtn((metrics?['failed'] as num?)?.toInt() ?? 0)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.error,
                       foregroundColor: Colors.white,
@@ -1004,7 +1024,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Đóng', style: TextStyle(fontFamily: 'Manrope')),
+                  child: Text(context.l10n.close, style: const TextStyle(fontFamily: 'Manrope')),
                 ),
               ],
             );
@@ -1067,7 +1087,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     switch (status) {
       case 'NORMALIZED':
         col = AppColors.green700;
-        txt = 'Chuẩn hóa TEI';
+        txt = context.l10n.filterNormalizedTEI;
         break;
       case 'PARSED':
         col = AppColors.primary;
@@ -1075,16 +1095,16 @@ class _JobMonitorViewState extends State<JobMonitorView> {
         break;
       case 'FETCHED':
         col = const Color(0xFF6366F1);
-        txt = 'Đã tải PDF';
+        txt = context.l10n.filterFetchedPDF;
         break;
       case 'FAILED':
         col = AppColors.error;
-        txt = 'Lỗi';
+        txt = context.l10n.filterError;
         break;
       case 'HARVESTED':
       default:
         col = AppColors.textMuted;
-        txt = 'Đang chờ';
+        txt = context.l10n.statusPending;
         break;
     }
 

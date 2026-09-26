@@ -158,7 +158,7 @@ void main() {
       expect(find.text('Load Sample Manuscript'), findsOneWidget);
       expect(find.text('Include validated exemplars from journal corpus'),
           findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Check Manuscript Alignment'),
+      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'),
           findsOneWidget);
 
       // Tap "Load Sample Manuscript"
@@ -195,7 +195,7 @@ void main() {
 
       // Scroll submit button into view and submit
       final submitFinder =
-          find.widgetWithText(ElevatedButton, 'Check Manuscript Alignment');
+          find.widgetWithText(ElevatedButton, 'Check Alignment');
       await tester.ensureVisible(submitFinder);
       await tester.pumpAndSettle();
 
@@ -218,7 +218,7 @@ void main() {
       // Verify Missing GAP alert card
       expect(find.text('Missing Research Gap'), findsWidgets);
       expect(find.text('CRITICAL MOVE'), findsOneWidget);
-      expect(find.text('Validated Journal Exemplar'), findsOneWidget);
+      expect(find.text('Validated Journal Exemplar'), findsWidgets);
       expect(find.text('“However, prior approaches remain limited.”'),
           findsWidgets);
       expect(find.text('DOI: 10.1109/TSE.2024.12345'), findsWidgets);
@@ -236,7 +236,7 @@ void main() {
       await tester.tap(find.text('New Check'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(ElevatedButton, 'Check Manuscript Alignment'),
+      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'),
           findsOneWidget);
     });
 
@@ -262,7 +262,7 @@ void main() {
       await tester.tap(find.text('Return to Submission Form'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(ElevatedButton, 'Check Manuscript Alignment'),
+      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'),
           findsOneWidget);
     });
 
@@ -287,7 +287,7 @@ void main() {
       await tester.tap(find.text('Submit Another Draft'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(ElevatedButton, 'Check Manuscript Alignment'),
+      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'),
           findsOneWidget);
     });
   });

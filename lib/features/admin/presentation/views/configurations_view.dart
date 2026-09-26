@@ -1,5 +1,7 @@
+import '../../../../core/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../data/datasources/admin_api_client.dart';
 
 class ConfigurationsView extends StatefulWidget {
@@ -101,13 +103,14 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
       }
     }
 
-    return 'Khoa học máy tính & Công nghệ';
+    return context.l10n.defaultDomainCs;
   }
 
   void _showConfigDialog(BuildContext context) {
     if (_journals.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng đăng ký ít nhất một tạp chí trước khi thiết lập cấu hình.')),
+      AppNotification.showWarning(
+        context,
+        context.l10n.needAtLeastOneJournalConfig,
       );
       return;
     }
@@ -129,9 +132,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
             return AlertDialog(
               backgroundColor: AppColors.surface,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-              title: const Text(
-                'Thiết lập cấu hình khai phá mới',
-                style: TextStyle(
+              title: Text(
+                context.l10n.newMiningConfigTitle,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Manrope',
@@ -144,12 +147,12 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Xác định khoảng năm xuất bản và số lượng bài báo mục tiêu để Grobid bóc tách cấu trúc TEI XML.',
-                      style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                    Text(
+                      context.l10n.newMiningConfigDesc,
+                      style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 20),
-                    const Text('Tạp chí áp dụng *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
+                    Text(context.l10n.applicableJournalRequired, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       initialValue: selectedJournalId,
@@ -176,19 +179,19 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    const Text('Lĩnh vực nghiên cứu (Domain) *', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
+                    Text(context.l10n.researchDomainRequired, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
                     const SizedBox(height: 6),
                     TextField(
                       controller: domainController,
                       style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontFamily: 'Manrope'),
-                      decoration: const InputDecoration(
-                        hintText: 'Ví dụ: Bioinformatics & Computational Biology',
+                      decoration: InputDecoration(
+                        hintText: context.l10n.domainPlaceholder,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Tự động đồng bộ từ OpenAlex. Bạn có thể giữ nguyên hoặc điều chỉnh.',
-                      style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                    Text(
+                      context.l10n.domainSyncNote,
+                      style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -197,7 +200,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Từ năm', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              Text(context.l10n.fromYearLabel, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearStart,
@@ -217,7 +220,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Đến năm', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              Text(context.l10n.toYearLabel, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearEnd,
@@ -238,9 +241,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Số bài báo mục tiêu (Target)', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                        Text(context.l10n.targetPapersLabel, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
                         Text(
-                          '${targetPapers.toInt()} bài',
+                          context.l10n.papersCountLabel(targetPapers.toInt()),
                           style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
                         ),
                       ],
@@ -261,7 +264,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
               actions: [
                 TextButton(
                   onPressed: isSaving ? null : () => Navigator.of(ctx).pop(),
-                  child: const Text('Hủy'),
+                  child: Text(context.l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: isSaving
@@ -269,8 +272,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                       : () async {
                           final domain = domainController.text.trim();
                           if (domain.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Vui lòng nhập tên lĩnh vực nghiên cứu.')),
+                            AppNotification.showWarning(
+                              context,
+                              context.l10n.enterDomainWarning,
                             );
                             return;
                           }
@@ -287,22 +291,20 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                             );
                             if (ctx.mounted) Navigator.of(ctx).pop();
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Đã tạo cấu hình khai phá thành công.'),
-                                  backgroundColor: AppColors.green700,
-                                ),
+                              AppNotification.showSuccess(
+                                context,
+                                context.l10n.configCreatedSuccess,
+                                title: 'Tạo cấu hình thành công',
                               );
                             }
                             _loadData();
                           } catch (err) {
                             setModalState(() => isSaving = false);
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Lỗi: $err'),
-                                  backgroundColor: AppColors.error,
-                                ),
+                              AppNotification.showError(
+                                context,
+                                'Lỗi: $err',
+                                title: 'Tạo cấu hình thất bại',
                               );
                             }
                           }
@@ -328,21 +330,20 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     try {
       await _apiClient.triggerAnalysis(configId);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Đã kích hoạt chu trình phân tích cho: $journalName'),
-            backgroundColor: AppColors.green700,
-          ),
+        AppNotification.showSuccess(
+          context,
+          'Đã kích hoạt chu trình phân tích cho: $journalName',
+          title: 'Kích hoạt thành công',
+          icon: Icons.bolt_rounded,
         );
         widget.onNavigateToTab(3); // Navigate to Job Monitor
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi kích hoạt: $e'),
-            backgroundColor: AppColors.error,
-          ),
+        AppNotification.showError(
+          context,
+          'Lỗi kích hoạt: $e',
+          title: 'Kích hoạt thất bại',
         );
       }
     }
@@ -352,15 +353,19 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     try {
       await _apiClient.deleteConfiguration(configId);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã xóa cấu hình khai phá.')),
+        AppNotification.showSuccess(
+          context,
+          'Đã xóa cấu hình khai phá.',
+          title: 'Thao tác thành công',
         );
         _loadData();
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+        AppNotification.showError(
+          context,
+          'Lỗi: $e',
+          title: context.l10n.jobDeleteFailedTitle,
         );
       }
     }
@@ -372,8 +377,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     final yearTo = (config['year_to'] ?? 2024) as int;
 
     if (newYear > yearTo) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Năm bắt đầu không được lớn hơn năm kết thúc.')),
+      AppNotification.showWarning(
+        context,
+        context.l10n.startYearGreaterThanEndYear,
       );
       return;
     }
@@ -385,19 +391,20 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     try {
       await _apiClient.updateConfiguration(configId, yearFrom: newYear);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Đã cập nhật năm bắt đầu: $newYear'),
-          duration: const Duration(seconds: 2),
-        ),
+      AppNotification.showSuccess(
+        context,
+        'Đã cập nhật năm bắt đầu: $newYear',
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       if (!mounted) return;
       setState(() {
         config['year_from'] = oldYear;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi cập nhật: $e'), backgroundColor: AppColors.error),
+      AppNotification.showError(
+        context,
+        'Lỗi cập nhật: $e',
+        title: 'Cập nhật thất bại',
       );
     }
   }
@@ -408,8 +415,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     final yearFrom = (config['year_from'] ?? 2021) as int;
 
     if (newYear < yearFrom) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Năm kết thúc không được nhỏ hơn năm bắt đầu.')),
+      AppNotification.showWarning(
+        context,
+        'Năm kết thúc không được nhỏ hơn năm bắt đầu.',
       );
       return;
     }
@@ -421,19 +429,20 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     try {
       await _apiClient.updateConfiguration(configId, yearTo: newYear);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Đã cập nhật năm kết thúc: $newYear'),
-          duration: const Duration(seconds: 2),
-        ),
+      AppNotification.showSuccess(
+        context,
+        'Đã cập nhật năm kết thúc: $newYear',
+        duration: const Duration(seconds: 2),
       );
     } catch (e) {
       if (!mounted) return;
       setState(() {
         config['year_to'] = oldYear;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi cập nhật: $e'), backgroundColor: AppColors.error),
+      AppNotification.showError(
+        context,
+        'Lỗi cập nhật: $e',
+        title: 'Cập nhật thất bại',
       );
     }
   }
@@ -452,12 +461,12 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
             return AlertDialog(
               backgroundColor: AppColors.surface,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Row(
+              title: Row(
                 children: [
-                  Icon(Icons.tune_rounded, color: AppColors.primary, size: 20),
+                  const Icon(Icons.tune_rounded, color: AppColors.primary, size: 20),
                   SizedBox(width: 8),
                   Text(
-                    'Số lượng bài báo mục tiêu',
+                    context.l10n.targetPapersLabel,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -473,8 +482,8 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Nhập trực tiếp hoặc chọn nhanh số bài báo Grobid sẽ trích xuất toàn văn:',
+                    Text(
+                      context.l10n.targetPapersHelp,
                       style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 16),
@@ -484,8 +493,8 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                       autofocus: true,
                       style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Manrope', color: AppColors.textPrimary),
                       decoration: InputDecoration(
-                        labelText: 'Số lượng bài báo',
-                        suffixText: 'bài',
+                        labelText: context.l10n.targetPapersCount,
+                        suffixText: context.l10n.papersUnit,
                         suffixStyle: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary),
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
@@ -528,7 +537,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                               ),
                             ),
                             child: Text(
-                              '$preset bài',
+                              context.l10n.papersCountLabel(preset),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -546,14 +555,15 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Hủy'),
+                  child: Text(context.l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () async {
                     final count = int.tryParse(controller.text.trim()) ?? selectedValue;
                     if (count < 5 || count > 5000) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Vui lòng nhập số lượng từ 5 đến 5000 bài.')),
+                      AppNotification.showWarning(
+                        context,
+                        'Vui lòng nhập số lượng từ 5 đến 5000 bài.',
                       );
                       return;
                     }
@@ -568,12 +578,10 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     try {
                       await _apiClient.updateConfiguration(configId, targetArticles: count);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Đã cập nhật mục tiêu: $count bài báo'),
-                            backgroundColor: AppColors.green700,
-                            duration: const Duration(seconds: 2),
-                          ),
+                        AppNotification.showSuccess(
+                          context,
+                          context.l10n.updatedTargetPapers(count),
+                          duration: const Duration(seconds: 2),
                         );
                       }
                     } catch (e) {
@@ -581,8 +589,10 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                         setState(() {
                           config['target_articles'] = oldCount;
                         });
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+                        AppNotification.showError(
+                          context,
+                          'Lỗi: $e',
+                          title: 'Cập nhật thất bại',
                         );
                       }
                     }
@@ -613,11 +623,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Cấu Hình Tham Số Khai Phá',
+                    context.l10n.configSystemParams,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -628,7 +638,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Thiết lập phạm vi năm khảo sát, số lượng bài báo mục tiêu và hồ sơ TEI XML phục vụ bóc tách cấu trúc với Grobid.',
+                    context.l10n.configSectionDesc,
                     style: TextStyle(
                       fontSize: 14,
                       color: AppColors.textMuted,
@@ -642,7 +652,7 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   IconButton(
                     onPressed: _loadData,
                     icon: const Icon(Icons.refresh_rounded),
-                    tooltip: 'Tải lại cấu hình',
+                    tooltip: context.l10n.reloadList,
                     color: AppColors.primary,
                   ),
                   const SizedBox(width: 8),
@@ -927,14 +937,14 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     ),
                     const SizedBox(height: 6),
                     Tooltip(
-                      message: 'Nhấn để đổi số lượng bài báo',
+                      message: context.l10n.clickToChangeTarget,
                       child: InkWell(
                         onTap: () => _showEditTargetArticlesDialog(config),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              '$targetArticles bài báo',
+                              context.l10n.articlesCountLabel(targetArticles),
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,

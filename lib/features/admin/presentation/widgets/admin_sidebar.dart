@@ -100,7 +100,7 @@ class AdminSidebar extends StatelessWidget {
             ? Center(
                 key: const ValueKey('brand_collapsed'),
                 child: Tooltip(
-                  message: 'Mở rộng thanh menu',
+                  message: context.l10n.expandSidebar,
                   child: InkWell(
                     onTap: onToggleCollapse,
                     borderRadius: BorderRadius.circular(8),
@@ -184,7 +184,7 @@ class AdminSidebar extends StatelessWidget {
                       color: Color(0xFF64748B),
                       size: 22,
                     ),
-                    tooltip: 'Thu gọn thanh menu',
+                    tooltip: context.l10n.collapseSidebar,
                     padding: const EdgeInsets.all(4),
                     constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                     style: IconButton.styleFrom(
@@ -247,6 +247,7 @@ class AdminSidebar extends StatelessWidget {
                 ),
                 onSelected: (val) => _handleProfileMenuAction(context, val),
                 itemBuilder: (context) => _buildProfileMenuItems(
+                  context: context,
                   displayName: displayName,
                   email: email,
                   role: role,
@@ -285,6 +286,7 @@ class AdminSidebar extends StatelessWidget {
                 ),
                 onSelected: (val) => _handleProfileMenuAction(context, val),
                 itemBuilder: (context) => _buildProfileMenuItems(
+                  context: context,
                   displayName: displayName,
                   email: email,
                   role: role,
@@ -392,6 +394,7 @@ class AdminSidebar extends StatelessWidget {
   }
 
   List<PopupMenuEntry<String>> _buildProfileMenuItems({
+    required BuildContext context,
     required String displayName,
     required String email,
     required String role,
@@ -463,12 +466,12 @@ class AdminSidebar extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 16, color: Color(0xFF64748B)),
+              const Icon(Icons.person_outline_rounded, size: 16, color: Color(0xFF64748B)),
               SizedBox(width: 10),
               Text(
-                'Hồ sơ tài khoản',
+                context.l10n.accountProfile,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -489,12 +492,12 @@ class AdminSidebar extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.home_outlined, size: 16, color: Color(0xFF64748B)),
+              const Icon(Icons.home_outlined, size: 16, color: Color(0xFF64748B)),
               SizedBox(width: 10),
               Text(
-                'Trang chủ người dùng',
+                context.l10n.backToHome,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
@@ -518,12 +521,12 @@ class AdminSidebar extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFFECDD3), width: 0.8),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.logout_rounded, size: 16, color: Color(0xFFDC2626)),
+              const Icon(Icons.logout_rounded, size: 16, color: Color(0xFFDC2626)),
               SizedBox(width: 10),
               Text(
-                'Đăng xuất',
+                context.l10n.signOut,
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,

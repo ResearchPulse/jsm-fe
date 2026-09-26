@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/stance_comparison.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class StanceCard extends StatelessWidget {
   final StanceComparison? comparison;
@@ -28,17 +29,17 @@ class StanceCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(
+            children: [
+              const Icon(
                 Icons.psychology_outlined,
                 size: 20,
                 color: AppColors.primary,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Stance & Epistemic Markers',
-                  style: TextStyle(
+                  context.l10n.stanceAnalysis,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -53,24 +54,24 @@ class StanceCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _StanceMetricTile(
-                  title: 'Hedge Rate',
+                  title: context.l10n.hedgesRate,
                   subtitle: 'E.g., "suggests", "may indicate"',
                   userValue:
-                      '${comp.userHedgeRate.toStringAsFixed(1)} / 1k words',
+                      '${comp.userHedgeRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
                   journalValue:
-                      '${comp.journalHedgeRate.toStringAsFixed(1)} / 1k words',
+                      '${comp.journalHedgeRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
                   diff: comp.hedgeRateDiff,
                 ),
               ),
               const SizedBox(width: 14),
               Expanded(
                 child: _StanceMetricTile(
-                  title: 'Booster Rate',
+                  title: context.l10n.boostersRate,
                   subtitle: 'E.g., "clearly shows", "definitely"',
                   userValue:
-                      '${comp.userBoosterRate.toStringAsFixed(1)} / 1k words',
+                      '${comp.userBoosterRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
                   journalValue:
-                      '${comp.journalBoosterRate.toStringAsFixed(1)} / 1k words',
+                      '${comp.journalBoosterRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
                   diff: comp.boosterRateDiff,
                 ),
               ),

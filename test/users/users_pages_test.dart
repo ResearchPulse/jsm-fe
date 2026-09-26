@@ -135,9 +135,9 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('User Information'), findsOneWidget);
+    expect(find.text('Account Profile'), findsOneWidget);
     expect(find.text('sub-1'), findsOneWidget);
-    expect(find.text('a@b.co'), findsOneWidget);
+    expect(find.text('a@b.co'), findsWidgets);
     expect(find.text('A B'), findsWidgets);
   });
 }

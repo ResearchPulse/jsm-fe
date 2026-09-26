@@ -196,7 +196,7 @@ class _SnapshotsViewState extends State<SnapshotsView> {
                                 flex: 2,
                                 child: Text(context.l10n.colFrozenDate, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
-                              SizedBox(width: 90, child: Text(context.l10n.colActions, textAlign: TextAlign.right, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'))),
+                              SizedBox(width: 120, child: Text(context.l10n.colActions, textAlign: TextAlign.right, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'))),
                             ],
                           ),
                         ),
@@ -220,18 +220,18 @@ class _SnapshotsViewState extends State<SnapshotsView> {
                           OutlinedButton.icon(
                             onPressed: _loadSnapshots,
                             icon: const Icon(Icons.refresh_rounded, size: 16),
-                            label: const Text('Thử lại'),
+                            label: Text(context.l10n.retry),
                           ),
                         ],
                       ),
                     ),
                   )
                 else if (filtered.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(48),
+                  Padding(
+                    padding: const EdgeInsets.all(48),
                     child: Center(
                       child: Text(
-                        'Chưa có Snapshot bất biến nào được khởi tạo.',
+                        context.l10n.noData,
                         style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
                       ),
                     ),
@@ -255,7 +255,7 @@ class _SnapshotsViewState extends State<SnapshotsView> {
   }
 
   Widget _buildSnapshotRow(Map<String, dynamic> s) {
-    final journal = s['journal'] ?? 'Chưa rõ';
+    final journal = s['journal'] ?? context.l10n.unknown;
     final id = s['id'] ?? 'N/A';
     final journalId = s['journal_id']?.toString();
     final yearRange = s['yearRange'] ?? '2021 - 2024';
@@ -294,7 +294,7 @@ class _SnapshotsViewState extends State<SnapshotsView> {
           Expanded(
             flex: 2,
             child: Text(
-              '$paperCount bài báo',
+              context.l10n.articlesCountLabel(paperCount),
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
             ),
           ),
@@ -326,7 +326,7 @@ class _SnapshotsViewState extends State<SnapshotsView> {
             ),
           ),
           SizedBox(
-            width: 90,
+            width: 120,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -336,12 +336,11 @@ class _SnapshotsViewState extends State<SnapshotsView> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    minimumSize: const Size(100, 36),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
-                  child: const Text('Xem hồ sơ', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
+                  child: Text(context.l10n.viewProfile, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
                 ),
               ],
             ),

@@ -4,6 +4,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../auth/domain/entities/auth_user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class UserSidebar extends StatelessWidget {
   final int selectedIndex;
@@ -51,7 +52,7 @@ class UserSidebar extends StatelessWidget {
                   isCollapsed: isCollapsed,
                   icon: Icons.rate_review_outlined,
                   activeIcon: Icons.rate_review_rounded,
-                  title: 'Kiểm tra Bản thảo',
+                  title: AppLocalizations.of(context).navManuscriptChecker,
                   showIconInExpanded: false,
                   onTap: onDestinationSelected,
                 ),
@@ -62,7 +63,7 @@ class UserSidebar extends StatelessWidget {
                   isCollapsed: isCollapsed,
                   icon: Icons.recommend_outlined,
                   activeIcon: Icons.recommend_rounded,
-                  title: 'Gợi ý Tạp chí',
+                  title: AppLocalizations.of(context).navJournalRecommendations,
                   showIconInExpanded: false,
                   onTap: onDestinationSelected,
                 ),
@@ -73,7 +74,7 @@ class UserSidebar extends StatelessWidget {
                   isCollapsed: isCollapsed,
                   icon: Icons.history_rounded,
                   activeIcon: Icons.history_rounded,
-                  title: 'Lịch sử Đánh giá',
+                  title: AppLocalizations.of(context).navEvaluationHistory,
                   showIconInExpanded: false,
                   onTap: onDestinationSelected,
                 ),
@@ -101,7 +102,7 @@ class UserSidebar extends StatelessWidget {
             ? Center(
                 key: const ValueKey('brand_collapsed'),
                 child: Tooltip(
-                  message: 'Mở rộng thanh menu',
+                  message: AppLocalizations.of(context).expandSidebar,
                   child: InkWell(
                     onTap: onToggleCollapse,
                     borderRadius: BorderRadius.circular(8),
@@ -199,7 +200,7 @@ class UserSidebar extends StatelessWidget {
                     ),
                   ),
                   Tooltip(
-                    message: 'Thu gọn thanh menu',
+                    message: AppLocalizations.of(context).collapseSidebar,
                     child: InkWell(
                       onTap: onToggleCollapse,
                       borderRadius: BorderRadius.circular(8),
@@ -241,7 +242,7 @@ class UserSidebar extends StatelessWidget {
 
     final displayName = (user?.name != null && user!.name!.trim().isNotEmpty)
         ? user.name!
-        : (user?.email?.split('@').first ?? 'Người dùng');
+        : (user?.email?.split('@').first ?? AppLocalizations.of(context).user);
     final email = user?.email ?? 'scholar.user@lab.edu.vn';
     final role = (user?.role ?? 'USER').toUpperCase();
     final initials = _getInitials(displayName);
@@ -282,7 +283,8 @@ class UserSidebar extends StatelessWidget {
                   side: const BorderSide(color: Color(0xFFE2E8F0)),
                 ),
                 onSelected: (val) => _handleProfileMenuAction(context, val, isAdminRole),
-                itemBuilder: (context) => _buildProfileMenuItems(
+                itemBuilder: (popupContext) => _buildProfileMenuItems(
+                  context: context,
                   displayName: displayName,
                   email: email,
                   role: role,
@@ -321,7 +323,8 @@ class UserSidebar extends StatelessWidget {
                   side: const BorderSide(color: Color(0xFFE2E8F0)),
                 ),
                 onSelected: (val) => _handleProfileMenuAction(context, val, isAdminRole),
-                itemBuilder: (context) => _buildProfileMenuItems(
+                itemBuilder: (popupContext) => _buildProfileMenuItems(
+                  context: context,
                   displayName: displayName,
                   email: email,
                   role: role,
@@ -430,6 +433,7 @@ class UserSidebar extends StatelessWidget {
   }
 
   List<PopupMenuEntry<String>> _buildProfileMenuItems({
+    required BuildContext context,
     required String displayName,
     required String email,
     required String role,
@@ -502,13 +506,13 @@ class UserSidebar extends StatelessWidget {
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.person_outline_rounded, size: 16, color: Color(0xFF64748B)),
-              SizedBox(width: 10),
+              const Icon(Icons.person_outline_rounded, size: 16, color: Color(0xFF64748B)),
+              const SizedBox(width: 10),
               Text(
-                'Hồ sơ tài khoản',
-                style: TextStyle(
+                AppLocalizations.of(context).accountProfile,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF0F172A),
@@ -529,13 +533,13 @@ class UserSidebar extends StatelessWidget {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.admin_panel_settings_outlined, size: 16, color: Color(0xFF64748B)),
-                SizedBox(width: 10),
+                const Icon(Icons.admin_panel_settings_outlined, size: 16, color: Color(0xFF64748B)),
+                const SizedBox(width: 10),
                 Text(
-                  'Trang quản trị (Admin)',
-                  style: TextStyle(
+                  AppLocalizations.of(context).adminManagement,
+                  style: const TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF0F172A),
@@ -558,13 +562,13 @@ class UserSidebar extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
             border: Border.all(color: const Color(0xFFFECDD3), width: 0.8),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Icon(Icons.logout_rounded, size: 16, color: Color(0xFFDC2626)),
-              SizedBox(width: 10),
+              const Icon(Icons.logout_rounded, size: 16, color: Color(0xFFDC2626)),
+              const SizedBox(width: 10),
               Text(
-                'Đăng xuất',
-                style: TextStyle(
+                AppLocalizations.of(context).signOut,
+                style: const TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w700,
                   color: Color(0xFFDC2626),

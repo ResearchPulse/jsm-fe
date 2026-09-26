@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/warning_item.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class WarningsListCard extends StatelessWidget {
   final List<WarningItem> warnings;
@@ -51,19 +52,21 @@ class WarningsListCard extends StatelessWidget {
           border: Border.all(color: AppColors.border),
         ),
         padding: const EdgeInsets.all(24),
-        child: const Center(
+        child: Center(
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle_outline, color: AppColors.green700, size: 20),
-              SizedBox(width: 8),
-              Text(
-                'No style warnings detected. Manuscript aligns well with target journal.',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.green700,
-                  fontFamily: 'Manrope',
+              const Icon(Icons.check_circle_outline, color: AppColors.green700, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  context.l10n.noWarningsDetected,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.green700,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
               ),
             ],
@@ -90,10 +93,10 @@ class WarningsListCard extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Diagnostics & Style Warnings',
-                  style: TextStyle(
+                  context.l10n.diagnosticsAndWarnings,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -233,10 +236,10 @@ class WarningsListCard extends StatelessWidget {
                                   color: AppColors.primary,
                                 ),
                                 const SizedBox(width: 6),
-                                const Expanded(
+                                Expanded(
                                   child: Text(
-                                    'Validated Exemplar from Target Journal',
-                                    style: TextStyle(
+                                    context.l10n.publishedExemplar,
+                                    style: const TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
                                       color: AppColors.primary,

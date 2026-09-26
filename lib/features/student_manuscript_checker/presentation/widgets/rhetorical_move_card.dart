@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/warning_item.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class RhetoricalMoveCard extends StatelessWidget {
   final List<WarningItem> moveWarnings;
@@ -31,18 +32,18 @@ class RhetoricalMoveCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              const Row(
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.account_tree_outlined,
                     size: 20,
                     color: AppColors.primary,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'Rhetorical Move Analysis',
-                    style: TextStyle(
+                    context.l10n.rhetoricalMovesTitle,
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,

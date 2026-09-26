@@ -1,6 +1,8 @@
+import '../../../../core/localization/app_localizations.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../data/datasources/admin_api_client.dart';
 
 /// Journal All-in-One Command Center Panel
@@ -75,7 +77,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     _domainController = TextEditingController(
       text: _config?['domain']?.toString() ??
           widget.journal['field']?.toString() ??
-          'Khoa học máy tính & Công nghệ',
+          context.l10n.defaultDomainCs,
     );
   }
 
@@ -212,7 +214,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
   /// 1-Touch Smart Preset Trigger
   Future<void> _handleOneTouchExecute() async {
     final journalId = widget.journal['id']?.toString() ?? '';
-    final journalTitle = widget.journal['title']?.toString() ?? 'Tạp chí';
+    final journalTitle = widget.journal['title']?.toString() ?? context.l10n.journal;
     if (journalId.isEmpty) return;
 
     setState(() => _isTriggering = true);
@@ -237,7 +239,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           journalId: journalId,
           domain: _domainController.text.trim().isNotEmpty
               ? _domainController.text.trim()
-              : (widget.journal['field']?.toString() ?? 'Khoa học máy tính & Công nghệ'),
+              : (widget.journal['field']?.toString() ?? context.l10n.defaultDomainCs),
           yearFrom: _yearFrom,
           yearTo: _yearTo,
           targetArticles: _targetArticles,
@@ -251,12 +253,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       if (activeConfigId.isNotEmpty) {
         await _apiClient.triggerAnalysis(activeConfigId);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('⚡ Đã kích hoạt chu trình khai phá cho "$journalTitle"'),
-              backgroundColor: AppColors.green700,
-              behavior: SnackBarBehavior.floating,
-            ),
+          AppNotification.showSuccess(
+            context,
+            'Đã kích hoạt chu trình khai phá cho "$journalTitle"',
+            title: context.l10n.success,
+            icon: Icons.bolt_rounded,
           );
         }
       }
@@ -267,12 +268,10 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       _startPolling();
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi kích hoạt khai phá: $e'),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotification.showError(
+          context,
+          'Lỗi kích hoạt khai phá: $e',
+          title: context.l10n.error,
         );
       }
     } finally {
@@ -292,14 +291,14 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           border: Border.all(color: AppColors.border),
         ),
         padding: const EdgeInsets.all(40),
-        child: const Center(
+        child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              CircularProgressIndicator(strokeWidth: 2.5),
-              SizedBox(height: 16),
+              const CircularProgressIndicator(strokeWidth: 2.5),
+              const SizedBox(height: 16),
               Text(
-                'Đang đồng bộ dữ liệu tác vụ và hồ sơ phong cách...',
+                context.l10n.syncCommandCenterDesc,
                 style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
               ),
             ],
@@ -308,8 +307,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       );
     }
 
-    final title = widget.journal['title'] ?? 'Chưa rõ tên tạp chí';
-    final publisher = widget.journal['publisher'] ?? 'Chưa rõ nhà xuất bản';
+    final title = widget.journal['title'] ?? context.l10n.unknownJournalTitle;
+    final publisher = widget.journal['publisher'] ?? context.l10n.unknownPublisher;
     final issn = widget.journal['issn_l'] ??
         ((widget.journal['issns'] is List && (widget.journal['issns'] as List).isNotEmpty)
             ? widget.journal['issns'][0].toString()
@@ -369,27 +368,27 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     if (jobStatus == 'RUNNING') {
       badgeBg = AppColors.blue100;
       badgeText = AppColors.blue700;
-      badgeLabel = 'Đang khai phá...';
+      badgeLabel = context.l10n.badgeMining;
       badgeIcon = Icons.autorenew_rounded;
     } else if (jobStatus == 'COMPLETED') {
       badgeBg = AppColors.green100;
       badgeText = AppColors.green700;
-      badgeLabel = 'Hoàn tất & Có hồ sơ';
+      badgeLabel = context.l10n.badgeCompleteProfile;
       badgeIcon = Icons.check_circle_rounded;
     } else if (jobStatus == 'FAILED') {
       badgeBg = AppColors.red100;
       badgeText = AppColors.red700;
-      badgeLabel = 'Lỗi chu trình';
+      badgeLabel = context.l10n.badgePipelineError;
       badgeIcon = Icons.error_outline_rounded;
     } else if (_config != null) {
       badgeBg = AppColors.surfaceSoft;
       badgeText = AppColors.textPrimary;
-      badgeLabel = 'Sẵn sàng khai phá';
+      badgeLabel = context.l10n.badgeReadyMining;
       badgeIcon = Icons.schedule_rounded;
     } else {
       badgeBg = AppColors.surfaceSoft;
       badgeText = AppColors.textMuted;
-      badgeLabel = 'Chưa thiết lập';
+      badgeLabel = context.l10n.badgeNotConfigured;
       badgeIcon = Icons.help_outline_rounded;
     }
 
@@ -471,8 +470,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
             children: [
               _buildMetaTag(Icons.fingerprint_rounded, 'ISSN: $issn'),
               _buildMetaTag(Icons.category_rounded, _domainController.text),
-              _buildMetaTag(Icons.library_books_rounded, '$worksCount bài trên OpenAlex'),
-              _buildMetaTag(Icons.format_quote_rounded, '$citedCount trích dẫn'),
+              _buildMetaTag(Icons.library_books_rounded, '${context.l10n.papersCountLabel(worksCount)} ${context.l10n.worksOnOpenAlexLabel}'),
+              _buildMetaTag(Icons.format_quote_rounded, '${context.l10n.papersCountLabel(citedCount)} ${context.l10n.citationsLabel}'),
             ],
           ),
         ],
@@ -535,8 +534,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                         : (isRunning
                             ? 'Đang khai phá theo chu trình...'
                             : (isCompleted
-                                ? 'Khai phá lại ($_targetArticles bài)'
-                                : 'Bắt đầu Khai phá & Phân tích ($_targetArticles bài)')),
+                                ? context.l10n.reMineActionCount(_targetArticles)
+                                : context.l10n.startMiningActionCount(_targetArticles))),
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -558,7 +557,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 onPressed: () {
                   setState(() => _isAdvancedExpanded = !_isAdvancedExpanded);
                 },
-                tooltip: 'Tùy chỉnh thông số khai phá',
+                tooltip: context.l10n.customMiningParams,
                 icon: Icon(
                   _isAdvancedExpanded ? Icons.tune_rounded : Icons.tune_outlined,
                   color: _isAdvancedExpanded ? AppColors.primary : AppColors.textMuted,
@@ -584,7 +583,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  'Mặc định tối ưu: $_targetArticles bài báo • Năm $_yearFrom–$_yearTo • Tự động chuẩn hóa TEI XML',
+                  context.l10n.defaultOptimizedConfigDetails(_targetArticles, _yearFrom, _yearTo),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
@@ -623,8 +622,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Số bài báo mục tiêu:',
+                      Text(
+                        context.l10n.targetPapersColon,
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
                       ),
                       const SizedBox(height: 6),
@@ -644,7 +643,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                                 border: Border.all(color: isSel ? AppColors.textPrimary : AppColors.border),
                               ),
                               child: Text(
-                                '$preset bài',
+                                context.l10n.papersCountLabel(preset),
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
@@ -729,11 +728,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
 
     String cardTitle;
     if (isRunning) {
-      cardTitle = 'Đang phân tích';
+      cardTitle = context.l10n.analyzingCardTitle;
     } else if (isCompleted) {
-      cardTitle = 'Đã hoàn tất phân tích';
+      cardTitle = context.l10n.completedAnalysisCardTitle;
     } else {
-      cardTitle = 'Tiến độ phân tích';
+      cardTitle = context.l10n.progressAnalysisCardTitle;
     }
 
     return Padding(
@@ -864,7 +863,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                         children: [
                           Text(
                             isRunning
-                                ? 'Đang bóc tách bài ${processedArticles < totalArticles ? processedArticles + 1 : totalArticles} / $totalArticles'
+                                ? context.l10n.parsingPaperProgress(processedArticles < totalArticles ? processedArticles + 1 : totalArticles, totalArticles)
                                 : (isCompleted
                                     ? 'Đã bóc tách & phân tích hoàn tất'
                                     : 'Chưa có tác vụ phân tích'),
@@ -903,8 +902,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                                 ? _currentArticleTitle!
                                 : 'Bài nghiên cứu ${processedArticles < totalArticles ? processedArticles + 1 : totalArticles}: Trích xuất cấu trúc câu IMRAD & CARS Moves...')
                             : (isCompleted
-                                ? 'Dữ liệu toàn văn đã chuẩn hóa ($processedArticles bài) và sẵn sàng khảo sát đối chuẩn học thuật.'
-                                : 'Nhấn nút "Khai phá ($_targetArticles bài)" phía trên để bắt đầu phân tích.'),
+                                ? context.l10n.miningCompleteStatus(processedArticles)
+                                : context.l10n.clickMineAbovePrompt(_targetArticles)),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -944,7 +943,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     const Icon(Icons.check_circle_outline_rounded, size: 15, color: AppColors.green700),
                     const SizedBox(width: 6),
                     Text(
-                      'Đã hoàn thành: $processedArticles / $totalArticles bài báo',
+                      context.l10n.completedPapersFraction(processedArticles, totalArticles),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -961,18 +960,18 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                       const Icon(Icons.warning_amber_rounded, size: 15, color: AppColors.error),
                       const SizedBox(width: 4),
                       Text(
-                        '$failedCount bài lỗi',
+                        context.l10n.failedPapersCount(failedCount),
                         style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.error, fontFamily: 'Manrope'),
                       ),
                     ],
                   ),
                 InkWell(
                   onTap: () => widget.onNavigateToTab(2), // Navigate to Tab 2 (Hệ thống & Giám sát logs)
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        'Xem chi tiết tác vụ & logs',
+                        context.l10n.viewJobAndLogsDetails,
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
@@ -1020,13 +1019,13 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
             runSpacing: 8,
             spacing: 12,
             children: [
-              const Row(
+              Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primary),
-                  SizedBox(width: 6),
+                  const Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primary),
+                  const SizedBox(width: 6),
                   Text(
-                    'Hồ Sơ Phong Cách NLP & Rhetorical Moves',
+                    context.l10n.nlpStyleProfileSectionTitle,
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
@@ -1039,7 +1038,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
               OutlinedButton.icon(
                 onPressed: () => widget.onNavigateToTab(1), // Tab 1: Hồ sơ & Đối chuẩn NLP
                 icon: const Icon(Icons.analytics_outlined, size: 14),
-                label: const Text('Xem toàn diện & Đối chuẩn Corpus ➔', style: TextStyle(fontSize: 11, fontFamily: 'Manrope')),
+                label: Text(context.l10n.viewComprehensiveCorpusBenchmark, style: TextStyle(fontSize: 11, fontFamily: 'Manrope')),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary),
@@ -1061,15 +1060,15 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 return Column(
                   children: [
                     _buildMetricTile(
-                      'Độ dài câu (Từ)',
+                      context.l10n.sentenceLengthWords,
                       '$p50Len từ/câu',
-                      'Trung bình: $meanLen • Chuẩn học thuật',
+                      '${context.l10n.avgLabel}: $meanLen • ${context.l10n.academicStandard}',
                       Icons.text_fields_rounded,
                     ),
                     const SizedBox(height: 8),
                     _buildMetricTile(
-                      'Lập trường Hyland',
-                      '$hedges1k cẩn trọng',
+                      context.l10n.hylandStance,
+                      '$hedges1k ${context.l10n.cautiousTone}',
                       'Boosters: $boosters1k • Stance Neutral: ${neutralStance.toInt()}%',
                       Icons.psychology_rounded,
                     ),
@@ -1088,17 +1087,17 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 children: [
                   Expanded(
                     child: _buildMetricTile(
-                      'Độ dài câu (Từ)',
+                      context.l10n.sentenceLengthWords,
                       '$p50Len từ/câu',
-                      'Trung bình: $meanLen • Chuẩn học thuật',
+                      '${context.l10n.avgLabel}: $meanLen • ${context.l10n.academicStandard}',
                       Icons.text_fields_rounded,
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: _buildMetricTile(
-                      'Lập trường Hyland',
-                      '$hedges1k cẩn trọng',
+                      context.l10n.hylandStance,
+                      '$hedges1k ${context.l10n.cautiousTone}',
                       'Boosters: $boosters1k • Stance: ${supportStance.toInt()}% sup, ${neutralStance.toInt()}% neu',
                       Icons.psychology_rounded,
                     ),

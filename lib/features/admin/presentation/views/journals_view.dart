@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/widgets/search_input_box.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/admin_api_client.dart';
@@ -25,7 +26,7 @@ class _JournalsViewState extends State<JournalsView> {
   final TextEditingController _searchController = TextEditingController();
 
   String _searchQuery = '';
-  String _selectedDomain = 'Tất cả';
+  String _selectedDomain = 'ALL';
   String _filterStatus = 'all'; // 'all' | 'configured' | 'unconfigured'
   int _currentPage = 1;
   static const int _pageSize = 6;
@@ -135,7 +136,7 @@ class _JournalsViewState extends State<JournalsView> {
       return 'Computer Science';
     }
 
-    return 'Khoa học máy tính & Công nghệ';
+    return context.l10n.defaultDomainCs;
   }
 
   Future<void> _searchOpenAlex([String? query]) async {
@@ -190,11 +191,10 @@ class _JournalsViewState extends State<JournalsView> {
       );
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Đã nạp "$title" vào cơ sở dữ liệu thành công.'),
-          backgroundColor: AppColors.green700,
-        ),
+      AppNotification.showSuccess(
+        context,
+        'Đã nạp "$title" vào cơ sở dữ liệu thành công.',
+        title: context.l10n.success,
       );
 
       setState(() {
@@ -208,11 +208,10 @@ class _JournalsViewState extends State<JournalsView> {
       setState(() {
         _importingIds.remove(openalexId);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi khi nạp tạp chí: $e'),
-          backgroundColor: AppColors.error,
-        ),
+      AppNotification.showError(
+        context,
+        'Lỗi khi nạp tạp chí: $e',
+        title: context.l10n.error,
       );
     }
   }
@@ -228,12 +227,11 @@ class _JournalsViewState extends State<JournalsView> {
       setState(() {
         _triggeringConfigIds.remove(configId);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('⚡ Đã kích hoạt chu trình phân tích cho: $journalName'),
-          backgroundColor: AppColors.green700,
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppNotification.showSuccess(
+        context,
+        'Đã kích hoạt chu trình phân tích cho: $journalName',
+        title: context.l10n.success,
+        icon: Icons.bolt_rounded,
       );
       widget.onNavigateToTab(2); // Chuyển sang Tab 2 (Hệ thống & Giám sát)
     } catch (e) {
@@ -241,12 +239,10 @@ class _JournalsViewState extends State<JournalsView> {
       setState(() {
         _triggeringConfigIds.remove(configId);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi kích hoạt khai phá: $e'),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppNotification.showError(
+        context,
+        'Lỗi kích hoạt khai phá: $e',
+        title: context.l10n.error,
       );
     }
   }
@@ -268,22 +264,22 @@ class _JournalsViewState extends State<JournalsView> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
               ),
-              title: const Column(
+              title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Nhập Tạp chí thủ công',
-                    style: TextStyle(
+                    context.l10n.manualJournalEntryTitle,
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                       fontFamily: 'Manrope',
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  SizedBox(height: 4),
+                  const SizedBox(height: 4),
                   Text(
-                    'Dành cho tạp chí nội bộ, trong nước hoặc chưa có trên OpenAlex.',
-                    style: TextStyle(
+                    context.l10n.manualJournalEntryDesc,
+                    style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w400,
                       fontFamily: 'Manrope',
@@ -298,15 +294,15 @@ class _JournalsViewState extends State<JournalsView> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Tên Tạp chí đầy đủ (Title) *',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                    Text(
+                      context.l10n.fullJournalTitleRequired,
+                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: titleController,
                       decoration: InputDecoration(
-                        hintText: 'Ví dụ: IEEE Transactions on Software Engineering',
+                        hintText: context.l10n.journalTitlePlaceholder,
                         hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle),
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
@@ -380,8 +376,9 @@ class _JournalsViewState extends State<JournalsView> {
                           final title = titleController.text.trim();
                           final issn = issnController.text.trim();
                           if (title.isEmpty || issn.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Vui lòng nhập tên tạp chí và mã ISSN')),
+                            AppNotification.showWarning(
+                              context,
+                              'Vui lòng nhập tên tạp chí và mã ISSN',
                             );
                             return;
                           }
@@ -404,22 +401,20 @@ class _JournalsViewState extends State<JournalsView> {
 
                             if (ctx.mounted) Navigator.of(ctx).pop();
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Đã đăng ký tạp chí thành công vào cơ sở dữ liệu.'),
-                                  backgroundColor: AppColors.green700,
-                                ),
+                              AppNotification.showSuccess(
+                                context,
+                                'Đã đăng ký tạp chí thành công vào cơ sở dữ liệu.',
+                                title: 'Đăng ký thành công',
                               );
                             }
                             _loadAllData();
                           } catch (err) {
                             setModalState(() => isSubmitting = false);
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Lỗi: $err'),
-                                  backgroundColor: AppColors.error,
-                                ),
+                              AppNotification.showError(
+                                context,
+                                'Lỗi: $err',
+                                title: 'Thao tác thất bại',
                               );
                             }
                           }
@@ -597,9 +592,9 @@ class _JournalsViewState extends State<JournalsView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Số bài báo mục tiêu (Target)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                        Text(context.l10n.targetPapersLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
                         Text(
-                          '$targetPapers bài',
+                          context.l10n.papersCountLabel(targetPapers.toInt()),
                           style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                         ),
                       ],
@@ -610,7 +605,7 @@ class _JournalsViewState extends State<JournalsView> {
                       keyboardType: TextInputType.number,
                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
                       decoration: InputDecoration(
-                        suffixText: 'bài báo',
+                        suffixText: context.l10n.papersUnit,
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
                         contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -645,7 +640,7 @@ class _JournalsViewState extends State<JournalsView> {
                               border: Border.all(color: isSelected ? AppColors.textPrimary : AppColors.border),
                             ),
                             child: Text(
-                              '$preset bài',
+                              context.l10n.papersCountLabel(preset),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
@@ -704,16 +699,20 @@ class _JournalsViewState extends State<JournalsView> {
                               await _apiClient.deleteConfiguration(configId);
                               if (ctx.mounted) Navigator.of(ctx).pop();
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Đã xóa cấu hình khai phá.')),
+                                AppNotification.showSuccess(
+                                  context,
+                                  'Đã xóa cấu hình khai phá.',
+                                  title: 'Thao tác thành công',
                                 );
                               }
                               _loadAllData();
                             } catch (e) {
                               setModalState(() => isSaving = false);
                               if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.error),
+                                AppNotification.showError(
+                                  context,
+                                  'Lỗi: $e',
+                                  title: 'Xóa thất bại',
                                 );
                               }
                             }
@@ -732,14 +731,16 @@ class _JournalsViewState extends State<JournalsView> {
                       : () async {
                           final domain = domainController.text.trim();
                           if (domain.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Vui lòng nhập tên lĩnh vực nghiên cứu.')),
+                            AppNotification.showWarning(
+                              context,
+                              'Vui lòng nhập tên lĩnh vực nghiên cứu.',
                             );
                             return;
                           }
                           if (yearStart > yearEnd) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Năm bắt đầu không được lớn hơn năm kết thúc.')),
+                            AppNotification.showWarning(
+                              context,
+                              'Năm bắt đầu không được lớn hơn năm kết thúc.',
                             );
                             return;
                           }
@@ -768,19 +769,20 @@ class _JournalsViewState extends State<JournalsView> {
 
                             if (ctx.mounted) Navigator.of(ctx).pop();
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Đã lưu cấu hình cho "$journalTitle" thành công.'),
-                                  backgroundColor: AppColors.green700,
-                                ),
+                              AppNotification.showSuccess(
+                                context,
+                                'Đã lưu cấu hình cho "$journalTitle" thành công.',
+                                title: 'Lưu cấu hình thành công',
                               );
                             }
                             _loadAllData();
                           } catch (err) {
                             setModalState(() => isSaving = false);
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Lỗi: $err'), backgroundColor: AppColors.error),
+                              AppNotification.showError(
+                                context,
+                                'Lỗi: $err',
+                                title: 'Lưu cấu hình thất bại',
                               );
                             }
                           }
@@ -799,14 +801,16 @@ class _JournalsViewState extends State<JournalsView> {
                       : () async {
                           final domain = domainController.text.trim();
                           if (domain.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Vui lòng nhập tên lĩnh vực nghiên cứu.')),
+                            AppNotification.showWarning(
+                              context,
+                              'Vui lòng nhập tên lĩnh vực nghiên cứu.',
                             );
                             return;
                           }
                           if (yearStart > yearEnd) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Năm bắt đầu không được lớn hơn năm kết thúc.')),
+                            AppNotification.showWarning(
+                              context,
+                              'Năm bắt đầu không được lớn hơn năm kết thúc.',
                             );
                             return;
                           }
@@ -844,8 +848,10 @@ class _JournalsViewState extends State<JournalsView> {
                           } catch (err) {
                             setModalState(() => isSaving = false);
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Lỗi: $err'), backgroundColor: AppColors.error),
+                              AppNotification.showError(
+                                context,
+                                'Lỗi: $err',
+                                title: 'Khởi chạy thất bại',
                               );
                             }
                           }
@@ -1141,7 +1147,7 @@ class _JournalsViewState extends State<JournalsView> {
         hoverColor: Colors.transparent,
       ),
       child: PopupMenuButton<String>(
-        tooltip: 'Lọc theo chuyên ngành',
+        tooltip: context.l10n.filterByDomain,
         position: PopupMenuPosition.under,
         offset: const Offset(0, 6),
         elevation: 8,
@@ -1270,7 +1276,7 @@ class _JournalsViewState extends State<JournalsView> {
               OutlinedButton.icon(
                 onPressed: _loadAllData,
                 icon: const Icon(Icons.refresh_rounded, size: 16),
-                label: const Text('Thử lại'),
+                label: Text(context.l10n.retry),
               ),
             ],
           ),
@@ -1366,7 +1372,7 @@ class _JournalsViewState extends State<JournalsView> {
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 color: _currentPage > 1 ? AppColors.primary : AppColors.slate300,
                 onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null,
-                tooltip: 'Trang trước',
+                tooltip: context.l10n.prevPageTooltip,
               ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 6),
@@ -1393,7 +1399,7 @@ class _JournalsViewState extends State<JournalsView> {
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 color: _currentPage < totalPages ? AppColors.primary : AppColors.slate300,
                 onPressed: _currentPage < totalPages ? () => setState(() => _currentPage++) : null,
-                tooltip: 'Trang sau',
+                tooltip: context.l10n.nextPageTooltip,
               ),
             ],
           ),
@@ -1404,8 +1410,8 @@ class _JournalsViewState extends State<JournalsView> {
 
   Widget _buildJournalCard(Map<String, dynamic> journal) {
     final journalId = journal['id'].toString();
-    final title = journal['title'] ?? 'Chưa rõ';
-    final publisher = journal['publisher'] ?? 'Chưa rõ nhà xuất bản';
+    final title = journal['title'] ?? context.l10n.unknown;
+    final publisher = journal['publisher'] ?? context.l10n.unknownPublisher;
     final issn = journal['issn_l'] ??
         ((journal['issns'] is List && (journal['issns'] as List).isNotEmpty)
             ? journal['issns'][0].toString()
@@ -1494,9 +1500,9 @@ class _JournalsViewState extends State<JournalsView> {
                                 color: AppColors.green100,
                                 borderRadius: BorderRadius.circular(4),
                               ),
-                              child: const Text(
-                                'Đã cấu hình',
-                                style: TextStyle(
+                              child: Text(
+                                context.l10n.configured,
+                                style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w700,
                                   color: AppColors.green700,
@@ -1512,9 +1518,9 @@ class _JournalsViewState extends State<JournalsView> {
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(color: AppColors.border),
                               ),
-                              child: const Text(
-                                'Chưa cấu hình',
-                                style: TextStyle(
+                              child: Text(
+                                context.l10n.notConfigured,
+                                style: const TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.w600,
                                   color: AppColors.textMuted,
@@ -1564,14 +1570,14 @@ class _JournalsViewState extends State<JournalsView> {
                           ),
                           const Spacer(),
                           Text(
-                            '$worksCount bài',
+                            context.l10n.papersCountLabel(worksCount),
                             style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted, fontFamily: 'Manrope'),
                           ),
                           const SizedBox(width: 6),
                           IconButton(
                             onPressed: () => _showQuickConfigDialog(context, journal),
                             icon: const Icon(Icons.tune_rounded, size: 14),
-                            tooltip: 'Cấu hình chi tiết',
+                            tooltip: context.l10n.configDetailsTooltip,
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             color: AppColors.textMuted,
@@ -1694,7 +1700,7 @@ class _JournalsViewState extends State<JournalsView> {
               ),
               const SizedBox(height: 16),
               Text(
-                'Đang tra cứu "$_searchQuery" trên OpenAlex toàn cầu...',
+                context.l10n.openAlexSearchingGlobal(_searchQuery),
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -1703,8 +1709,8 @@ class _JournalsViewState extends State<JournalsView> {
                 ),
               ),
               const SizedBox(height: 4),
-              const Text(
-                'Hệ thống đang kết nối trực tiếp đến chỉ mục học thuật mở OpenAlex',
+              Text(
+                context.l10n.openAlexConnectingDesc,
                 style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
               ),
             ],
@@ -1730,7 +1736,7 @@ class _JournalsViewState extends State<JournalsView> {
               OutlinedButton.icon(
                 onPressed: () => _searchOpenAlex(_searchQuery),
                 icon: const Icon(Icons.refresh_rounded, size: 16),
-                label: const Text('Thử lại'),
+                label: Text(context.l10n.retry),
               ),
             ],
           ),
@@ -1770,7 +1776,7 @@ class _JournalsViewState extends State<JournalsView> {
               const Icon(Icons.search_off_rounded, size: 40, color: AppColors.textSubtle),
               const SizedBox(height: 12),
               Text(
-                'Không tìm thấy tạp chí nào có tên hoặc ISSN "$_searchQuery" trên OpenAlex.',
+                context.l10n.noJournalFoundOpenAlex,
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
@@ -1779,8 +1785,8 @@ class _JournalsViewState extends State<JournalsView> {
                 ),
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Vui lòng thử từ khóa khác (ví dụ: "IEEE", "Finance", "Nature") hoặc mã ISSN.',
+              Text(
+                context.l10n.tryAnotherKeywords,
                 style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
               ),
             ],
@@ -1815,7 +1821,7 @@ class _JournalsViewState extends State<JournalsView> {
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  'Không tìm thấy "$_searchQuery" trong CSDL nội bộ',
+                  context.l10n.notFoundInLocalDb(_searchQuery),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontSize: 15,
@@ -1825,8 +1831,8 @@ class _JournalsViewState extends State<JournalsView> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Tạp chí này chưa được lưu trữ trong hệ thống. Bạn có muốn tra cứu trực tiếp từ kho học thuật toàn cầu OpenAlex để nạp vào không?',
+                Text(
+                  context.l10n.notStoredInSystemDesc,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 13,
@@ -1839,7 +1845,7 @@ class _JournalsViewState extends State<JournalsView> {
                 ElevatedButton.icon(
                   onPressed: () => _searchOpenAlex(_searchQuery),
                   icon: const Icon(Icons.travel_explore_rounded, size: 16),
-                  label: Text('Tra cứu "$_searchQuery" trên OpenAlex'),
+                  label: Text(context.l10n.lookupOnOpenAlexBtn(_searchQuery)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.textPrimary,
                     foregroundColor: Colors.white,
@@ -1861,20 +1867,20 @@ class _JournalsViewState extends State<JournalsView> {
           children: [
             const Icon(Icons.menu_book_outlined, size: 40, color: AppColors.textSubtle),
             const SizedBox(height: 8),
-            const Text(
-              'Chưa có tạp chí nào trong cơ sở dữ liệu.',
+            Text(
+              context.l10n.noJournalsInDb,
               style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
             ),
             const SizedBox(height: 6),
-            const Text(
-              'Gõ tên tạp chí vào ô tìm kiếm ở trên để tra cứu từ OpenAlex, hoặc nhập thủ công.',
+            Text(
+              context.l10n.searchOrManualHint,
               style: TextStyle(fontSize: 12, color: AppColors.textSubtle, fontFamily: 'Manrope'),
             ),
             const SizedBox(height: 14),
             OutlinedButton.icon(
               onPressed: () => _showAddJournalDialog(context),
               icon: const Icon(Icons.post_add_rounded, size: 16),
-              label: const Text('Nhập thủ công', style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+              label: Text(context.l10n.manualEntryBtn, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textPrimary,
                 side: const BorderSide(color: AppColors.border),
@@ -1903,7 +1909,7 @@ class _JournalsViewState extends State<JournalsView> {
           const SizedBox(width: 8),
           Expanded(
             child: Text(
-              'Kết quả tra cứu từ OpenAlex (${_openAlexResults.length} tạp chí phù hợp):',
+              context.l10n.openAlexResultsCount(_openAlexResults.length),
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -1920,7 +1926,7 @@ class _JournalsViewState extends State<JournalsView> {
               });
             },
             icon: const Icon(Icons.close_rounded, size: 14),
-            label: const Text('Ẩn kết quả OpenAlex', style: TextStyle(fontSize: 11)),
+            label: Text(context.l10n.hideOpenAlexResults, style: TextStyle(fontSize: 11)),
             style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
           ),
         ],
@@ -1929,8 +1935,8 @@ class _JournalsViewState extends State<JournalsView> {
   }
 
   Widget _buildOpenAlexJournalRow(Map<String, dynamic> journal) {
-    final title = journal['title'] ?? 'Chưa rõ';
-    final publisher = journal['publisher'] ?? 'Chưa rõ nhà xuất bản';
+    final title = journal['title'] ?? context.l10n.unknown;
+    final publisher = journal['publisher'] ?? context.l10n.unknownPublisher;
     final issn = journal['issn_l'] ??
         ((journal['issns'] is List && (journal['issns'] as List).isNotEmpty)
             ? journal['issns'][0].toString()
@@ -2014,14 +2020,14 @@ class _JournalsViewState extends State<JournalsView> {
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: AppColors.green100),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.check_circle_rounded, size: 16, color: AppColors.green700),
-                      SizedBox(width: 6),
+                      const Icon(Icons.check_circle_rounded, size: 16, color: AppColors.green700),
+                      const SizedBox(width: 6),
                       Text(
-                        'Đã nạp vào CSDL',
-                        style: TextStyle(
+                        context.l10n.importedToDb,
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: AppColors.green700,
@@ -2042,7 +2048,7 @@ class _JournalsViewState extends State<JournalsView> {
                         )
                       : const Icon(Icons.add_rounded, size: 16),
                   label: Text(
-                    isImporting ? 'Đang nạp...' : 'Nạp vào CSDL',
+                    isImporting ? context.l10n.importingToDb : context.l10n.importToDbBtn,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -2109,7 +2115,7 @@ class _JournalsViewState extends State<JournalsView> {
                     const Icon(Icons.menu_book_rounded, size: 12, color: AppColors.textSubtle),
                     const SizedBox(width: 4),
                     Text(
-                      '$worksCount bài viết • $citedCount trích dẫn',
+                      context.l10n.worksAndCitations(worksCount, citedCount),
                       style: const TextStyle(
                         fontSize: 11,
                         color: AppColors.textSecondary,
@@ -2128,7 +2134,7 @@ class _JournalsViewState extends State<JournalsView> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  isImported ? 'Đã lưu hệ thống' : 'Chưa nạp CSDL',
+                  isImported ? context.l10n.savedInSystem : context.l10n.notImportedToDb,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,

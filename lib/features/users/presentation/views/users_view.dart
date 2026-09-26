@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../data/datasources/users_api_client.dart';
@@ -157,12 +158,10 @@ class _UsersViewState extends State<UsersView> {
     if (isCurrentlyAdmin && isCurrentlyActive) {
       final isDemotingOrDeactivating = (newStatus == false) || (newRole != null && newRole != 'admin');
       if (isDemotingOrDeactivating && _activeAdminCount <= 1) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(context.l10n.cannotDemoteLastAdmin),
-            backgroundColor: AppColors.error,
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotification.showError(
+          context,
+          context.l10n.cannotDemoteLastAdmin,
+          title: 'Thao tác không được phép',
         );
         return;
       }
@@ -197,24 +196,20 @@ class _UsersViewState extends State<UsersView> {
         }
       });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Đã cập nhật thông tin tài khoản "$email" thành công.'),
-          backgroundColor: AppColors.green700,
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppNotification.showSuccess(
+        context,
+        'Đã cập nhật thông tin tài khoản "$email" thành công.',
+        title: 'Cập nhật thành công',
       );
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _savingUserIds.remove(userId);
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Lỗi cập nhật tài khoản: $e'),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppNotification.showError(
+        context,
+        'Lỗi cập nhật tài khoản: $e',
+        title: 'Cập nhật thất bại',
       );
     }
   }
@@ -228,12 +223,10 @@ class _UsersViewState extends State<UsersView> {
 
   void _confirmDeleteUser(String userId, String fullName, String email, bool isAdmin) {
     if (isAdmin && _activeAdminCount <= 1) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(context.l10n.cannotDeleteLastAdmin),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-        ),
+      AppNotification.showError(
+        context,
+        context.l10n.cannotDeleteLastAdmin,
+        title: 'Thao tác không được phép',
       );
       return;
     }
@@ -318,22 +311,18 @@ class _UsersViewState extends State<UsersView> {
                   _editedRoles.remove(userId);
                   _editedStatuses.remove(userId);
                 });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Đã xóa vĩnh viễn tài khoản "$email".'),
-                    backgroundColor: AppColors.green700,
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                AppNotification.showSuccess(
+                  context,
+                  'Đã xóa vĩnh viễn tài khoản "$email".',
+                  title: 'Xóa tài khoản',
                 );
               } catch (e) {
                 if (!mounted) return;
                 setState(() => _deletingUserIds.remove(userId));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Lỗi khi xóa tài khoản: $e'),
-                    backgroundColor: AppColors.error,
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                AppNotification.showError(
+                  context,
+                  'Lỗi khi xóa tài khoản: $e',
+                  title: 'Xóa thất bại',
                 );
               }
             },
@@ -771,12 +760,10 @@ class _UsersViewState extends State<UsersView> {
                           isLastAdmin: isLastAdmin,
                           onPressed: isLastAdmin
                               ? () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text(context.l10n.cannotDeleteLastAdmin),
-                                      backgroundColor: AppColors.error,
-                                      behavior: SnackBarBehavior.floating,
-                                    ),
+                                  AppNotification.showError(
+                                    context,
+                                    context.l10n.cannotDeleteLastAdmin,
+                                    title: 'Thao tác không được phép',
                                   );
                                 }
                               : () => _confirmDeleteUser(userId, fullName, email, isAdmin),

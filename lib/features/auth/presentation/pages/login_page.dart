@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/widgets/language_switcher.dart';
 import '../../domain/entities/auth_provider.dart';
@@ -242,31 +243,10 @@ class _LoginViewState extends State<LoginView>
                 child: BlocConsumer<AuthCubit, AuthState>(
                   listener: (context, state) {
                     if (state is AuthFailure) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.error,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          content: Row(
-                            children: [
-                              const Icon(Icons.error_outline_rounded,
-                                  color: Colors.white, size: 18),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  state.message,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontFamily: 'Manrope',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      AppNotification.showError(
+                        context,
+                        state.message,
+                        title: 'Đăng nhập thất bại',
                       );
                     }
                   },

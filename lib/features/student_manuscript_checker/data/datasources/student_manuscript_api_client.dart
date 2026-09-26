@@ -92,7 +92,7 @@ class StudentManuscriptApiClient {
 
     try {
       final response = await _client.get(
-        Uri.parse(ApiEndpoints.adminJournals),
+        Uri.parse(ApiEndpoints.studentAvailableJournals),
         headers: headers,
       );
 

@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../data/datasources/manuscript_file_picker.dart';
 import '../../domain/entities/target_journal.dart';
 import '../cubit/student_manuscript_checker_cubit.dart';
 import '../cubit/student_manuscript_checker_state.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class ManuscriptInputCard extends StatefulWidget {
   final StudentManuscriptCheckerInitial initialState;
@@ -129,11 +131,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
       // Text mode
       final text = _textController.text.trim();
       if (text.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please enter or paste manuscript text.'),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotification.showWarning(
+          context,
+          'Please enter or paste manuscript text.',
         );
         return;
       }
@@ -147,11 +147,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
     } else {
       // File mode
       if (_pickedFileBytes == null || _pickedFileBytes!.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Please choose a file (.pdf, .docx, .txt).'),
-            behavior: SnackBarBehavior.floating,
-          ),
+        AppNotification.showWarning(
+          context,
+          context.l10n.pleaseChooseFile,
         );
         return;
       }
@@ -195,14 +193,14 @@ These findings highlight the necessity of providing immediate linguistic feedbac
               borderRadius: BorderRadius.circular(20),
               border: Border.all(color: AppColors.blue100),
             ),
-            child: const Row(
+            child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.auto_stories_rounded, size: 14, color: AppColors.primary),
-                SizedBox(width: 6),
+                const Icon(Icons.auto_stories_rounded, size: 14, color: AppColors.primary),
+                const SizedBox(width: 6),
                 Text(
-                  'Phân tích & Thẩm định Bản thảo Học thuật',
-                  style: TextStyle(
+                  context.l10n.studentCheckerSubtitle,
+                  style: const TextStyle(
                     color: AppColors.primary,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w700,
@@ -213,9 +211,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
             ),
           ),
           const SizedBox(height: 14),
-          const Text(
-            'Check Manuscript Alignment',
-            style: TextStyle(
+          Text(
+            context.l10n.checkManuscriptAlignment,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,
@@ -224,9 +222,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
-            'Evaluate your student draft against target journal style standards and detect missing rhetorical moves.',
-            style: TextStyle(
+          Text(
+            context.l10n.checkManuscriptDesc,
+            style: const TextStyle(
               fontSize: 13.5,
               color: AppColors.textSecondary,
               fontFamily: 'Manrope',
@@ -264,9 +262,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                     ),
                   ),
                   const SizedBox(width: 8),
-                  const Text(
-                    'Target Journal Profile',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.targetJournalProfile,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -295,8 +293,8 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                       const SizedBox(width: 4),
                       Text(
                         _isManualJournal
-                            ? 'Select from catalog'
-                            : 'Enter custom journal ID',
+                            ? context.l10n.selectFromCatalog
+                            : context.l10n.enterCustomJournalId,
                         style: const TextStyle(
                           fontSize: 12.5,
                           fontWeight: FontWeight.w600,
@@ -345,7 +343,7 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                   ),
                 ),
                 prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 32),
-                hintText: 'e.g. 550e8400-e29b-41d4-a716-446655440000',
+                hintText: context.l10n.targetJournalIdHint,
                 hintStyle: const TextStyle(
                   fontSize: 13.5,
                   color: AppColors.textSubtle,
@@ -433,17 +431,17 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Manrope',
               ),
-              tabs: const [
+              tabs: [
                 Tab(
                   height: 38,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.edit_note_rounded, size: 16),
-                      SizedBox(width: 8),
+                      const Icon(Icons.edit_note_rounded, size: 16),
+                      const SizedBox(width: 8),
                       Flexible(
                         child: Text(
-                          'Direct Text / Draft',
+                          context.l10n.directTextDraft,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -456,11 +454,11 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.upload_file_rounded, size: 16),
-                      SizedBox(width: 8),
+                      const Icon(Icons.upload_file_rounded, size: 16),
+                      const SizedBox(width: 8),
                       Flexible(
                         child: Text(
-                          'Upload File',
+                          context.l10n.uploadManuscriptFile,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -501,10 +499,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                             height: 1.6,
                             color: AppColors.textPrimary,
                           ),
-                          decoration: const InputDecoration(
-                            hintText:
-                                'Paste or draft your academic manuscript here...\n\nInclude section headings like "Introduction", "Methods", etc. for accurate rhetorical move scoring.',
-                            hintStyle: TextStyle(
+                          decoration: InputDecoration(
+                            hintText: context.l10n.pasteDraftHere,
+                            hintStyle: const TextStyle(
                               fontSize: 13.5,
                               color: AppColors.textSubtle,
                               fontFamily: 'Manrope',
@@ -513,7 +510,7 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
-                            contentPadding: EdgeInsets.all(16),
+                            contentPadding: const EdgeInsets.all(16),
                           ),
                           onChanged: (val) {
                             setState(() {}); // Update word count
@@ -545,14 +542,14 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                                   borderRadius: BorderRadius.circular(8),
                                   border: Border.all(color: AppColors.blue100),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Icon(Icons.auto_stories_outlined, size: 14, color: AppColors.primary),
-                                    SizedBox(width: 6),
+                                    const Icon(Icons.auto_stories_outlined, size: 14, color: AppColors.primary),
+                                    const SizedBox(width: 6),
                                     Text(
-                                      'Load Sample Manuscript',
-                                      style: TextStyle(
+                                      context.l10n.loadSample,
+                                      style: const TextStyle(
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600,
                                         color: AppColors.primary,
@@ -572,11 +569,11 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                                   context.read<StudentManuscriptCheckerCubit>().updateDraftText('');
                                 },
                                 borderRadius: BorderRadius.circular(8),
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                                   child: Text(
-                                    'Clear',
-                                    style: TextStyle(
+                                    context.l10n.clear,
+                                    style: const TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textMuted,
                                       fontWeight: FontWeight.w600,
@@ -609,7 +606,7 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    '$wordCount words',
+                                    '$wordCount ${context.l10n.words}',
                                     style: TextStyle(
                                       fontSize: 11.5,
                                       fontWeight: FontWeight.w700,
@@ -701,9 +698,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                             ),
                           ),
                         ] else ...[
-                          const Text(
-                            'Supports PDF, DOCX, or TXT manuscripts',
-                            style: TextStyle(
+                          Text(
+                            context.l10n.uploadTitle,
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -711,9 +708,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Click below to browse files from your computer',
-                            style: TextStyle(
+                          Text(
+                            context.l10n.uploadDesc,
+                            style: const TextStyle(
                               fontSize: 12.5,
                               color: AppColors.textMuted,
                               fontFamily: 'Manrope',
@@ -729,8 +726,8 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                           ),
                           label: Text(
                             _pickedFileName != null
-                                ? 'Change File'
-                                : 'Select Manuscript File',
+                                ? context.l10n.changeFile
+                                : context.l10n.selectFile,
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
@@ -803,9 +800,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Include validated exemplars from journal corpus',
-                          style: TextStyle(
+                        Text(
+                          context.l10n.includeValidatedExemplars,
+                          style: const TextStyle(
                             fontSize: 13.5,
                             fontWeight: FontWeight.w700,
                             color: AppColors.textPrimary,
@@ -813,9 +810,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                           ),
                         ),
                         const SizedBox(height: 2),
-                        const Text(
-                          'Attaches authentic reference sentences and DOIs to generated style & rhetorical move warnings.',
-                          style: TextStyle(
+                        Text(
+                          context.l10n.includeValidatedExemplarsDesc,
+                          style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textMuted,
                             fontFamily: 'Manrope',
@@ -871,14 +868,14 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                 ),
                 child: Container(
                   alignment: Alignment.center,
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.spellcheck_rounded, size: 20),
-                      SizedBox(width: 10),
+                      const Icon(Icons.spellcheck_rounded, size: 20),
+                      const SizedBox(width: 10),
                       Text(
-                        'Check Manuscript Alignment',
-                        style: TextStyle(
+                        context.l10n.checkAlignmentBtn,
+                        style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
                           fontFamily: 'Manrope',
@@ -991,7 +988,7 @@ class _SearchableJournalDropdownState extends State<SearchableJournalDropdown> {
         ? widget.selectedJournalTitle!
         : (widget.journals.any((j) => j.id == widget.selectedJournalId)
             ? widget.journals.firstWhere((j) => j.id == widget.selectedJournalId).title
-            : (widget.journals.isNotEmpty ? widget.journals.first.title : 'Select Target Journal'));
+            : (widget.journals.isNotEmpty ? widget.journals.first.title : context.l10n.selectTargetJournal));
 
     return CompositedTransformTarget(
       link: _layerLink,
@@ -1139,7 +1136,7 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
                   decoration: InputDecoration(
                     isDense: true,
                     filled: false,
-                    hintText: 'Tìm kiếm tên tạp chí, chuyên ngành...',
+                    hintText: context.l10n.searchJournalDropdownHint,
                     hintStyle: const TextStyle(
                       fontSize: 12.5,
                       color: Color(0xFF94A3B8),
@@ -1186,7 +1183,7 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
                           ),
                           const SizedBox(height: 8),
                           Text(
-                            'Không tìm thấy tạp chí nào khớp với "$_searchQuery"',
+                            context.l10n.noJournalsMatched(_searchQuery),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 12.5,

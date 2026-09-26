@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/voice_person_comparison.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class VoicePersonCard extends StatelessWidget {
   final VoicePersonComparison? comparison;
@@ -30,17 +31,17 @@ class VoicePersonCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(
+            children: [
+              const Icon(
                 Icons.record_voice_over_outlined,
                 size: 20,
                 color: AppColors.primary,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Voice & Person Comparison',
-                  style: TextStyle(
+                  context.l10n.voicePersonAnalysis,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -55,7 +56,7 @@ class VoicePersonCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _ComparisonTile(
-                  title: 'Passive Voice Rate',
+                  title: context.l10n.passiveVoiceRate,
                   userValue: '${(comp.userPassiveRate * 100).toStringAsFixed(1)}%',
                   journalValue:
                       '${(comp.journalPassiveRate * 100).toStringAsFixed(1)}%',
@@ -65,7 +66,7 @@ class VoicePersonCard extends StatelessWidget {
               const SizedBox(width: 14),
               Expanded(
                 child: _ComparisonTile(
-                  title: '“We” / Author Voice Rate',
+                  title: context.l10n.weAuthorRate,
                   userValue: '${(comp.userWeRate * 100).toStringAsFixed(1)}%',
                   journalValue:
                       '${(comp.journalWeRate * 100).toStringAsFixed(1)}%',

@@ -1,3 +1,4 @@
+import '../../../../core/localization/app_localizations.dart';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -19,7 +20,7 @@ class RadarDataset {
   });
 
   /// Factory helper to build a normalized dataset from an API profile map.
-  factory RadarDataset.fromProfile(Map<String, dynamic> profile, Color color) {
+  factory RadarDataset.fromProfile(Map<String, dynamic> profile, Color color, AppLocalizations l10n) {
     final name = profile['journal_name']?.toString() ?? 'Tạp chí';
     final id = profile['journal_id']?.toString() ?? name;
     final metrics = profile['sentence_metrics'] as Map<String, dynamic>?;
@@ -51,12 +52,12 @@ class RadarDataset {
       color: color,
       values: [normLen, normLex, normHedge, normBooster, normNeutral, normCars],
       rawDisplayValues: [
-        '${meanLen.toStringAsFixed(1)} từ/câu',
-        '${(lexDensity * 100).toStringAsFixed(0)}% mật độ',
-        '${hedges.toStringAsFixed(1)}/1k từ',
-        '${boosters.toStringAsFixed(1)}/1k từ',
-        '${(neutral * 100).toStringAsFixed(0)}% trung tính',
-        '${(carsScore * 100).toStringAsFixed(0)}% hoàn thiện',
+        l10n.rawSentenceLength(meanLen.toStringAsFixed(1)),
+        l10n.rawLexicalDensity((lexDensity * 100).toStringAsFixed(0)),
+        l10n.rawPer1k(hedges.toStringAsFixed(1)),
+        l10n.rawPer1k(boosters.toStringAsFixed(1)),
+        l10n.rawNeutral((neutral * 100).toStringAsFixed(0)),
+        l10n.rawCars((carsScore * 100).toStringAsFixed(0)),
       ],
     );
   }
@@ -69,23 +70,7 @@ class StyleRadarChart extends StatefulWidget {
   final double height;
   final bool showLegend;
 
-  static const List<String> axisTitles = [
-    'Độ dài câu',
-    'Mật độ từ vựng',
-    'Rào đón (Hedges)',
-    'Khẳng định (Boosters)',
-    'Trung lập (Stance)',
-    'Khung CARS',
-  ];
 
-  static const List<String> axisSubtitles = [
-    'Sentence Length',
-    'Lexical Density',
-    'Hedging Intensity',
-    'Booster Intensity',
-    'Neutral Stance',
-    'Move Completeness',
-  ];
 
   const StyleRadarChart({
     super.key,
@@ -168,14 +153,23 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
     }
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
+    final axisTitles = [
+      context.l10n.radarAxisSentenceLength,
+      context.l10n.radarAxisLexicalDensity,
+      context.l10n.radarAxisHedges,
+      context.l10n.radarAxisBoosters,
+      context.l10n.radarAxisNeutral,
+      context.l10n.radarAxisCars,
+    ];
+
     if (widget.datasets.isEmpty) {
       return SizedBox(
         height: widget.height,
-        child: const Center(
+        child: Center(
           child: Text(
-            'Chọn tạp chí để hiển thị biểu đồ Radar',
+            context.l10n.selectJournalsForRadar,
             style: TextStyle(color: AppColors.textSubtle, fontSize: 13),
           ),
         ),
@@ -249,8 +243,8 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
                       size: Size(chartWidth, widget.height),
                       painter: _StyleRadarPainter(
                         datasets: widget.datasets,
-                        axisTitles: StyleRadarChart.axisTitles,
-                        axisSubtitles: StyleRadarChart.axisSubtitles,
+                        axisTitles: axisTitles,
+                        
                         hoveredDatasetIndex: _hoveredDatasetIndex,
                         hoveredAxisIndex: _hoveredAxisIndex,
                       ),
@@ -260,7 +254,7 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
                         _hoveredAxisIndex != null &&
                         _hoverPosition != null &&
                         _hoveredDatasetIndex! < widget.datasets.length)
-                      _buildFloatingTooltip(chartWidth, widget.height),
+                      _buildFloatingTooltip(chartWidth, widget.height, axisTitles),
                   ],
                 ),
               ),
@@ -271,7 +265,7 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
     );
   }
 
-  Widget _buildFloatingTooltip(double chartWidth, double chartHeight) {
+  Widget _buildFloatingTooltip(double chartWidth, double chartHeight, List<String> axisTitles) {
     final ds = widget.datasets[_hoveredDatasetIndex!];
     final axisIdx = _hoveredAxisIndex!;
     final pos = _hoverPosition!;
@@ -300,8 +294,8 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
     final normPct = (axisIdx < ds.values.length)
         ? '${(ds.values[axisIdx] * 100).toStringAsFixed(0)}%'
         : '-';
-    final title = StyleRadarChart.axisTitles[axisIdx];
-    final subtitle = StyleRadarChart.axisSubtitles[axisIdx];
+    final title = axisTitles[axisIdx];
+    
 
     return Positioned(
       left: left,
@@ -374,7 +368,7 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
               const SizedBox(height: 6),
               // Axis Name
               Text(
-                '$title ($subtitle)',
+                title,
                 style: const TextStyle(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w500,
@@ -390,9 +384,9 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
-                  const Text(
-                    'Đo được: ',
-                    style: TextStyle(fontSize: 11, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                  Text(
+                    context.l10n.measuredLabel,
+                    style: const TextStyle(fontSize: 11, color: AppColors.textSubtle, fontFamily: 'Manrope'),
                   ),
                   Text(
                     rawVal,
@@ -416,14 +410,14 @@ class _StyleRadarChartState extends State<StyleRadarChart> {
 class _StyleRadarPainter extends CustomPainter {
   final List<RadarDataset> datasets;
   final List<String> axisTitles;
-  final List<String> axisSubtitles;
+  
   final int? hoveredDatasetIndex;
   final int? hoveredAxisIndex;
 
   _StyleRadarPainter({
     required this.datasets,
     required this.axisTitles,
-    required this.axisSubtitles,
+    
     this.hoveredDatasetIndex,
     this.hoveredAxisIndex,
   });
@@ -564,31 +558,14 @@ class _StyleRadarPainter extends CustomPainter {
 
   void _drawAxisLabel(Canvas canvas, Offset center, double radius, double angle, int index) {
     final title = axisTitles[index];
-    final subtitle = axisSubtitles[index];
-
     final textSpan = TextSpan(
-      children: [
-        TextSpan(
-          text: '$title\n',
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            color: AppColors.textPrimary,
-            height: 1.1,
-          ),
-        ),
-        TextSpan(
-          text: subtitle,
-          style: const TextStyle(
-            fontSize: 9.5,
-            fontWeight: FontWeight.w400,
-            color: AppColors.textSubtle,
-            height: 1.1,
-          ),
-        ),
-      ],
+      text: title,
+      style: const TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      ),
     );
-
     final textPainter = TextPainter(
       text: textSpan,
       textAlign: TextAlign.center,

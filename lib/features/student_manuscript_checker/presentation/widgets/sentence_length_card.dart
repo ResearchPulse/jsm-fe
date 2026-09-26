@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/sentence_length_comparison.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class SentenceLengthCard extends StatelessWidget {
   final SentenceLengthComparison? comparison;
@@ -46,10 +47,10 @@ class SentenceLengthCard extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Sentence Length Analysis',
-                  style: TextStyle(
+                  context.l10n.sentenceLengthAnalysis,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -81,24 +82,24 @@ class SentenceLengthCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _MetricTile(
-                  label: 'MANUSCRIPT MEDIAN',
-                  value: '${comp.userMedian.toStringAsFixed(1)} words',
+                  label: context.l10n.manuscriptMedian,
+                  value: '${comp.userMedian.toStringAsFixed(1)} ${context.l10n.words}',
                   highlightColor: statusColor,
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _MetricTile(
-                  label: 'JOURNAL MEDIAN',
-                  value: '${comp.journalMedian.toStringAsFixed(1)} words',
+                  label: context.l10n.journalMedian,
+                  value: '${comp.journalMedian.toStringAsFixed(1)} ${context.l10n.words}',
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: _MetricTile(
-                  label: 'EXPECTED P10 - P90',
+                  label: context.l10n.expectedP10P90,
                   value:
-                      '${comp.journalP10.toStringAsFixed(0)} - ${comp.journalP90.toStringAsFixed(0)} words',
+                      '${comp.journalP10.toStringAsFixed(0)} - ${comp.journalP90.toStringAsFixed(0)} ${context.l10n.words}',
                 ),
               ),
             ],

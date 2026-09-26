@@ -107,7 +107,9 @@ void main() {
     await tester.tap(profileFinder);
     await tester.pumpAndSettle();
 
-    final signOutFinder = find.text('Đăng xuất');
+    final signOutFinder = find.byWidgetPredicate(
+      (widget) => widget is Text && (widget.data == 'Sign out' || widget.data == 'Đăng xuất'),
+    );
     await tester.tap(signOutFinder);
     await tester.pumpAndSettle();
 

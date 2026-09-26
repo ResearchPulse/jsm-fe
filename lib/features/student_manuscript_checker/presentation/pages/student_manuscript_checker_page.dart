@@ -122,7 +122,7 @@ class _StudentManuscriptCheckerView extends StatelessWidget {
                                   .read<StudentManuscriptCheckerCubit>()
                                   .reset();
                             },
-                            child: const Text('Return to Submission Form'),
+                            child: Text(context.l10n.returnToSubmissionForm),
                           ),
                         ],
                       ),
@@ -150,9 +150,9 @@ class _StudentManuscriptCheckerView extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'No Manuscript Sections Found',
-                            style: TextStyle(
+                          Text(
+                            context.l10n.noManuscriptSectionsFound,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -178,7 +178,7 @@ class _StudentManuscriptCheckerView extends StatelessWidget {
                             },
                             icon: const Icon(Icons.arrow_back_rounded,
                                 size: 16),
-                            label: const Text('Submit Another Draft'),
+                            label: Text(context.l10n.submitAnotherDraft),
                           ),
                         ],
                       ),
@@ -343,7 +343,7 @@ class _ResultsView extends StatelessWidget {
                 context.read<StudentManuscriptCheckerCubit>().reset();
               },
               icon: const Icon(Icons.arrow_back_rounded, size: 16),
-              label: const Text('Check Another Manuscript'),
+              label: Text(context.l10n.checkAnotherManuscript),
               style: OutlinedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(
                     horizontal: 24, vertical: 14),

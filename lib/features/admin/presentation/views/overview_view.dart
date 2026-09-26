@@ -1,3 +1,4 @@
+import '../../../../core/localization/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../app/theme/app_colors.dart';
@@ -152,13 +153,13 @@ class _OverviewViewState extends State<OverviewView> {
                         color: AppColors.blue50,
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: const Row(
+                      child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.hub_rounded, size: 14, color: AppColors.primary),
+                          const Icon(Icons.hub_rounded, size: 14, color: AppColors.primary),
                           SizedBox(width: 6),
                           Text(
-                            'Trung tâm điều phối khai phá dữ liệu',
+                            context.l10n.dataMinerCoordination,
                             style: TextStyle(
                               color: AppColors.primary,
                               fontSize: 12,
@@ -186,7 +187,7 @@ class _OverviewViewState extends State<OverviewView> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            isHealthy ? 'Pipeline Sẵn sàng (Live API)' : 'Hệ thống đang đồng bộ',
+                            isHealthy ? context.l10n.pipelineReady : context.l10n.systemSyncing,
                             style: TextStyle(
                               color: isHealthy ? AppColors.green700 : const Color(0xFFD97706),
                               fontSize: 12,
@@ -201,14 +202,14 @@ class _OverviewViewState extends State<OverviewView> {
                     IconButton(
                       onPressed: _loadOverviewData,
                       icon: const Icon(Icons.refresh_rounded, size: 18),
-                      tooltip: 'Làm mới số liệu',
+                      tooltip: context.l10n.refreshMetrics,
                       color: AppColors.primary,
                     ),
                   ],
                 ),
                 const SizedBox(height: 14),
-                const Text(
-                  'Tổng Quan Chu Trình Khai Phá Tạp Chí',
+                Text(
+                  context.l10n.journalMiningOverview,
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
@@ -218,8 +219,8 @@ class _OverviewViewState extends State<OverviewView> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Điều phối toàn trình: Thu thập metadata tạp chí ➔ Cấu hình trích xuất ➔ Bóc tách cấu trúc bằng Grobid ➔ Đóng băng Corpus Snapshot ➔ Xây dựng hồ sơ phong cách.',
+                Text(
+                  context.l10n.pipelineDescription,
                   style: TextStyle(
                     fontSize: 14,
                     color: AppColors.textMuted,
@@ -236,7 +237,7 @@ class _OverviewViewState extends State<OverviewView> {
               ElevatedButton.icon(
                 onPressed: widget.onTriggerNewAnalysis,
                 icon: const Icon(Icons.bolt_rounded, size: 18),
-                label: const Text('Kích hoạt phân tích mới'),
+                label: Text(context.l10n.startNewAnalysis),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,
@@ -251,7 +252,7 @@ class _OverviewViewState extends State<OverviewView> {
               OutlinedButton.icon(
                 onPressed: () => widget.onNavigateToTab(1),
                 icon: const Icon(Icons.add_rounded, size: 18),
-                label: const Text('Đăng ký tạp chí mới'),
+                label: Text(context.l10n.registerNewJournal),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.textPrimary,
                   side: const BorderSide(color: AppColors.border),
@@ -278,9 +279,9 @@ class _OverviewViewState extends State<OverviewView> {
           children: [
             _buildKpiCard(
               width: itemWidth.clamp(220, 400),
-              title: 'Tạp chí theo dõi',
+              title: context.l10n.trackedJournals,
               value: _isLoading ? '...' : '$_journalsCount',
-              delta: 'Đã lưu trong CSDL',
+              delta: context.l10n.savedInDatabase,
               deltaPositive: true,
               icon: Icons.menu_book_rounded,
               iconColor: AppColors.primary,
@@ -289,7 +290,7 @@ class _OverviewViewState extends State<OverviewView> {
             ),
             _buildKpiCard(
               width: itemWidth.clamp(220, 400),
-              title: 'Tác vụ đang chạy / Tổng',
+              title: context.l10n.jobsRunningTotal,
               value: _isLoading ? '...' : '$_runningJobsCount / $_totalJobsCount',
               delta: _grobidAlive ? 'Grobid & Pipeline active' : 'Grobid Standby',
               deltaPositive: _grobidAlive,
@@ -302,7 +303,7 @@ class _OverviewViewState extends State<OverviewView> {
               width: itemWidth.clamp(220, 400),
               title: 'Kho Corpus Snapshots',
               value: _isLoading ? '...' : '$_snapshotsCount',
-              delta: 'Bộ dữ liệu bất biến',
+              delta: context.l10n.frozenDatasets,
               deltaPositive: true,
               icon: Icons.layers_rounded,
               iconColor: const Color(0xFF7C3AED),
@@ -311,9 +312,9 @@ class _OverviewViewState extends State<OverviewView> {
             ),
             _buildKpiCard(
               width: itemWidth.clamp(220, 400),
-              title: 'Tài khoản người dùng',
+              title: context.l10n.userAccounts,
               value: _isLoading ? '...' : '$_usersCount',
-              delta: 'Giảng viên & Sinh viên',
+              delta: context.l10n.lecturersAndStudents,
               deltaPositive: true,
               icon: Icons.people_alt_rounded,
               iconColor: const Color(0xFF0D9488),
@@ -422,33 +423,33 @@ class _OverviewViewState extends State<OverviewView> {
     final stages = [
       _PipelineStageData(
         number: 1,
-        title: 'Danh mục & Cấu hình',
-        subtitle: '$_journalsCount tạp chí • $_configsCount cấu hình',
-        status: 'Sẵn sàng',
+        title: context.l10n.categoryAndConfig,
+        subtitle: context.l10n.journalsAndConfigsCount(_journalsCount, _configsCount),
+        status: context.l10n.systemReady,
         icon: Icons.tune_rounded,
         targetTab: 1,
       ),
       _PipelineStageData(
         number: 2,
         title: 'Grobid TEI Parse',
-        subtitle: '$_runningJobsCount job đang xử lý',
-        status: _runningJobsCount > 0 ? 'Đang chạy' : 'Sẵn sàng',
+        subtitle: context.l10n.runningJobsCountLabel(_runningJobsCount),
+        status: _runningJobsCount > 0 ? context.l10n.running : context.l10n.systemReady,
         icon: Icons.monitor_heart_rounded,
         targetTab: 3,
       ),
       _PipelineStageData(
         number: 3,
         title: 'Freeze Snapshot',
-        subtitle: '$_snapshotsCount bộ bất biến',
-        status: 'Bảo mật',
+        subtitle: context.l10n.snapshotsCountLabel(_snapshotsCount),
+        status: context.l10n.secured,
         icon: Icons.layers_rounded,
         targetTab: 4,
       ),
       _PipelineStageData(
         number: 4,
-        title: 'Hồ sơ phong cách',
+        title: context.l10n.styleProfiles,
         subtitle: 'Stance, CARS, Hedges',
-        status: 'Đã sẵn sàng',
+        status: context.l10n.systemReady,
         icon: Icons.psychology_outlined,
         targetTab: 5,
       ),
@@ -468,11 +469,11 @@ class _OverviewViewState extends State<OverviewView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Chu Trình Khai Phá Tuyến Tính (Data Pipeline Flow)',
+                    context.l10n.dataPipelineFlow,
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
@@ -482,7 +483,7 @@ class _OverviewViewState extends State<OverviewView> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Bấm vào từng giai đoạn để chuyển ngay tới giao diện quản lý tương ứng.',
+                    context.l10n.clickPhaseToNavigate,
                     style: TextStyle(
                       fontSize: 13,
                       color: AppColors.textMuted,
@@ -494,7 +495,7 @@ class _OverviewViewState extends State<OverviewView> {
               OutlinedButton.icon(
                 onPressed: () => widget.onNavigateToTab(3),
                 icon: const Icon(Icons.play_circle_outline_rounded, size: 16),
-                label: const Text('Theo dõi chi tiết Job'),
+                label: Text(context.l10n.viewJobDetails),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary),
@@ -610,8 +611,8 @@ class _OverviewViewState extends State<OverviewView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Tác Vụ Khai Phá Gần Đây',
+                    Text(
+                      context.l10n.recentMiningJobs,
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w700,
@@ -622,16 +623,16 @@ class _OverviewViewState extends State<OverviewView> {
                     TextButton.icon(
                       onPressed: () => widget.onNavigateToTab(3),
                       icon: const Icon(Icons.arrow_forward_rounded, size: 14),
-                      label: const Text('Xem tất cả'),
+                      label: Text(context.l10n.viewAll),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 if (_recentJobs.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.all(24),
+                  Padding(
+                    padding: const EdgeInsets.all(24),
                     child: Center(
-                      child: Text('Chưa có tác vụ nào được kích hoạt gần đây.', style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
+                      child: Text(context.l10n.noRecentJobs, style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
                     ),
                   )
                 else
@@ -659,8 +660,8 @@ class _OverviewViewState extends State<OverviewView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Trạng Thái Dịch Vụ Hệ Thống',
+                Text(
+                  context.l10n.systemServiceStatus,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
@@ -696,7 +697,7 @@ class _OverviewViewState extends State<OverviewView> {
                 OutlinedButton.icon(
                   onPressed: () => widget.onNavigateToTab(6),
                   icon: const Icon(Icons.settings_outlined, size: 16),
-                  label: const Text('Cấu hình tham số hệ thống'),
+                  label: Text(context.l10n.configSystemParams),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     side: const BorderSide(color: AppColors.border),
@@ -714,7 +715,7 @@ class _OverviewViewState extends State<OverviewView> {
 
   Widget _buildRecentJobItem(Map<String, dynamic> job) {
     final journal = job['journal'] as Map<String, dynamic>?;
-    final title = journal?['title'] ?? 'Tạp chí khai phá';
+    final title = journal?['title'] ?? context.l10n.miningJournal;
     final issn = journal?['issn_l'] ?? 'N/A';
     final status = (job['status'] ?? 'PENDING').toString();
     final step = (job['current_step'] ?? 'QUEUED').toString();
@@ -724,16 +725,16 @@ class _OverviewViewState extends State<OverviewView> {
     progress = progress.clamp(0.0, 1.0);
 
     Color statusColor = AppColors.primary;
-    String statusLabel = 'Đang xử lý';
+    String statusLabel = context.l10n.statusProcessing;
     if (status.toUpperCase() == 'COMPLETED') {
       statusColor = AppColors.green700;
-      statusLabel = 'Hoàn thành';
+      statusLabel = context.l10n.statusCompleted;
     } else if (status.toUpperCase() == 'PENDING') {
       statusColor = const Color(0xFFD97706);
-      statusLabel = 'Hàng đợi';
+      statusLabel = context.l10n.statusPending;
     } else if (status.toUpperCase() == 'FAILED') {
       statusColor = AppColors.error;
-      statusLabel = 'Thất bại';
+      statusLabel = context.l10n.statusFailed;
     }
 
     return Row(

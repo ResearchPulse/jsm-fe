@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../views/journals_view.dart';
 import '../views/style_and_corpus_view.dart';
@@ -159,11 +160,10 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     final successMsg = context.l10n.analysisTriggeredSuccess;
                     Navigator.of(ctx).pop();
                     _navigateToTab(2, subTabIndex: 0); // Navigate to Tab 2 (Job Monitor logs)
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(successMsg),
-                        behavior: SnackBarBehavior.floating,
-                      ),
+                    AppNotification.showSuccess(
+                      context,
+                      successMsg,
+                      title: context.l10n.success,
                     );
                   },
                   child: Text(context.l10n.startAnalysis),

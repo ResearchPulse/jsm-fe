@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class SectionScoresCard extends StatelessWidget {
   final Map<String, double> sectionScores;
@@ -38,10 +39,10 @@ class SectionScoresCard extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Section Alignment Scores',
-                  style: TextStyle(
+                  context.l10n.sectionScoresTitle,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -51,7 +52,7 @@ class SectionScoresCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                '${sectionScores.length} Sections',
+                context.l10n.sectionsCount(sectionScores.length),
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textMuted,

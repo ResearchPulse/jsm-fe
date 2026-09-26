@@ -3,6 +3,7 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../student_manuscript_checker/presentation/pages/student_manuscript_checker_page.dart';
 import '../widgets/user_header.dart';
 import '../widgets/user_sidebar.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -35,6 +36,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildJournalRecommendationsPlaceholder() {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
@@ -60,9 +62,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Gợi Ý Tạp Chí Phù Hợp',
-                style: TextStyle(
+              Text(
+                l10n.journalRecTitle,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Manrope',
@@ -70,10 +72,10 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Tính năng phân tích ngữ nghĩa và đề xuất các tạp chí Q1/Q2/Scopus phù hợp nhất với bản thảo của bạn đang được hoàn thiện.',
+              Text(
+                l10n.journalRecDesc,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                   fontFamily: 'Manrope',
@@ -84,7 +86,7 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton.icon(
                 onPressed: () => _navigateToTab(0),
                 icon: const Icon(Icons.arrow_back_rounded, size: 16),
-                label: const Text('Quay lại Kiểm tra Bản thảo'),
+                label: Text(l10n.backToManuscriptChecker),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),
@@ -97,6 +99,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildHistoryPlaceholder() {
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 720),
@@ -122,9 +125,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Lịch Sử Đánh Giá Bản Thảo',
-                style: TextStyle(
+              Text(
+                l10n.evalHistoryTitle,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Manrope',
@@ -132,10 +135,10 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
-                'Bạn chưa có lượt kiểm tra bản thảo nào gần đây. Hãy bắt đầu bằng cách nộp bản thảo tại tab Kiểm tra Bản thảo.',
+              Text(
+                l10n.evalHistoryDesc,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: AppColors.textSecondary,
                   fontFamily: 'Manrope',
@@ -146,7 +149,7 @@ class _HomePageState extends State<HomePage> {
               ElevatedButton.icon(
                 onPressed: () => _navigateToTab(0),
                 icon: const Icon(Icons.rate_review_rounded, size: 16),
-                label: const Text('Kiểm tra Bản thảo ngay'),
+                label: Text(l10n.checkManuscriptNow),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 ),

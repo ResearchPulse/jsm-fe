@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/language_switcher.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class UserHeader extends StatelessWidget {
   final int selectedIndex;
@@ -12,16 +13,17 @@ class UserHeader extends StatelessWidget {
     this.onResetCheck,
   });
 
-  String _getBreadcrumb() {
+  String _getBreadcrumb(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     switch (selectedIndex) {
       case 0:
-        return 'Không gian Học thuật / Kiểm tra Bản thảo';
+        return '${l10n.academicWorkspace} / ${l10n.navManuscriptChecker}';
       case 1:
-        return 'Không gian Học thuật / Gợi ý Tạp chí';
+        return '${l10n.academicWorkspace} / ${l10n.navJournalRecommendations}';
       case 2:
-        return 'Không gian Học thuật / Lịch sử';
+        return '${l10n.academicWorkspace} / ${l10n.navEvaluationHistory}';
       default:
-        return 'Không gian Học thuật';
+        return l10n.academicWorkspace;
     }
   }
 
@@ -40,7 +42,7 @@ class UserHeader extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-            _getBreadcrumb(),
+            _getBreadcrumb(context),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
@@ -57,9 +59,9 @@ class UserHeader extends StatelessWidget {
               color: AppColors.sidebarActive,
               borderRadius: BorderRadius.circular(6),
             ),
-            child: const Text(
-              'Journal Dashboard',
-              style: TextStyle(
+            child: Text(
+              context.l10n.journalDashboardBadge,
+              style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 color: AppColors.primary,
