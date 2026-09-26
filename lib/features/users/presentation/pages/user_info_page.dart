@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/widgets/language_switcher.dart';
 
 /// Displays the authenticated user's Central SSO profile information.
 /// Requires an [AuthCubit] above it. Only SSO-supported fields are shown:
@@ -13,11 +15,17 @@ class UserInfoPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('User Information')),
+      appBar: AppBar(
+        title: Text(context.l10n.userInfoTitle),
+        actions: const [
+          LanguageSwitcher(),
+          SizedBox(width: 12),
+        ],
+      ),
       body: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, state) {
           if (state is! AuthAuthenticated) {
-            return const Center(child: Text('Not signed in.'));
+            return Center(child: Text(context.l10n.notSignedIn));
           }
           final user = state.user;
           return Center(
@@ -43,16 +51,16 @@ class UserInfoPage extends StatelessWidget {
                         const SizedBox(width: 16),
                         Expanded(
                           child: Text(
-                            user.name ?? user.email ?? 'Signed-in user',
+                            user.name ?? user.email ?? context.l10n.signedInUser,
                             style: Theme.of(context).textTheme.titleLarge,
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 24),
-                    _InfoRow(label: 'Subject', value: user.sub),
-                    _InfoRow(label: 'Email', value: user.email ?? '—'),
-                    _InfoRow(label: 'Name', value: user.name ?? '—'),
+                    _InfoRow(label: context.l10n.subjectLabel, value: user.sub),
+                    _InfoRow(label: context.l10n.emailLabel, value: user.email ?? '—'),
+                    _InfoRow(label: context.l10n.nameLabel, value: user.name ?? '—'),
                   ],
                 ),
               ),

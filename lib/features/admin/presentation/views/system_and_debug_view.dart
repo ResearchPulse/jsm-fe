@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../../users/presentation/views/users_view.dart';
 import 'job_monitor_view.dart';
 import 'settings_view.dart';
@@ -58,8 +59,8 @@ class _SystemAndDebugViewState extends State<SystemAndDebugView> {
                 child: _buildSegmentItem(
                   index: 0,
                   icon: Icons.monitor_heart_rounded,
-                  title: 'Nhật Ký Tác Vụ & Debug',
-                  subtitle: 'Giám sát Celery, logs bóc tách, retry bài lỗi',
+                  title: context.l10n.tabJobMonitorTitle,
+                  subtitle: context.l10n.tabJobMonitorSubtitle,
                 ),
               ),
               const SizedBox(width: 14),
@@ -67,8 +68,8 @@ class _SystemAndDebugViewState extends State<SystemAndDebugView> {
                 child: _buildSegmentItem(
                   index: 1,
                   icon: Icons.tune_rounded,
-                  title: 'Cài Đặt Dịch Vụ',
-                  subtitle: 'MinIO Storage, GROBID Server, OpenAlex Pool',
+                  title: context.l10n.tabServiceSettingsTitle,
+                  subtitle: context.l10n.tabServiceSettingsSubtitle,
                 ),
               ),
               const SizedBox(width: 14),
@@ -76,8 +77,8 @@ class _SystemAndDebugViewState extends State<SystemAndDebugView> {
                 child: _buildSegmentItem(
                   index: 2,
                   icon: Icons.manage_accounts_rounded,
-                  title: 'Quản Lý Người Dùng',
-                  subtitle: 'Phân quyền Admin, Researcher, Quota API',
+                  title: context.l10n.tabUserManagementTitle,
+                  subtitle: context.l10n.tabUserManagementSubtitle,
                 ),
               ),
             ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import 'profiles_review_view.dart';
 import 'snapshots_view.dart';
 
@@ -57,8 +58,8 @@ class _StyleAndCorpusViewState extends State<StyleAndCorpusView> {
                 child: _buildSegmentItem(
                   index: 0,
                   icon: Icons.psychology_rounded,
-                  title: 'Hồ Sơ Phong Cách NLP & CARS Moves',
-                  subtitle: 'Hyland Stance, CARS Rhetorical Moves, Phân phối câu',
+                  title: context.l10n.tabNlpProfilesTitle,
+                  subtitle: context.l10n.tabNlpProfilesSubtitle,
                 ),
               ),
               const SizedBox(width: 14),
@@ -66,8 +67,8 @@ class _StyleAndCorpusViewState extends State<StyleAndCorpusView> {
                 child: _buildSegmentItem(
                   index: 1,
                   icon: Icons.layers_rounded,
-                  title: 'Kho Corpus Snapshots & Dữ Liệu',
-                  subtitle: 'Reference Corpus, Phiên bản kho bài, Tải JSON/CSV',
+                  title: context.l10n.tabCorpusSnapshotsTitle,
+                  subtitle: context.l10n.tabCorpusSnapshotsSubtitle,
                 ),
               ),
             ],

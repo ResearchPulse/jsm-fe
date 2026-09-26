@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
@@ -22,9 +23,9 @@ class _SettingsViewState extends State<SettingsView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header
-          const Text(
-            'Cài Đặt Hệ Thống & Tham Số Vận Hành',
-            style: TextStyle(
+          Text(
+            context.l10n.settingsTitle,
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w700,
               fontFamily: 'Manrope',
@@ -33,9 +34,9 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           ),
           const SizedBox(height: 4),
-          const Text(
-            'Quản trị bảo mật dữ liệu bản thảo, quy tắc lưu trữ tạm thời và giới hạn tốc độ cào bài học thuật.',
-            style: TextStyle(
+          Text(
+            context.l10n.settingsSubtitle,
+            style: const TextStyle(
               fontSize: 14,
               color: AppColors.textMuted,
               fontFamily: 'Manrope',
@@ -55,13 +56,13 @@ class _SettingsViewState extends State<SettingsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.shield_outlined, size: 20, color: AppColors.primary),
-                    SizedBox(width: 10),
+                    const Icon(Icons.shield_outlined, size: 20, color: AppColors.primary),
+                    const SizedBox(width: 10),
                     Text(
-                      'Xác Thực Tập Trung Phòng Thí Nghiệm (Central SSO)',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      context.l10n.ssoTitle,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                     ),
                   ],
                 ),
@@ -86,18 +87,18 @@ class _SettingsViewState extends State<SettingsView> {
                         child: const Icon(Icons.check_rounded, color: AppColors.green700, size: 20),
                       ),
                       const SizedBox(width: 14),
-                      const Expanded(
+                      Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Đang kết nối phiên OIDC SSO',
-                              style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                              context.l10n.ssoConnected,
+                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                             ),
-                            SizedBox(height: 2),
+                            const SizedBox(height: 2),
                             Text(
-                              'Nhà cung cấp danh tính phòng lab (Keycloak OIDC) • Client ID: researchpulse-ecosystem',
-                              style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                              context.l10n.ssoProvider,
+                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
                             ),
                           ],
                         ),
@@ -108,9 +109,9 @@ class _SettingsViewState extends State<SettingsView> {
                           color: AppColors.green50,
                           borderRadius: BorderRadius.circular(6),
                         ),
-                        child: const Text(
-                          'HOẠT ĐỘNG',
-                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.green700, fontFamily: 'Manrope'),
+                        child: Text(
+                          context.l10n.ssoActive,
+                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.green700, fontFamily: 'Manrope'),
                         ),
                       ),
                     ],
@@ -133,30 +134,30 @@ class _SettingsViewState extends State<SettingsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.privacy_tip_outlined, size: 20, color: AppColors.primary),
-                    SizedBox(width: 10),
+                    const Icon(Icons.privacy_tip_outlined, size: 20, color: AppColors.primary),
+                    const SizedBox(width: 10),
                     Text(
-                      'Bảo Mật Bản Thảo & Chính Sách Lưu Trữ',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      context.l10n.privacyTitle,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Bản thảo của tác giả chỉ là các bản nháp tạm thời phục vụ chấm điểm và không bao giờ bị gộp vào kho Corpus vĩnh viễn.',
-                  style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                Text(
+                  context.l10n.privacyDesc,
+                  style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                    'Tự động dọn dẹp file nháp tạm thời',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                  title: Text(
+                    context.l10n.autoPurgeTitle,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
                   ),
                   subtitle: Text(
-                    'Tự động xóa sạch file bản thảo PDF/DOCX sau ${_retentionDays.toInt()} ngày (tối đa 30 ngày)',
+                    context.l10n.autoPurgeSubtitle(_retentionDays.toInt()),
                     style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
                   ),
                   value: _autoPurge,
@@ -188,30 +189,30 @@ class _SettingsViewState extends State<SettingsView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Row(
+                Row(
                   children: [
-                    Icon(Icons.speed_rounded, size: 20, color: AppColors.primary),
-                    SizedBox(width: 10),
+                    const Icon(Icons.speed_rounded, size: 20, color: AppColors.primary),
+                    const SizedBox(width: 10),
                     Text(
-                      'Cơ Chế Cào Bài Lịch Sự (Polite Pool)',
-                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      context.l10n.politePoolTitle,
+                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  'Gắn email của phòng lab vào HTTP header khi gửi request đến OpenAlex / CrossRef để tránh lỗi chặn IP (HTTP 429).',
-                  style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                Text(
+                  context.l10n.politePoolDesc,
+                  style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                    'Kích hoạt Polite Pool cho OpenAlex',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                  title: Text(
+                    context.l10n.politePoolEnable,
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
                   ),
                   subtitle: Text(
-                    'Giới hạn tối đa ${_requestsPerSecond.toInt()} requests / giây',
+                    context.l10n.politePoolSubtitle(_requestsPerSecond.toInt()),
                     style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
                   ),
                   value: _politePool,
@@ -235,14 +236,14 @@ class _SettingsViewState extends State<SettingsView> {
           ElevatedButton.icon(
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Đã lưu các thiết lập hệ thống thành công.'),
+                SnackBar(
+                  content: Text(context.l10n.settingsSaved),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
             },
             icon: const Icon(Icons.save_rounded, size: 18),
-            label: const Text('Lưu toàn bộ cài đặt'),
+            label: Text(context.l10n.saveAllSettings),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,

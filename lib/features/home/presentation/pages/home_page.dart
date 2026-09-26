@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/widgets/language_switcher.dart';
 import '../../../admin/presentation/pages/admin_dashboard_page.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 
@@ -12,7 +14,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Journal Dashboard'),
+        title: Text(context.l10n.journalDashboardTitle),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 8),
@@ -28,7 +30,7 @@ class HomePage extends StatelessWidget {
                 Icons.admin_panel_settings_rounded,
                 size: 16,
               ),
-              label: const Text('Admin dashboard'),
+              label: Text(context.l10n.adminDashboard),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
@@ -39,9 +41,14 @@ class HomePage extends StatelessWidget {
             ),
           ),
           IconButton(
-            tooltip: 'Sign out',
+            tooltip: context.l10n.signOut,
             icon: const Icon(Icons.logout),
             onPressed: () => context.read<AuthCubit>().logout(),
+          ),
+          const SizedBox(width: 4),
+          const Padding(
+            padding: EdgeInsets.only(right: 12),
+            child: LanguageSwitcher(),
           ),
         ],
       ),
@@ -58,7 +65,7 @@ class HomePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('user'),
+              child: Text(context.l10n.user),
             ),
             const SizedBox(width: 16),
             ElevatedButton(
@@ -76,7 +83,7 @@ class HomePage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: const Text('admin'),
+              child: Text(context.l10n.admin),
             ),
             const SizedBox(width: 16),
             ElevatedButton.icon(
@@ -87,7 +94,7 @@ class HomePage extends StatelessWidget {
                 Icons.spellcheck_rounded,
                 size: 16,
               ),
-              label: const Text('checker'),
+              label: Text(context.l10n.checker),
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -99,4 +106,4 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-}
+}

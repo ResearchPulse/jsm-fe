@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../views/journals_view.dart';
 import '../views/style_and_corpus_view.dart';
 import '../views/system_and_debug_view.dart';
@@ -49,9 +50,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20), // --ds-radius-panel
               ),
-              title: const Text(
-                'Kích hoạt Khai phá Tạp chí',
-                style: TextStyle(
+              title: Text(
+                context.l10n.triggerMiningTitle,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Manrope',
@@ -68,17 +69,17 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Tạo tác vụ chạy nền để cào bài, bóc tách cấu trúc bằng Grobid và trích xuất hồ sơ phong cách.',
-                        style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                      Text(
+                        context.l10n.triggerMiningDesc,
+                        style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
                       ),
                       const SizedBox(height: 20),
-                      const Text('Mã ISSN hoặc Tên tạp chí', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                      Text(context.l10n.issnOrJournalName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                       const SizedBox(height: 6),
                       TextField(
                         controller: journalController,
-                        decoration: const InputDecoration(
-                          hintText: 'Ví dụ: 0098-5589 hoặc IEEE TSE',
+                        decoration: InputDecoration(
+                          hintText: context.l10n.issnHint,
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -88,7 +89,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Từ năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                                Text(context.l10n.fromYear, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<int>(
                                   initialValue: yearStart,
@@ -108,7 +109,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text('Đến năm', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                                Text(context.l10n.toYear, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<int>(
                                   initialValue: yearEnd,
@@ -129,9 +130,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Số lượng bài báo mục tiêu', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                          Text(context.l10n.targetPapersCount, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
                           Text(
-                            '${targetPapers.toInt()} bài',
+                            '${targetPapers.toInt()} ${context.l10n.papersUnit}',
                             style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
                           ),
                         ],
@@ -151,20 +152,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
               actions: [
                 OutlinedButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: const Text('Hủy bỏ'),
+                  child: Text(context.l10n.cancel),
                 ),
                 ElevatedButton(
                   onPressed: () {
+                    final successMsg = context.l10n.analysisTriggeredSuccess;
                     Navigator.of(ctx).pop();
                     _navigateToTab(2, subTabIndex: 0); // Navigate to Tab 2 (Job Monitor logs)
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Đã kích hoạt tác vụ phân tích tạp chí thành công.'),
+                      SnackBar(
+                        content: Text(successMsg),
                         behavior: SnackBarBehavior.floating,
                       ),
                     );
                   },
-                  child: const Text('Bắt đầu phân tích'),
+                  child: Text(context.l10n.startAnalysis),
                 ),
               ],
             );
