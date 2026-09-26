@@ -172,4 +172,5 @@ AuthUser _toAuthUser(SsoUserInfo info) => AuthUser(
       email: info.email,
       name: info.name,
       picture: info.picture,
+      role: info.role,
     );

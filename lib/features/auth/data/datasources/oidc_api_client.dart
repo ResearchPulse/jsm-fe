@@ -47,12 +47,14 @@ class SsoUserInfo {
   final String? email;
   final String? name;
   final String? picture;
+  final String? role;
 
   const SsoUserInfo({
     required this.sub,
     this.email,
     this.name,
     this.picture,
+    this.role,
   });
 
   Map<String, dynamic> toJson() => {
@@ -60,15 +62,26 @@ class SsoUserInfo {
         if (email != null) 'email': email,
         if (name != null) 'name': name,
         if (picture != null) 'picture': picture,
+        if (role != null) 'role': role,
       };
 
-  factory SsoUserInfo.fromJson(Map<String, dynamic> json) => SsoUserInfo(
-        sub: (json['sub'] ?? json['id'] ?? '').toString(),
-        email: json['email'] as String?,
-        name: (json['name'] ?? json['preferred_username'] ?? json['username'])
-            as String?,
-        picture: (json['picture'] ?? json['avatar']) as String?,
-      );
+  factory SsoUserInfo.fromJson(Map<String, dynamic> json) {
+    String? resolvedRole;
+    final r = json['role'] ?? json['roles'] ?? json['groups'];
+    if (r is List && r.isNotEmpty) {
+      resolvedRole = r.first.toString();
+    } else if (r is String) {
+      resolvedRole = r;
+    }
+    return SsoUserInfo(
+      sub: (json['sub'] ?? json['id'] ?? '').toString(),
+      email: json['email'] as String?,
+      name: (json['name'] ?? json['preferred_username'] ?? json['username'])
+          as String?,
+      picture: (json['picture'] ?? json['avatar']) as String?,
+      role: resolvedRole,
+    );
+  }
 }
 
 /// HTTP client for the Central SSO token and userinfo endpoints. The

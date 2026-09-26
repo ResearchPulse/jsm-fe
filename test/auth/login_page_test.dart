@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_provider.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_result.dart';
+import 'package:jsm_fe/features/auth/domain/entities/auth_user.dart';
 import 'package:jsm_fe/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jsm_fe/features/auth/domain/usecases/login_usecase.dart';
 import 'package:jsm_fe/features/auth/domain/usecases/logout_usecase.dart';
@@ -35,6 +36,16 @@ class _StubRepo implements AuthRepository {
 
   @override
   Future<String?> currentToken() async => null;
+
+  @override
+  Future<AuthUser> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  }) async {
+    return AuthUser(sub: sub, email: email, name: name, role: role);
+  }
 }
 
 Widget _wrap(AuthRepository repo) => BlocProvider(

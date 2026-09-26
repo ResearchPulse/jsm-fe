@@ -53,6 +53,7 @@ class UserInfoPage extends StatelessWidget {
                     _InfoRow(label: 'Subject', value: user.sub),
                     _InfoRow(label: 'Email', value: user.email ?? '—'),
                     _InfoRow(label: 'Name', value: user.name ?? '—'),
+                    _InfoRow(label: 'Role / Phân quyền', value: (user.role ?? 'USER').toUpperCase()),
                   ],
                 ),
               ),

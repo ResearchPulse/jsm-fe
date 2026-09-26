@@ -43,6 +43,16 @@ class _FakeAuthRepository implements AuthRepository {
 
   @override
   Future<String?> currentToken() async => null;
+
+  @override
+  Future<AuthUser> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  }) async {
+    return AuthUser(sub: sub, email: email, name: name, role: role);
+  }
 }
 
 void main() {
@@ -168,4 +178,14 @@ class _ThrowingRepo implements AuthRepository {
 
   @override
   Future<String?> currentToken() async => null;
+
+  @override
+  Future<AuthUser> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  }) async {
+    return AuthUser(sub: sub, email: email, name: name, role: role);
+  }
 }

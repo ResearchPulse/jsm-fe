@@ -980,31 +980,35 @@ class _JournalsViewState extends State<JournalsView> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Danh Mục & Trung Tâm Khai Phá Tạp Chí',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-                fontFamily: 'Manrope',
-                letterSpacing: -0.4,
+        const Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Danh Mục & Trung Tâm Khai Phá Tạp Chí',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Manrope',
+                  letterSpacing: -0.4,
+                ),
               ),
-            ),
-            SizedBox(height: 4),
-            Text(
-              'Chọn tạp chí để kích hoạt khai phá 1-chạm (300 bài), giám sát bóc tách TEI XML và xem hồ sơ phong cách NLP tức thì.',
-              style: TextStyle(
-                fontSize: 14,
-                color: AppColors.textMuted,
-                fontFamily: 'Manrope',
+              SizedBox(height: 4),
+              Text(
+                'Chọn tạp chí để kích hoạt khai phá 1-chạm (300 bài), giám sát bóc tách TEI XML và xem hồ sơ phong cách NLP tức thì.',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        const SizedBox(width: 16),
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
               onPressed: _loadAllData,
@@ -1105,45 +1109,48 @@ class _JournalsViewState extends State<JournalsView> {
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              _buildStatusFilterChip('all', 'Tất cả (${_journals.length})'),
-              const SizedBox(width: 6),
-              _buildStatusFilterChip('configured', 'Đã cấu hình ($configuredCount)'),
-              const SizedBox(width: 6),
-              _buildStatusFilterChip('unconfigured', 'Chưa có ($unconfiguredCount)'),
-              const Spacer(),
-              if (domains.isNotEmpty) ...[
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceSoft,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: AppColors.border),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildStatusFilterChip('all', 'Tất cả (${_journals.length})'),
+                const SizedBox(width: 6),
+                _buildStatusFilterChip('configured', 'Đã cấu hình ($configuredCount)'),
+                const SizedBox(width: 6),
+                _buildStatusFilterChip('unconfigured', 'Chưa có ($unconfiguredCount)'),
+                if (domains.isNotEmpty) ...[
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceSoft,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: DropdownButton<String>(
+                      value: domains.contains(_selectedDomain) || _selectedDomain == 'Tất cả' ? _selectedDomain : 'Tất cả',
+                      isDense: true,
+                      underline: const SizedBox(),
+                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      items: ['Tất cả', ...domains].map((d) {
+                        return DropdownMenuItem<String>(
+                          value: d,
+                          child: Text(d, style: const TextStyle(fontSize: 11, fontFamily: 'Manrope')),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() {
+                            _selectedDomain = val;
+                            _currentPage = 1;
+                          });
+                        }
+                      },
+                    ),
                   ),
-                  child: DropdownButton<String>(
-                    value: domains.contains(_selectedDomain) || _selectedDomain == 'Tất cả' ? _selectedDomain : 'Tất cả',
-                    isDense: true,
-                    underline: const SizedBox(),
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
-                    items: ['Tất cả', ...domains].map((d) {
-                      return DropdownMenuItem<String>(
-                        value: d,
-                        child: Text(d, style: const TextStyle(fontSize: 11, fontFamily: 'Manrope')),
-                      );
-                    }).toList(),
-                    onChanged: (val) {
-                      if (val != null) {
-                        setState(() {
-                          _selectedDomain = val;
-                          _currentPage = 1;
-                        });
-                      }
-                    },
-                  ),
-                ),
+                ],
               ],
-            ],
+            ),
           ),
         ],
       ),

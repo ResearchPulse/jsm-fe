@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
@@ -10,6 +12,7 @@ import '../../domain/usecases/auth_launcher.dart';
 import '../datasources/browser_sso_seam.dart';
 import '../datasources/desktop_sso_launcher.dart';
 import '../datasources/sso_auth_launcher.dart';
+import '../datasources/sso_session_store.dart';
 
 /// Auth repository backed by the Central SSO (OIDC Authorization Code +
 /// PKCE) launcher. All browser/network details live behind [AuthLauncher];
@@ -72,6 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
           email: snapshot.userInfo.email,
           name: snapshot.userInfo.name,
           picture: snapshot.userInfo.picture,
+          role: snapshot.userInfo.role,
         ),
         accessToken: snapshot.tokens.accessToken,
         refreshToken: snapshot.tokens.refreshToken,
@@ -100,5 +104,62 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<String?> currentToken() async {
     final session = await restoreSession();
     return session?.accessToken;
+  }
+
+  @override
+  Future<AuthUser> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  }) async {
+    final header = base64Url
+        .encode(utf8.encode(jsonEncode({'alg': 'none', 'typ': 'JWT'})))
+        .replaceAll('=', '');
+    final payload = base64Url
+        .encode(utf8.encode(jsonEncode({
+          'sub': sub,
+          'email': email,
+          'name': name,
+          'role': role,
+          'roles': [role],
+          'type': 'access',
+          'exp': (DateTime.now()
+                  .add(const Duration(days: 7))
+                  .millisecondsSinceEpoch ~/
+              1000),
+        })))
+        .replaceAll('=', '');
+    final token = '$header.$payload.';
+
+    final user = AuthUser(
+      sub: sub,
+      email: email,
+      name: name,
+      role: role,
+    );
+
+    final ssoLauncher = launcher;
+    if (ssoLauncher is SsoAuthLauncher) {
+      ssoLauncher.store.write(
+        SsoSessionKeys.tokens,
+        jsonEncode({
+          'access_token': token,
+          'expires_at': DateTime.now()
+              .add(const Duration(days: 7))
+              .millisecondsSinceEpoch,
+        }),
+      );
+      ssoLauncher.store.write(
+        SsoSessionKeys.user,
+        jsonEncode({
+          'sub': sub,
+          'email': email,
+          'name': name,
+          'role': role,
+        }),
+      );
+    }
+    return user;
   }
 }

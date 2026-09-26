@@ -459,7 +459,160 @@ class _LoginViewState extends State<LoginView>
                                     ),
                                   ),
 
-                                  const SizedBox(height: 22),
+                                  const SizedBox(height: 20),
+
+                                  // Divider: Test Mock Accounts
+                                  Row(
+                                    children: [
+                                      const Expanded(child: Divider(color: AppColors.border)),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        child: Text(
+                                          'HOẶC GIẢ LẬP SSO (TEST MODE)',
+                                          style: TextStyle(
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w700,
+                                            color: AppColors.textSubtle,
+                                            fontFamily: 'Manrope',
+                                            letterSpacing: 0.5,
+                                          ),
+                                        ),
+                                      ),
+                                      const Expanded(child: Divider(color: AppColors.border)),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 14),
+
+                                  // Button Mock ADMIN
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 46,
+                                    child: OutlinedButton(
+                                      onPressed: busy
+                                          ? null
+                                          : () => context.read<AuthCubit>().mockLogin(
+                                                sub: 'mock-sso-admin-id',
+                                                email: 'admin@jsm.edu.vn',
+                                                name: 'Quản trị viên Hệ thống (Admin)',
+                                                role: 'ADMIN',
+                                              ),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Color(0xFF7C3AED), width: 1.5),
+                                        backgroundColor: const Color(0xFFF5F3FF),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.admin_panel_settings_rounded,
+                                            size: 18,
+                                            color: Color(0xFF7C3AED),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Expanded(
+                                            child: Text(
+                                              'Giả lập SSO: ADMIN',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF7C3AED),
+                                                fontFamily: 'Manrope',
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFEDE9FE),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: const Text(
+                                              'ADMIN',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w800,
+                                                color: Color(0xFF7C3AED),
+                                                fontFamily: 'Manrope',
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  // Button Mock USER
+                                  SizedBox(
+                                    width: double.infinity,
+                                    height: 46,
+                                    child: OutlinedButton(
+                                      onPressed: busy
+                                          ? null
+                                          : () => context.read<AuthCubit>().mockLogin(
+                                                sub: 'mock-sso-user-id',
+                                                email: 'scholar.user@lab.edu.vn',
+                                                name: 'TS. Nguyễn Văn Scholar (User)',
+                                                role: 'USER',
+                                              ),
+                                      style: OutlinedButton.styleFrom(
+                                        side: const BorderSide(color: Color(0xFF0D9488), width: 1.5),
+                                        backgroundColor: const Color(0xFFF0FDFA),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(
+                                            Icons.person_rounded,
+                                            size: 18,
+                                            color: Color(0xFF0D9488),
+                                          ),
+                                          const SizedBox(width: 8),
+                                          const Expanded(
+                                            child: Text(
+                                              'Giả lập SSO: USER',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w700,
+                                                color: Color(0xFF0D9488),
+                                                fontFamily: 'Manrope',
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                            decoration: BoxDecoration(
+                                              color: const Color(0xFFCCFBF1),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: const Text(
+                                              'USER',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w800,
+                                                color: Color(0xFF0D9488),
+                                                fontFamily: 'Manrope',
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 20),
 
                                   // Explanatory note
                                   Container(

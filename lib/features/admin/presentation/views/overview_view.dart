@@ -21,7 +21,7 @@ class OverviewView extends StatefulWidget {
 
 class _OverviewViewState extends State<OverviewView> {
   final AdminApiClient _adminApiClient = AdminApiClient();
-  final UsersApiClient _usersApiClient = UsersApiClient(tokenProvider: () async => null);
+  late final UsersApiClient _usersApiClient;
 
   bool _isLoading = true;
   int _journalsCount = 0;
@@ -38,6 +38,11 @@ class _OverviewViewState extends State<OverviewView> {
   @override
   void initState() {
     super.initState();
+    final authRepo = context.read<AuthRepository?>();
+    _usersApiClient = UsersApiClient(
+      tokenProvider: () async =>
+          authRepo != null ? await authRepo.currentToken() : null,
+    );
     _loadOverviewData();
   }
 

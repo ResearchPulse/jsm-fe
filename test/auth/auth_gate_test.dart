@@ -37,6 +37,16 @@ class _StubRepo implements AuthRepository {
 
   @override
   Future<String?> currentToken() async => null;
+
+  @override
+  Future<AuthUser> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  }) async {
+    return AuthUser(sub: sub, email: email, name: name, role: role);
+  }
 }
 
 Widget _gate(AuthRepository repo) => MultiRepositoryProvider(
@@ -113,6 +123,30 @@ void main() {
     await tester.pumpWidget(_gate(repo));
     await tester.pumpAndSettle();
     expect(find.text('Journal Dashboard'), findsOneWidget);
+  });
+
+  testWidgets('admin authenticated: routes directly to AdminDashboardPage',
+      (tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
+    final repo = _StubRepo()
+      ..callbackResult = AuthResult(
+        user: AuthUser(
+          sub: 'admin_1',
+          email: 'admin@example.com',
+          name: 'Super Admin',
+          role: 'ADMIN',
+        ),
+      );
+    await tester.pumpWidget(_gate(repo));
+    await tester.pumpAndSettle();
+    expect(find.text('Danh Mục & Trung Tâm Khai Phá Tạp Chí'), findsOneWidget);
+    expect(find.text('Journal Dashboard'), findsNothing);
   });
 }
 

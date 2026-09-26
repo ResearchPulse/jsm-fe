@@ -53,35 +53,39 @@ class AdminHeader extends StatelessWidget {
       child: Row(
         children: [
           // Breadcrumb & Title
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                _getBreadcrumb(),
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSubtle,
-                  fontWeight: FontWeight.w500,
-                  fontFamily: 'Manrope',
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  _getBreadcrumb(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSubtle,
+                    fontWeight: FontWeight.w500,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                _getTitle(),
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  fontFamily: 'Manrope',
-                  letterSpacing: -0.3,
+                const SizedBox(height: 2),
+                Text(
+                  _getTitle(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                    letterSpacing: -0.3,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-
-          const Spacer(),
-
+          const SizedBox(width: 16),
           // Search input
           SizedBox(
             width: 280,

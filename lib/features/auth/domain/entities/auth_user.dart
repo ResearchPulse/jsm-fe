@@ -6,14 +6,16 @@ class AuthUser extends Equatable {
   final String? email;
   final String? name;
   final String? picture;
+  final String? role;
 
   const AuthUser({
     required this.sub,
     this.email,
     this.name,
     this.picture,
+    this.role,
   });
 
   @override
-  List<Object?> get props => [sub, email, name, picture];
+  List<Object?> get props => [sub, email, name, picture, role];
 }
