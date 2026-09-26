@@ -1260,6 +1260,7 @@ class _JournalsViewState extends State<JournalsView> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.border),
             ),
+            clipBehavior: Clip.antiAlias,
             child: Column(
               children: [
                 _buildOpenAlexHeaderBanner(),
@@ -1684,15 +1685,23 @@ class _JournalsViewState extends State<JournalsView> {
     }
 
     if (_openAlexResults.isNotEmpty) {
-      return Column(
-        children: [
-          _buildOpenAlexHeaderBanner(),
-          for (int i = 0; i < _openAlexResults.length; i++) ...[
-            _buildOpenAlexJournalRow(_openAlexResults[i]),
-            if (i < _openAlexResults.length - 1)
-              const Divider(height: 1, color: AppColors.borderSoft),
+      return Container(
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            _buildOpenAlexHeaderBanner(),
+            for (int i = 0; i < _openAlexResults.length; i++) ...[
+              _buildOpenAlexJournalRow(_openAlexResults[i]),
+              if (i < _openAlexResults.length - 1)
+                const Divider(height: 1, color: AppColors.borderSoft),
+            ],
           ],
-        ],
+        ),
       );
     }
 
@@ -1879,159 +1888,198 @@ class _JournalsViewState extends State<JournalsView> {
     final isImporting = _importingIds.contains(openalexId);
 
     return Container(
-      color: AppColors.surfaceSoft.withAlpha(100),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Row(
+      color: AppColors.surface,
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            flex: 4,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+          // Top Row: Title, OpenAlex badge & Action button
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Flexible(
-                      child: Text(
-                        title,
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                          fontFamily: 'Manrope',
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.textPrimary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: const Text(
-                        'OpenAlex',
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                          fontFamily: 'Manrope',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  publisher,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMuted,
-                    fontFamily: 'Manrope',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              issn,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
-                fontFamily: 'Manrope',
-              ),
-            ),
-          ),
-          const Expanded(
-            flex: 3,
-            child: Text(
-              'Chưa nạp CSDL',
-              style: TextStyle(
-                fontSize: 11,
-                color: AppColors.textMuted,
-                fontFamily: 'Manrope',
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '$worksCount bài',
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                    fontFamily: 'Manrope',
-                  ),
-                ),
-                Text(
-                  '$citedCount trích dẫn',
-                  style: const TextStyle(
-                    fontSize: 11,
-                    color: AppColors.textMuted,
-                    fontFamily: 'Manrope',
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(
-            width: 210,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (isImported)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: AppColors.green700.withAlpha(30),
-                      borderRadius: BorderRadius.circular(6),
-                      border: Border.all(color: AppColors.green700.withAlpha(75)),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green700),
-                        SizedBox(width: 4),
-                        Text(
-                          'Đã trong CSDL',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.green700,
-                            fontFamily: 'Manrope',
+                        Expanded(
+                          child: Text(
+                            title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                              fontFamily: 'Manrope',
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withAlpha(20),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'OpenAlex',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                              fontFamily: 'Manrope',
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  )
-                else
-                  ElevatedButton.icon(
-                    onPressed: isImporting ? null : () => _importOpenAlexJournal(journal),
-                    icon: isImporting
-                        ? const SizedBox(width: 12, height: 12, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Icon(Icons.add_rounded, size: 15),
-                    label: Text(
-                      isImporting ? 'Đang nạp...' : 'Nạp vào CSDL',
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                    const SizedBox(height: 4),
+                    Text(
+                      publisher,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
-                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Action Button / Status
+              if (isImported)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.green700.withAlpha(25),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.green700.withAlpha(75)),
                   ),
-              ],
-            ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green700),
+                      SizedBox(width: 4),
+                      Text(
+                        'Đã trong CSDL',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.green700,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                ElevatedButton.icon(
+                  onPressed: isImporting ? null : () => _importOpenAlexJournal(journal),
+                  icon: isImporting
+                      ? const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Icon(Icons.add_rounded, size: 15),
+                  label: Text(
+                    isImporting ? 'Đang nạp...' : 'Nạp vào CSDL',
+                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 12),
+
+          // Bottom Row: Metadata tags
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              // ISSN Tag
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.tag_rounded, size: 12, color: AppColors.textSubtle),
+                    const SizedBox(width: 4),
+                    Text(
+                      'ISSN: $issn',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Works & Citations Tag
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.menu_book_rounded, size: 12, color: AppColors.textSubtle),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$worksCount bài viết • $citedCount trích dẫn',
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textSecondary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Status Tag
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isImported ? AppColors.green100 : AppColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  isImported ? 'Đã lưu hệ thống' : 'Chưa nạp CSDL',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    color: isImported ? AppColors.green700 : AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
