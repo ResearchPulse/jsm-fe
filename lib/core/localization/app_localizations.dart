@@ -873,6 +873,12 @@ class AppLocalizations {
       : 'Set survey year range, target papers count, and TEI XML profile for Grobid structure parsing.';
   String get clickToChangeTarget => isVietnamese ? 'Nhấn để đổi số lượng bài báo' : 'Click to change target papers count';
   String worksAndCitations(int works, int citations) => isVietnamese ? '$works bài viết • $citations trích dẫn' : '$works articles • $citations citations';
+  String showingJournalsRange(int start, int end, int total) => isVietnamese
+      ? 'Hiển thị $start - $end / $total tạp chí'
+      : 'Showing $start - $end of $total journals';
+  String pageCountLabel(int current, int total) => isVietnamese ? 'Trang $current / $total' : 'Page $current of $total';
+  String get noJournalsMatchedFilter => isVietnamese ? 'Không có tạp chí nào phù hợp với bộ lọc đã chọn.' : 'No journals match the selected filter.';
+  String get clearFilter => isVietnamese ? 'Xóa bộ lọc' : 'Clear filter';
 }
 
 class _AppLocalizationsDelegate

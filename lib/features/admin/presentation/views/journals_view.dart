@@ -26,7 +26,7 @@ class _JournalsViewState extends State<JournalsView> {
   final TextEditingController _searchController = TextEditingController();
 
   String _searchQuery = '';
-  String _selectedDomain = 'ALL';
+  String? _selectedDomain;
   String _filterStatus = 'all'; // 'all' | 'configured' | 'unconfigured'
   int _currentPage = 1;
   static const int _pageSize = 6;
@@ -894,7 +894,7 @@ class _JournalsViewState extends State<JournalsView> {
       final q = _searchQuery.toLowerCase();
 
       final matchesSearch = title.contains(q) || issn.contains(q) || publisher.contains(q) || domain.contains(q);
-      final matchesDomain = _selectedDomain == 'Tất cả' || _getDomainForJournal(j) == _selectedDomain;
+      final matchesDomain = _selectedDomain == null || _getDomainForJournal(j) == _selectedDomain;
 
       final hasConfig = _getConfigForJournal(j['id'].toString()) != null;
       bool matchesStatus = true;
@@ -1138,7 +1138,7 @@ class _JournalsViewState extends State<JournalsView> {
   }
 
   Widget _buildDomainFilterMenu(List<String> domains) {
-    final bool isFiltered = _selectedDomain != 'Tất cả';
+    final bool isFiltered = _selectedDomain != null;
 
     return Theme(
       data: Theme.of(context).copyWith(
@@ -1151,7 +1151,7 @@ class _JournalsViewState extends State<JournalsView> {
         position: PopupMenuPosition.under,
         offset: const Offset(0, 6),
         elevation: 8,
-        shadowColor: Colors.black.withOpacity(0.18),
+        shadowColor: Colors.black.withAlpha(46),
         color: AppColors.surface,
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(
@@ -1160,39 +1160,37 @@ class _JournalsViewState extends State<JournalsView> {
         ),
         onSelected: (val) {
           setState(() {
-            _selectedDomain = val;
+            _selectedDomain = val.isEmpty ? null : val;
             _currentPage = 1;
           });
         },
         itemBuilder: (context) {
-          final allOptions = ['Tất cả', ...domains];
-          return allOptions.map((d) {
-            final isCurrent = d == _selectedDomain;
-            return PopupMenuItem<String>(
-              value: d,
+          final items = <PopupMenuEntry<String>>[
+            PopupMenuItem<String>(
+              value: '',
               height: 38,
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                 decoration: BoxDecoration(
-                  color: isCurrent ? AppColors.sidebarActive : Colors.transparent,
+                  color: _selectedDomain == null ? AppColors.sidebarActive : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      isCurrent ? Icons.check_circle_rounded : Icons.circle_outlined,
+                      _selectedDomain == null ? Icons.check_circle_rounded : Icons.circle_outlined,
                       size: 15,
-                      color: isCurrent ? AppColors.primary : AppColors.textSubtle.withOpacity(0.4),
+                      color: _selectedDomain == null ? AppColors.primary : AppColors.textSubtle.withAlpha(102),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        d,
+                        context.l10n.filterAll,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
-                          color: isCurrent ? AppColors.primary : AppColors.textPrimary,
+                          fontWeight: _selectedDomain == null ? FontWeight.w700 : FontWeight.w500,
+                          color: _selectedDomain == null ? AppColors.primary : AppColors.textPrimary,
                           fontFamily: 'Manrope',
                         ),
                         maxLines: 1,
@@ -1202,8 +1200,50 @@ class _JournalsViewState extends State<JournalsView> {
                   ],
                 ),
               ),
+            ),
+          ];
+
+          for (final d in domains) {
+            final isCurrent = d == _selectedDomain;
+            items.add(
+              PopupMenuItem<String>(
+                value: d,
+                height: 38,
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  decoration: BoxDecoration(
+                    color: isCurrent ? AppColors.sidebarActive : Colors.transparent,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        isCurrent ? Icons.check_circle_rounded : Icons.circle_outlined,
+                        size: 15,
+                        color: isCurrent ? AppColors.primary : AppColors.textSubtle.withAlpha(102),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          d,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+                            color: isCurrent ? AppColors.primary : AppColors.textPrimary,
+                            fontFamily: 'Manrope',
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             );
-          }).toList();
+          }
+          return items;
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -1224,7 +1264,7 @@ class _JournalsViewState extends State<JournalsView> {
               ),
               const SizedBox(width: 5),
               Text(
-                _selectedDomain == 'Tất cả' ? 'Chuyên ngành' : _selectedDomain,
+                _selectedDomain ?? context.l10n.domainLabel,
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
@@ -1354,7 +1394,7 @@ class _JournalsViewState extends State<JournalsView> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Hiển thị $startIndex - $endIndex / $totalCount tạp chí',
+            context.l10n.showingJournalsRange(startIndex, endIndex, totalCount),
             style: const TextStyle(
               fontSize: 12,
               color: AppColors.textMuted,
@@ -1383,7 +1423,7 @@ class _JournalsViewState extends State<JournalsView> {
                   border: Border.all(color: AppColors.borderSoft),
                 ),
                 child: Text(
-                  'Trang $_currentPage / $totalPages',
+                  context.l10n.pageCountLabel(_currentPage, totalPages),
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
@@ -1855,6 +1895,40 @@ class _JournalsViewState extends State<JournalsView> {
                 ),
               ],
             ),
+          ),
+        ),
+      );
+    }
+
+    if (_journals.isNotEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(48),
+        child: Center(
+          child: Column(
+            children: [
+              const Icon(Icons.filter_list_off_rounded, size: 40, color: AppColors.textSubtle),
+              const SizedBox(height: 8),
+              Text(
+                context.l10n.noJournalsMatchedFilter,
+                style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+              ),
+              const SizedBox(height: 14),
+              OutlinedButton.icon(
+                onPressed: () => setState(() {
+                  _filterStatus = 'all';
+                  _selectedDomain = null;
+                  _currentPage = 1;
+                }),
+                icon: const Icon(Icons.clear_all_rounded, size: 16),
+                label: Text(context.l10n.clearFilter, style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.primary,
+                  side: const BorderSide(color: AppColors.primary),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
+              ),
+            ],
           ),
         ),
       );

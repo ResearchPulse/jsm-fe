@@ -1037,15 +1037,17 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
               ),
               OutlinedButton.icon(
                 onPressed: () => widget.onNavigateToTab(1), // Tab 1: Hồ sơ & Đối chuẩn NLP
-                icon: const Icon(Icons.analytics_outlined, size: 14),
-                label: Text(context.l10n.viewComprehensiveCorpusBenchmark, style: TextStyle(fontSize: 11, fontFamily: 'Manrope')),
+                icon: const Icon(Icons.analytics_outlined, size: 15),
+                label: Text(
+                  context.l10n.viewComprehensiveCorpusBenchmark,
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
-                  side: const BorderSide(color: AppColors.primary),
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                  side: const BorderSide(color: AppColors.primary, width: 1.2),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  minimumSize: const Size(0, 36),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 ),
               ),
             ],
@@ -1061,7 +1063,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   children: [
                     _buildMetricTile(
                       context.l10n.sentenceLengthWords,
-                      '$p50Len từ/câu',
+                      '$p50Len ${context.l10n.unitWordsPerSentence}',
                       '${context.l10n.avgLabel}: $meanLen • ${context.l10n.academicStandard}',
                       Icons.text_fields_rounded,
                     ),
@@ -1088,7 +1090,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   Expanded(
                     child: _buildMetricTile(
                       context.l10n.sentenceLengthWords,
-                      '$p50Len từ/câu',
+                      '$p50Len ${context.l10n.unitWordsPerSentence}',
                       '${context.l10n.avgLabel}: $meanLen • ${context.l10n.academicStandard}',
                       Icons.text_fields_rounded,
                     ),
