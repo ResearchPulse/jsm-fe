@@ -531,6 +531,10 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
                   : (profiles.isNotEmpty ? profiles.first['journal_id']?.toString() : null),
               isExpanded: true,
               isDense: true,
+              dropdownColor: AppColors.surface,
+              borderRadius: BorderRadius.circular(12),
+              focusColor: Colors.transparent,
+              elevation: 4,
               icon: Icon(Icons.keyboard_arrow_down_rounded, color: color, size: 20),
               style: const TextStyle(
                 fontSize: 13,

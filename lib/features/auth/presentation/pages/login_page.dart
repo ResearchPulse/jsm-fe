@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
 import '../../domain/entities/auth_provider.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
@@ -459,9 +460,10 @@ class _LoginViewState extends State<LoginView>
                                     ),
                                   ),
 
-                                  const SizedBox(height: 20),
+                                  if (!AppConstants.isProduction) ...[
+                                    const SizedBox(height: 20),
 
-                                  // Divider: Test Mock Accounts
+                                    // Divider: Test Mock Accounts
                                   Row(
                                     children: [
                                       const Expanded(child: Divider(color: AppColors.border)),
@@ -611,6 +613,7 @@ class _LoginViewState extends State<LoginView>
                                       ),
                                     ),
                                   ),
+                                ],
 
                                   const SizedBox(height: 20),
 

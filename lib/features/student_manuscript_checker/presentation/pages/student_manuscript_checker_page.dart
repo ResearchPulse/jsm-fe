@@ -25,11 +25,13 @@ import '../widgets/warnings_list_card.dart';
 class StudentManuscriptCheckerPage extends StatelessWidget {
   final StudentManuscriptRepository? repository;
   final StudentManuscriptCheckerCubit? cubit;
+  final bool showAppBar;
 
   const StudentManuscriptCheckerPage({
     super.key,
     this.repository,
     this.cubit,
+    this.showAppBar = true,
   });
 
   @override
@@ -37,13 +39,13 @@ class StudentManuscriptCheckerPage extends StatelessWidget {
     if (cubit != null) {
       return BlocProvider<StudentManuscriptCheckerCubit>.value(
         value: cubit!,
-        child: const _StudentManuscriptCheckerView(),
+        child: _StudentManuscriptCheckerView(showAppBar: showAppBar),
       );
     }
 
     try {
       context.read<StudentManuscriptCheckerCubit>();
-      return const _StudentManuscriptCheckerView();
+      return _StudentManuscriptCheckerView(showAppBar: showAppBar);
     } catch (_) {}
 
     AuthRepository? authRepo;
@@ -61,64 +63,48 @@ class StudentManuscriptCheckerPage extends StatelessWidget {
         checkManuscriptUseCase: CheckManuscriptUseCase(repo),
         getAvailableJournalsUseCase: GetAvailableJournalsUseCase(repo),
       )..loadJournals(),
-      child: const _StudentManuscriptCheckerView(),
+      child: _StudentManuscriptCheckerView(showAppBar: showAppBar),
     );
   }
 }
 
 class _StudentManuscriptCheckerView extends StatelessWidget {
-  const _StudentManuscriptCheckerView();
+  final bool showAppBar;
+  const _StudentManuscriptCheckerView({this.showAppBar = true});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Student Manuscript Checker'),
-        actions: [
-          BlocBuilder<StudentManuscriptCheckerCubit,
-              StudentManuscriptCheckerState>(
-            builder: (context, state) {
-              if (state is StudentManuscriptCheckerSuccess ||
-                  state is StudentManuscriptCheckerEmpty ||
-                  state is StudentManuscriptCheckerFailure) {
-                return Padding(
-                  padding: const EdgeInsets.only(right: 12),
-                  child: OutlinedButton.icon(
-                    onPressed: () {
-                      context.read<StudentManuscriptCheckerCubit>().reset();
-                    },
-                    icon: const Icon(Icons.refresh_rounded, size: 16),
-                    label: const Text('New Check'),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 12, vertical: 8),
-                    ),
-                  ),
-                );
-              }
-              return const SizedBox.shrink();
-            },
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 960),
-            child: BlocBuilder<StudentManuscriptCheckerCubit,
-                StudentManuscriptCheckerState>(
-              builder: (context, state) {
-                if (state is StudentManuscriptCheckerLoading) {
-                  return LoadingView(message: state.message);
-                }
+    final body = SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final screenWidth = MediaQuery.of(context).size.width;
+          
+          double maxCardWidth;
+          if (screenWidth >= 1440) {
+            maxCardWidth = 1180;
+          } else if (screenWidth >= 1200) {
+            maxCardWidth = 1050;
+          } else {
+            maxCardWidth = double.infinity;
+          }
 
-                if (state is StudentManuscriptCheckerFailure) {
-                  return Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
+          return Center(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxCardWidth),
+              child: BlocBuilder<StudentManuscriptCheckerCubit,
+                  StudentManuscriptCheckerState>(
+                  builder: (context, state) {
+                    if (state is StudentManuscriptCheckerLoading) {
+                      return LoadingView(message: state.message);
+                    }
+
+                    if (state is StudentManuscriptCheckerFailure) {
+                      return Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(24),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
                           ErrorView(
                             message: state.message,
                             onRetry: () {
@@ -215,8 +201,49 @@ class _StudentManuscriptCheckerView extends StatelessWidget {
               },
             ),
           ),
-        ),
+        );
+      },
+    ),
+  );
+
+    if (!showAppBar) {
+      return Container(
+        color: AppColors.background,
+        child: body,
+      );
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Student Manuscript Checker'),
+        actions: [
+          BlocBuilder<StudentManuscriptCheckerCubit,
+              StudentManuscriptCheckerState>(
+            builder: (context, state) {
+              if (state is StudentManuscriptCheckerSuccess ||
+                  state is StudentManuscriptCheckerEmpty ||
+                  state is StudentManuscriptCheckerFailure) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 12),
+                  child: OutlinedButton.icon(
+                    onPressed: () {
+                      context.read<StudentManuscriptCheckerCubit>().reset();
+                    },
+                    icon: const Icon(Icons.refresh_rounded, size: 16),
+                    label: const Text('New Check'),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 8),
+                    ),
+                  ),
+                );
+              }
+              return const SizedBox.shrink();
+            },
+          ),
+        ],
       ),
+      body: body,
     );
   }
 }

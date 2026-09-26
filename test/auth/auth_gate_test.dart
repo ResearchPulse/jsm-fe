@@ -77,6 +77,13 @@ void main() {
 
   testWidgets('sign-out from home returns to login (never stays authed)',
       (tester) async {
+    tester.view.physicalSize = const Size(1440, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
     final repo = _StubRepo()
       ..callbackResult = AuthResult(
           user: AuthUser(sub: 'u1', email: 'user@example.com'));
@@ -84,7 +91,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Journal Dashboard'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Sign out'));
+    final profileFinder = find.byKey(const ValueKey('profile_expanded'));
+    await tester.ensureVisible(profileFinder);
+    await tester.tap(profileFinder);
+    await tester.pumpAndSettle();
+
+    final signOutFinder = find.text('Đăng xuất');
+    await tester.tap(signOutFinder);
     await tester.pumpAndSettle();
 
     expect(repo.logoutCalled, isTrue);

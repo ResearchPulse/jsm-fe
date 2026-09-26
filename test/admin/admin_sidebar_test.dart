@@ -37,7 +37,7 @@ void main() {
 
     // 1. Brand header has Logo and HyperData Lab
     expect(find.text('HyperData Lab'), findsOneWidget);
-    expect(find.text('H'), findsOneWidget);
+    expect(find.byType(Image), findsWidgets);
 
     // 2. Collapse button is located at top next to logo
     final collapseBtn = find.byTooltip('Thu gọn thanh menu');

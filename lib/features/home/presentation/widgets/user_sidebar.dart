@@ -5,13 +5,13 @@ import '../../../auth/domain/entities/auth_user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
 import '../../../auth/presentation/cubit/auth_state.dart';
 
-class AdminSidebar extends StatelessWidget {
+class UserSidebar extends StatelessWidget {
   final int selectedIndex;
   final Function(int) onDestinationSelected;
   final bool isCollapsed;
   final VoidCallback onToggleCollapse;
 
-  const AdminSidebar({
+  const UserSidebar({
     super.key,
     required this.selectedIndex,
     required this.onDestinationSelected,
@@ -49,9 +49,10 @@ class AdminSidebar extends StatelessWidget {
                   index: 0,
                   isSelected: selectedIndex == 0,
                   isCollapsed: isCollapsed,
-                  icon: Icons.auto_stories_outlined,
-                  activeIcon: Icons.auto_stories_rounded,
-                  title: 'Trung tâm Tạp chí',
+                  icon: Icons.rate_review_outlined,
+                  activeIcon: Icons.rate_review_rounded,
+                  title: 'Kiểm tra Bản thảo',
+                  showIconInExpanded: false,
                   onTap: onDestinationSelected,
                 ),
                 const SizedBox(height: 3),
@@ -59,9 +60,10 @@ class AdminSidebar extends StatelessWidget {
                   index: 1,
                   isSelected: selectedIndex == 1,
                   isCollapsed: isCollapsed,
-                  icon: Icons.psychology_outlined,
-                  activeIcon: Icons.psychology_rounded,
-                  title: 'Hồ sơ & Đối chuẩn NLP',
+                  icon: Icons.recommend_outlined,
+                  activeIcon: Icons.recommend_rounded,
+                  title: 'Gợi ý Tạp chí',
+                  showIconInExpanded: false,
                   onTap: onDestinationSelected,
                 ),
                 const SizedBox(height: 3),
@@ -69,9 +71,10 @@ class AdminSidebar extends StatelessWidget {
                   index: 2,
                   isSelected: selectedIndex == 2,
                   isCollapsed: isCollapsed,
-                  icon: Icons.tune_outlined,
-                  activeIcon: Icons.tune_rounded,
-                  title: 'Hệ thống & Kỹ thuật',
+                  icon: Icons.history_rounded,
+                  activeIcon: Icons.history_rounded,
+                  title: 'Lịch sử Đánh giá',
+                  showIconInExpanded: false,
                   onTap: onDestinationSelected,
                 ),
               ],
@@ -137,8 +140,8 @@ class AdminSidebar extends StatelessWidget {
                 key: const ValueKey('brand_expanded'),
                 children: [
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
@@ -154,40 +157,64 @@ class AdminSidebar extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                       child: Image.asset(
                         'assets/images/app_logo.png',
-                        width: 36,
-                        height: 36,
+                        width: 38,
+                        height: 38,
                         fit: BoxFit.contain,
                       ),
                     ),
                   ),
                   const SizedBox(width: 12),
                   const Expanded(
-                    child: Text(
-                      'HyperData Lab',
-                      style: TextStyle(
-                        color: Color(0xFF0F172A),
-                        fontSize: 16,
-                        fontWeight: FontWeight.w800,
-                        fontFamily: 'Manrope',
-                        letterSpacing: -0.3,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'HyperData Lab',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF0F172A),
+                            fontFamily: 'Manrope',
+                            letterSpacing: -0.2,
+                            height: 1.15,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Academic Portal',
+                          style: TextStyle(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            color: Color(0xFF0071BC),
+                            fontFamily: 'Manrope',
+                            letterSpacing: 0.4,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
                   ),
-                  IconButton(
-                    onPressed: onToggleCollapse,
-                    icon: const Icon(
-                      Icons.chevron_left_rounded,
-                      color: Color(0xFF64748B),
-                      size: 22,
-                    ),
-                    tooltip: 'Thu gọn thanh menu',
-                    padding: const EdgeInsets.all(4),
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                    style: IconButton.styleFrom(
+                  Tooltip(
+                    message: 'Thu gọn thanh menu',
+                    child: InkWell(
+                      onTap: onToggleCollapse,
+                      borderRadius: BorderRadius.circular(8),
                       hoverColor: const Color(0xFFF0F7FC),
+                      focusColor: Colors.transparent,
                       highlightColor: Colors.transparent,
+                      splashColor: const Color(0xFF0071BC).withValues(alpha: 0.08),
+                      child: const Padding(
+                        padding: EdgeInsets.all(6),
+                        child: Icon(
+                          Icons.menu_open_rounded,
+                          size: 20,
+                          color: Color(0xFF64748B),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -199,7 +226,7 @@ class AdminSidebar extends StatelessWidget {
   String _getInitials(String name) {
     final parts =
         name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
-    if (parts.isEmpty) return 'A';
+    if (parts.isEmpty) return 'U';
     return parts.take(2).map((p) => p[0].toUpperCase()).join();
   }
 
@@ -214,14 +241,25 @@ class AdminSidebar extends StatelessWidget {
 
     final displayName = (user?.name != null && user!.name!.trim().isNotEmpty)
         ? user.name!
-        : (user?.email?.split('@').first ?? 'Admin');
-    final email = user?.email ?? 'admin@hcmus.edu.vn';
-    final role = (user?.role ?? 'ADMIN').toUpperCase();
+        : (user?.email?.split('@').first ?? 'Người dùng');
+    final email = user?.email ?? 'scholar.user@lab.edu.vn';
+    final role = (user?.role ?? 'USER').toUpperCase();
     final initials = _getInitials(displayName);
     final bool isAdminRole = role == 'ADMIN';
-    final Color badgeBg = isAdminRole ? const Color(0xFFFEE2E2) : const Color(0xFFF0FDFA);
-    final Color badgeText = isAdminRole ? const Color(0xFFDC2626) : const Color(0xFF0D9488);
-    final Color badgeBorder = isAdminRole ? const Color(0xFFFECACA) : const Color(0xFF99F6E4);
+    
+    Color badgeBg = const Color(0xFFF0FDFA);
+    Color badgeText = const Color(0xFF0D9488);
+    Color badgeBorder = const Color(0xFF99F6E4);
+
+    if (isAdminRole) {
+      badgeBg = const Color(0xFFFEE2E2);
+      badgeText = const Color(0xFFDC2626);
+      badgeBorder = const Color(0xFFFECACA);
+    } else if (role == 'LECTURER') {
+      badgeBg = const Color(0xFFF3E8FF);
+      badgeText = const Color(0xFF7E22CE);
+      badgeBorder = const Color(0xFFD8B4FE);
+    }
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 180),
@@ -243,7 +281,7 @@ class AdminSidebar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   side: const BorderSide(color: Color(0xFFE2E8F0)),
                 ),
-                onSelected: (val) => _handleProfileMenuAction(context, val),
+                onSelected: (val) => _handleProfileMenuAction(context, val, isAdminRole),
                 itemBuilder: (context) => _buildProfileMenuItems(
                   displayName: displayName,
                   email: email,
@@ -251,6 +289,7 @@ class AdminSidebar extends StatelessWidget {
                   badgeBg: badgeBg,
                   badgeBorder: badgeBorder,
                   badgeText: badgeText,
+                  isAdmin: isAdminRole,
                   includeHeader: true,
                 ),
                 child: CircleAvatar(
@@ -281,7 +320,7 @@ class AdminSidebar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                   side: const BorderSide(color: Color(0xFFE2E8F0)),
                 ),
-                onSelected: (val) => _handleProfileMenuAction(context, val),
+                onSelected: (val) => _handleProfileMenuAction(context, val, isAdminRole),
                 itemBuilder: (context) => _buildProfileMenuItems(
                   displayName: displayName,
                   email: email,
@@ -289,6 +328,7 @@ class AdminSidebar extends StatelessWidget {
                   badgeBg: badgeBg,
                   badgeBorder: badgeBorder,
                   badgeText: badgeText,
+                  isAdmin: isAdminRole,
                   includeHeader: false,
                 ),
                 child: Ink(
@@ -396,6 +436,7 @@ class AdminSidebar extends StatelessWidget {
     required Color badgeBg,
     required Color badgeBorder,
     required Color badgeText,
+    required bool isAdmin,
     bool includeHeader = false,
   }) {
     return [
@@ -478,32 +519,33 @@ class AdminSidebar extends StatelessWidget {
           ),
         ),
       ),
-      PopupMenuItem<String>(
-        value: 'home',
-        height: 38,
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Row(
-            children: [
-              Icon(Icons.home_outlined, size: 16, color: Color(0xFF64748B)),
-              SizedBox(width: 10),
-              Text(
-                'Trang chủ người dùng',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF0F172A),
-                  fontFamily: 'Manrope',
+      if (isAdmin)
+        PopupMenuItem<String>(
+          value: 'admin',
+          height: 38,
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Row(
+              children: [
+                Icon(Icons.admin_panel_settings_outlined, size: 16, color: Color(0xFF64748B)),
+                SizedBox(width: 10),
+                Text(
+                  'Trang quản trị (Admin)',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF0F172A),
+                    fontFamily: 'Manrope',
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
       const PopupMenuDivider(height: 8),
       PopupMenuItem<String>(
         value: 'logout',
@@ -536,13 +578,13 @@ class AdminSidebar extends StatelessWidget {
     ];
   }
 
-  void _handleProfileMenuAction(BuildContext context, String action) {
+  void _handleProfileMenuAction(BuildContext context, String action, bool isAdmin) {
     switch (action) {
       case 'info':
         Navigator.of(context).pushNamed('/user-info');
         break;
-      case 'home':
-        Navigator.of(context).pushReplacementNamed('/home');
+      case 'admin':
+        Navigator.of(context).pushReplacementNamed('/admin');
         break;
       case 'logout':
         try {
@@ -560,6 +602,7 @@ class _SidebarNavItem extends StatefulWidget {
   final IconData icon;
   final IconData activeIcon;
   final String title;
+  final bool showIconInExpanded;
   final ValueChanged<int> onTap;
 
   const _SidebarNavItem({
@@ -569,6 +612,7 @@ class _SidebarNavItem extends StatefulWidget {
     required this.icon,
     required this.activeIcon,
     required this.title,
+    this.showIconInExpanded = false,
     required this.onTap,
   });
 
@@ -588,6 +632,7 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
     const duration = Duration(milliseconds: 200);
     const curve = Curves.easeInOut;
 
+    // App style palette: refined HyperData Lab Blue system
     const Color hoverBlueBg = Color(0xFFF0F7FC);
     const Color activeBlueBg = Color(0xFFE0F2FE);
     const Color activeHoverBlueBg = Color(0xFFD6EEFD);
@@ -655,17 +700,19 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
                     : Row(
                         key: const ValueKey('nav_expanded'),
                         children: [
-                          TweenAnimationBuilder<Color?>(
-                            duration: duration,
-                            curve: curve,
-                            tween: ColorTween(end: contentColor),
-                            builder: (context, color, _) => Icon(
-                              isSelected ? widget.activeIcon : widget.icon,
-                              color: color,
-                              size: 20,
+                          if (widget.showIconInExpanded) ...[
+                            TweenAnimationBuilder<Color?>(
+                              duration: duration,
+                              curve: curve,
+                              tween: ColorTween(end: contentColor),
+                              builder: (context, color, _) => Icon(
+                                isSelected ? widget.activeIcon : widget.icon,
+                                color: color,
+                                size: 20,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: 12),
+                            const SizedBox(width: 12),
+                          ],
                           Expanded(
                             child: AnimatedDefaultTextStyle(
                               duration: duration,

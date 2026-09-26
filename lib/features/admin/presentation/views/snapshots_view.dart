@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/search_input_box.dart';
 import '../../data/datasources/admin_api_client.dart';
 
 class SnapshotsView extends StatefulWidget {
@@ -130,25 +131,16 @@ class _SnapshotsViewState extends State<SnapshotsView> {
 
           // Search Toolbar
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: AppColors.surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: AppColors.border),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
-            child: TextField(
+            child: SearchInputBox(
+              hintText: 'Tìm kiếm theo tên tạp chí, mã Snapshot, SHA-256 Hash...',
+              height: 38,
               onChanged: (val) => setState(() => _searchQuery = val),
-              style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
-              decoration: InputDecoration(
-                hintText: 'Tìm kiếm theo tên tạp chí, mã Snapshot, SHA-256 Hash...',
-                hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                fillColor: AppColors.surfaceSoft,
-                filled: true,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
-                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
-              ),
             ),
           ),
           const SizedBox(height: 20),

@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/search_input_box.dart';
 import '../../data/datasources/admin_api_client.dart';
 import '../widgets/journal_command_center_panel.dart';
 
@@ -1047,44 +1048,15 @@ class _JournalsViewState extends State<JournalsView> {
           Row(
             children: [
               Expanded(
-                child: TextField(
+                child: SearchInputBox(
                   controller: _searchController,
+                  height: 38,
+                  hintText: 'Tìm theo tên, ISSN, nhà xuất bản...',
                   onChanged: (val) => setState(() {
                     _searchQuery = val;
                     _currentPage = 1;
                   }),
                   onSubmitted: (val) => _searchOpenAlex(val),
-                  style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
-                  decoration: InputDecoration(
-                    hintText: 'Tìm theo tên, ISSN, nhà xuất bản...',
-                    hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                    prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
-                    suffixIcon: _searchQuery.isNotEmpty
-                        ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 16, color: AppColors.textSubtle),
-                            onPressed: () {
-                              _searchController.clear();
-                              setState(() {
-                                _searchQuery = '';
-                                _currentPage = 1;
-                                _openAlexResults = [];
-                                _lastSearchedOpenAlexQuery = null;
-                              });
-                            },
-                          )
-                        : null,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    fillColor: AppColors.surfaceSoft,
-                    filled: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: const BorderSide(color: AppColors.border),
-                    ),
-                  ),
                 ),
               ),
               const SizedBox(width: 10),
@@ -1108,6 +1080,7 @@ class _JournalsViewState extends State<JournalsView> {
               ),
             ],
           ),
+          const SizedBox(height: 12),
           Align(
             alignment: Alignment.centerLeft,
             child: Wrap(
@@ -1119,34 +1092,7 @@ class _JournalsViewState extends State<JournalsView> {
                 _buildStatusFilterChip('configured', 'Đã cấu hình ($configuredCount)'),
                 _buildStatusFilterChip('unconfigured', 'Chưa có ($unconfiguredCount)'),
                 if (domains.isNotEmpty) ...[
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: AppColors.surfaceSoft,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: AppColors.border),
-                    ),
-                    child: DropdownButton<String>(
-                      value: domains.contains(_selectedDomain) || _selectedDomain == 'Tất cả' ? _selectedDomain : 'Tất cả',
-                      isDense: true,
-                      underline: const SizedBox(),
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
-                      items: ['Tất cả', ...domains].map((d) {
-                        return DropdownMenuItem<String>(
-                          value: d,
-                          child: Text(d, style: const TextStyle(fontSize: 11, fontFamily: 'Manrope')),
-                        );
-                      }).toList(),
-                      onChanged: (val) {
-                        if (val != null) {
-                          setState(() {
-                            _selectedDomain = val;
-                            _currentPage = 1;
-                          });
-                        }
-                      },
-                    ),
-                  ),
+                  _buildDomainFilterMenu(domains),
                 ],
               ],
             ),
@@ -1178,6 +1124,114 @@ class _JournalsViewState extends State<JournalsView> {
             fontWeight: FontWeight.w600,
             color: isSelected ? Colors.white : AppColors.textSecondary,
             fontFamily: 'Manrope',
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDomainFilterMenu(List<String> domains) {
+    final bool isFiltered = _selectedDomain != 'Tất cả';
+
+    return Theme(
+      data: Theme.of(context).copyWith(
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
+        hoverColor: Colors.transparent,
+      ),
+      child: PopupMenuButton<String>(
+        tooltip: 'Lọc theo chuyên ngành',
+        position: PopupMenuPosition.under,
+        offset: const Offset(0, 6),
+        elevation: 8,
+        shadowColor: Colors.black.withOpacity(0.18),
+        color: AppColors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: AppColors.border),
+        ),
+        onSelected: (val) {
+          setState(() {
+            _selectedDomain = val;
+            _currentPage = 1;
+          });
+        },
+        itemBuilder: (context) {
+          final allOptions = ['Tất cả', ...domains];
+          return allOptions.map((d) {
+            final isCurrent = d == _selectedDomain;
+            return PopupMenuItem<String>(
+              value: d,
+              height: 38,
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                decoration: BoxDecoration(
+                  color: isCurrent ? AppColors.sidebarActive : Colors.transparent,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(
+                      isCurrent ? Icons.check_circle_rounded : Icons.circle_outlined,
+                      size: 15,
+                      color: isCurrent ? AppColors.primary : AppColors.textSubtle.withOpacity(0.4),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        d,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
+                          color: isCurrent ? AppColors.primary : AppColors.textPrimary,
+                          fontFamily: 'Manrope',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList();
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: isFiltered ? AppColors.sidebarActive : AppColors.surfaceSoft,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isFiltered ? AppColors.primary : AppColors.border,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.category_outlined,
+                size: 13,
+                color: isFiltered ? AppColors.primary : AppColors.textSecondary,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                _selectedDomain == 'Tất cả' ? 'Chuyên ngành' : _selectedDomain,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: isFiltered ? AppColors.primary : AppColors.textSecondary,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.keyboard_arrow_down_rounded,
+                size: 15,
+                color: isFiltered ? AppColors.primary : AppColors.textSecondary,
+              ),
+            ],
           ),
         ),
       ),
@@ -1953,21 +2007,21 @@ class _JournalsViewState extends State<JournalsView> {
               // Action Button / Status
               if (isImported)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
-                    color: AppColors.green700.withAlpha(25),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: AppColors.green700.withAlpha(75)),
+                    color: AppColors.green50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.green100),
                   ),
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green700),
-                      SizedBox(width: 4),
+                      Icon(Icons.check_circle_rounded, size: 16, color: AppColors.green700),
+                      SizedBox(width: 6),
                       Text(
-                        'Đã trong CSDL',
+                        'Đã nạp vào CSDL',
                         style: TextStyle(
-                          fontSize: 11,
+                          fontSize: 12,
                           fontWeight: FontWeight.w700,
                           color: AppColors.green700,
                           fontFamily: 'Manrope',
@@ -1981,23 +2035,27 @@ class _JournalsViewState extends State<JournalsView> {
                   onPressed: isImporting ? null : () => _importOpenAlexJournal(journal),
                   icon: isImporting
                       ? const SizedBox(
-                          width: 12,
-                          height: 12,
+                          width: 14,
+                          height: 14,
                           child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                         )
-                      : const Icon(Icons.add_rounded, size: 15),
+                      : const Icon(Icons.add_rounded, size: 16),
                   label: Text(
                     isImporting ? 'Đang nạp...' : 'Nạp vào CSDL',
-                    style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                 ),
             ],

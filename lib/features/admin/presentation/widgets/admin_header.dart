@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/search_input_box.dart';
 
 class AdminHeader extends StatelessWidget {
   final int selectedIndex;
@@ -47,7 +48,7 @@ class AdminHeader extends StatelessWidget {
       decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(
-          bottom: BorderSide(color: AppColors.sidebarBorder, width: 1),
+          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
         ),
       ),
       child: Row(
@@ -64,7 +65,7 @@ class AdminHeader extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: AppColors.textSubtle,
+                    color: Color(0xFF64748B),
                     fontWeight: FontWeight.w500,
                     fontFamily: 'Manrope',
                   ),
@@ -77,7 +78,7 @@ class AdminHeader extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
+                    color: Color(0xFF0F172A),
                     fontFamily: 'Manrope',
                     letterSpacing: -0.3,
                   ),
@@ -86,34 +87,14 @@ class AdminHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 16),
-          // Search input
-          SizedBox(
-            width: 280,
-            height: 44,
-            child: TextField(
-              onChanged: onSearchChanged,
-              style: const TextStyle(fontSize: 14, fontFamily: 'Manrope'),
-              decoration: InputDecoration(
-                hintText: 'Tìm kiếm tạp chí, snapshot, jobs...',
-                hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle, fontFamily: 'Manrope'),
-                prefixIcon: const Icon(Icons.search_rounded, size: 18, color: AppColors.textSubtle),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                fillColor: AppColors.surfaceSoft,
-                filled: true,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.border),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                ),
-              ),
-            ),
+          // Sleek animated search input (ResearchPulse FE style)
+          SearchInputBox(
+            hintText: 'Tìm kiếm tạp chí, snapshot, jobs...',
+            height: 38,
+            expandOnFocus: true,
+            width: 270,
+            expandedWidth: 320,
+            onChanged: onSearchChanged,
           ),
         ],
       ),

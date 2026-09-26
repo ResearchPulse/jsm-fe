@@ -670,6 +670,10 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                       DropdownButton<int>(
                         value: _yearFrom,
                         underline: const SizedBox(),
+                        dropdownColor: AppColors.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        focusColor: Colors.transparent,
+                        elevation: 4,
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                         items: [2018, 2019, 2020, 2021, 2022, 2023].map((y) {
                           return DropdownMenuItem(value: y, child: Text('$y'));
@@ -685,6 +689,10 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                       DropdownButton<int>(
                         value: _yearTo,
                         underline: const SizedBox(),
+                        dropdownColor: AppColors.surface,
+                        borderRadius: BorderRadius.circular(10),
+                        focusColor: Colors.transparent,
+                        elevation: 4,
                         style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
                         items: [2022, 2023, 2024, 2025, 2026].map((y) {
                           return DropdownMenuItem(value: y, child: Text('$y'));
