@@ -108,17 +108,59 @@ class UsersApiClient {
     }
   }
 
-  Future<void> deleteUser(String userId) async {
-    try {
-      final token = await tokenProvider();
-      final uri = Uri.parse('${ApiEndpoints.users}/$userId');
-      await _client.delete(
-        uri,
-        headers: {
-          if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
-        },
+  Future<Map<String, dynamic>> updateUser(
+    String userId, {
+    String? role,
+    bool? isActive,
+    String? fullName,
+  }) async {
+    final token = await tokenProvider();
+    final uri = Uri.parse('${ApiEndpoints.users}/$userId');
+    final payload = <String, dynamic>{};
+    if (role != null) payload['role'] = role;
+    if (isActive != null) payload['is_active'] = isActive;
+    if (fullName != null) payload['full_name'] = fullName;
+
+    final response = await _client.patch(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode(payload),
+    );
+
+    if (response.statusCode != 200) {
+      throw ServerException(
+        _errorMessage(response) ?? 'Cập nhật tài khoản thất bại.',
+        response.statusCode,
       );
-    } catch (_) {}
+    }
+
+    try {
+      final body = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      return (body['data'] as Map<String, dynamic>?) ?? {};
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> deleteUser(String userId) async {
+    final token = await tokenProvider();
+    final uri = Uri.parse('${ApiEndpoints.users}/$userId');
+    final response = await _client.delete(
+      uri,
+      headers: {
+        if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+      },
+    );
+
+    if (response.statusCode != 200 && response.statusCode != 204) {
+      throw ServerException(
+        _errorMessage(response) ?? 'Xóa tài khoản thất bại.',
+        response.statusCode,
+      );
+    }
   }
 }
 
