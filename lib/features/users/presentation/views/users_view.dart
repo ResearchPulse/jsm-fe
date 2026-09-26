@@ -479,7 +479,7 @@ class _UsersViewState extends State<UsersView> {
                                 child: Text('HỌ VÀ TÊN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
                               Expanded(
-                                flex: 3,
+                                flex: 4,
                                 child: Text('EMAIL TÀI KHOẢN', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
                               Expanded(
@@ -490,12 +490,8 @@ class _UsersViewState extends State<UsersView> {
                                 flex: 2,
                                 child: Text('TRẠNG THÁI', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
                               ),
-                              Expanded(
-                                flex: 2,
-                                child: Text('NGÀY CẤP', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
-                              ),
                               SizedBox(
-                                width: 140,
+                                width: 80,
                                 child: Text(
                                   'THAO TÁC',
                                   textAlign: TextAlign.center,
@@ -591,12 +587,24 @@ class _UsersViewState extends State<UsersView> {
             ),
           ),
 
-          // 2. Email
+          // 2. Email & Created Date
           Expanded(
-            flex: 3,
-            child: Text(
-              email,
-              style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+            flex: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  email,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Tham gia: ${_formatDate(user['created_at'] ?? user['createdAt'])}',
+                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                ),
+              ],
             ),
           ),
 
@@ -706,23 +714,14 @@ class _UsersViewState extends State<UsersView> {
             ),
           ),
 
-          // 5. Date
-          Expanded(
-            flex: 2,
-            child: Text(
-              _formatDate(user['created_at'] ?? user['createdAt']),
-              style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
-            ),
-          ),
-
-          // 6. Action column
+          // 5. Action column (Mini-Action Bar)
           SizedBox(
-            width: 140,
+            width: 80,
             child: isSaving || isDeleting
                 ? const Center(
                     child: SizedBox(
-                      width: 18,
-                      height: 18,
+                      width: 16,
+                      height: 16,
                       child: CircularProgressIndicator(strokeWidth: 2),
                     ),
                   )
@@ -730,50 +729,57 @@ class _UsersViewState extends State<UsersView> {
                     ? Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          ElevatedButton.icon(
-                            onPressed: () => _saveUserChanges(userId, email, fullName),
-                            icon: const Icon(Icons.check_rounded, size: 14),
-                            label: const Text('Lưu', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                              minimumSize: Size.zero,
-                              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                          Tooltip(
+                            message: 'Lưu thay đổi',
+                            child: InkWell(
+                              onTap: () => _saveUserChanges(userId, email, fullName),
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary,
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
-                          IconButton(
-                            onPressed: () => _discardUserChanges(userId),
-                            icon: const Icon(Icons.close_rounded, size: 16),
-                            tooltip: 'Hủy thay đổi',
-                            color: AppColors.textSubtle,
-                            padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(minWidth: 28, minHeight: 28),
+                          Tooltip(
+                            message: 'Hủy thay đổi',
+                            child: InkWell(
+                              onTap: () => _discardUserChanges(userId),
+                              borderRadius: BorderRadius.circular(6),
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceSoft,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: AppColors.border),
+                                ),
+                                child: const Icon(Icons.close_rounded, size: 16, color: AppColors.textSubtle),
+                              ),
+                            ),
                           ),
                         ],
                       )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            onPressed: isLastAdmin
-                                ? () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Không thể xóa Quản trị viên duy nhất của hệ thống.'),
-                                        backgroundColor: AppColors.error,
-                                        behavior: SnackBarBehavior.floating,
-                                      ),
-                                    );
-                                  }
-                                : () => _confirmDeleteUser(userId, fullName, email, isAdmin),
-                            icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                            color: isLastAdmin ? AppColors.slate300 : AppColors.error,
-                            tooltip: isLastAdmin ? 'Không thể xóa Quản trị viên duy nhất' : 'Xóa tài khoản',
-                          ),
-                        ],
+                    : Center(
+                        child: _SubtleDeleteButton(
+                          isLastAdmin: isLastAdmin,
+                          onPressed: isLastAdmin
+                              ? () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Không thể xóa Quản trị viên duy nhất của hệ thống.'),
+                                      backgroundColor: AppColors.error,
+                                      behavior: SnackBarBehavior.floating,
+                                    ),
+                                  );
+                                }
+                              : () => _confirmDeleteUser(userId, fullName, email, isAdmin),
+                        ),
                       ),
           ),
         ],
@@ -898,5 +904,51 @@ class _ActionCard extends StatelessWidget {
       return Expanded(child: cardContent);
     }
     return cardContent;
+  }
+}
+
+class _SubtleDeleteButton extends StatefulWidget {
+  final bool isLastAdmin;
+  final VoidCallback onPressed;
+
+  const _SubtleDeleteButton({
+    required this.isLastAdmin,
+    required this.onPressed,
+  });
+
+  @override
+  State<_SubtleDeleteButton> createState() => _SubtleDeleteButtonState();
+}
+
+class _SubtleDeleteButtonState extends State<_SubtleDeleteButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.isLastAdmin) {
+      return IconButton(
+        onPressed: widget.onPressed,
+        icon: const Icon(Icons.delete_outline_rounded, size: 18),
+        color: AppColors.slate300,
+        tooltip: 'Không thể xóa Quản trị viên duy nhất',
+        splashRadius: 18,
+        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+        padding: EdgeInsets.zero,
+      );
+    }
+
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: IconButton(
+        onPressed: widget.onPressed,
+        icon: const Icon(Icons.delete_outline_rounded, size: 18),
+        color: _isHovered ? AppColors.error : AppColors.textSubtle,
+        tooltip: 'Xóa tài khoản',
+        splashRadius: 18,
+        constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+        padding: EdgeInsets.zero,
+      ),
+    );
   }
 }

@@ -208,5 +208,15 @@
     "verification_command": "flutter analyze",
     "notes": "Covers stories: P1, P2",
     "priority": "P1"
+  },
+  {
+    "id": "phase-01-compact-user-table",
+    "title": "Compact User Table & Mini-Action Bar",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.6s)",
+    "user_visible_behavior": "Merged join date under email, removed separate date column, 76px action bar with subtle hover delete and compact save/cancel triggers.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
   }
 ]
