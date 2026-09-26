@@ -17,25 +17,30 @@ class LanguageSwitcher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<LocaleCubit, Locale>(
-      builder: (context, locale) {
-        final isVi = locale.languageCode == 'vi';
+    Locale? locale;
+    try {
+      locale = context.watch<LocaleCubit?>()?.state;
+    } catch (_) {}
+    locale ??= Localizations.maybeLocaleOf(context) ?? const Locale('vi');
+    final isVi = locale.languageCode == 'vi';
 
-        return Tooltip(
-          message: context.l10n.languageSwitcherTooltip,
-          child: PopupMenuButton<String>(
-            tooltip: '',
-            offset: const Offset(0, 40),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: const BorderSide(color: AppColors.border, width: 1),
-            ),
-            color: AppColors.surface,
-            elevation: 4,
-            onSelected: (String code) {
-              context.read<LocaleCubit>().setLocale(Locale(code));
-            },
-            itemBuilder: (BuildContext ctx) => [
+    return Tooltip(
+      message: context.l10n.languageSwitcherTooltip,
+      child: PopupMenuButton<String>(
+        tooltip: '',
+        offset: const Offset(0, 40),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(color: AppColors.border, width: 1),
+        ),
+        color: AppColors.surface,
+        elevation: 4,
+        onSelected: (String code) {
+          try {
+            context.read<LocaleCubit?>()?.setLocale(Locale(code));
+          } catch (_) {}
+        },
+        itemBuilder: (BuildContext ctx) => [
               PopupMenuItem<String>(
                 value: 'en',
                 height: 40,
@@ -179,7 +184,5 @@ class LanguageSwitcher extends StatelessWidget {
             ),
           ),
         );
-      },
-    );
   }
 }

@@ -13,6 +13,7 @@ import 'package:jsm_fe/features/auth/domain/usecases/logout_usecase.dart';
 import 'package:jsm_fe/features/auth/domain/usecases/restore_session_usecase.dart';
 import 'package:jsm_fe/features/auth/presentation/cubit/auth_cubit.dart';
 import 'package:jsm_fe/features/auth/presentation/pages/login_page.dart';
+import 'package:jsm_fe/features/admin/presentation/pages/admin_dashboard_page.dart';
 
 /// Stub repository: never touches a browser or the SSO network.
 class _StubRepo implements AuthRepository {
@@ -168,7 +169,7 @@ void main() {
       );
     await tester.pumpWidget(_gate(repo));
     await tester.pumpAndSettle();
-    expect(find.text('Danh Mục & Trung Tâm Khai Phá Tạp Chí'), findsOneWidget);
+    expect(find.byType(AdminDashboardPage), findsOneWidget);
     expect(find.text('Journal Dashboard'), findsNothing);
   });
 }
