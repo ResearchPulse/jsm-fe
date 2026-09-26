@@ -74,31 +74,35 @@ class _SnapshotsViewState extends State<SnapshotsView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Kho Lưu Trữ Corpus Snapshots (Bất Biến)',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      fontFamily: 'Manrope',
-                      letterSpacing: -0.4,
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Kho Lưu Trữ Corpus Snapshots (Bất Biến)',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                        letterSpacing: -0.4,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Tập hợp bài báo đã qua bóc tách cấu trúc bằng Grobid và làm sạch, được đóng băng phục vụ đối chiếu phong cách.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textMuted,
-                      fontFamily: 'Manrope',
+                    SizedBox(height: 4),
+                    Text(
+                      'Tập hợp bài báo đã qua bóc tách cấu trúc bằng Grobid và làm sạch, được đóng băng phục vụ đối chiếu phong cách.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 16),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   IconButton(
                     onPressed: _loadSnapshots,
@@ -157,24 +161,32 @@ class _SnapshotsViewState extends State<SnapshotsView> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: AppColors.border),
             ),
-            child: Column(
-              children: [
-                // Header
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                  decoration: const BoxDecoration(
-                    color: AppColors.surfaceSoft,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
-                    ),
-                  ),
-                  child: const Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: Text('TẠP CHÍ & MÃ SNAPSHOT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
-                      ),
+            child: LayoutBuilder(
+              builder: (context, tableConstraints) {
+                final tableWidth = tableConstraints.maxWidth > 880 ? tableConstraints.maxWidth : 880.0;
+                return SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
+                  child: SizedBox(
+                    width: tableWidth,
+                    child: Column(
+                      children: [
+                        // Header
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                          decoration: const BoxDecoration(
+                            color: AppColors.surfaceSoft,
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(16),
+                              topRight: Radius.circular(16),
+                            ),
+                          ),
+                          child: const Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: Text('TẠP CHÍ & MÃ SNAPSHOT', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                              ),
                       Expanded(
                         flex: 2,
                         child: Text('GIAI ĐOẠN NĂM', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
@@ -237,7 +249,11 @@ class _SnapshotsViewState extends State<SnapshotsView> {
                     if (i < filtered.length - 1)
                       const Divider(height: 1, color: AppColors.borderSoft),
                   ],
-              ],
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ],

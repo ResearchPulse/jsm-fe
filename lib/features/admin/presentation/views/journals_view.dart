@@ -906,7 +906,7 @@ class _JournalsViewState extends State<JournalsView> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isDesktop = constraints.maxWidth >= 1050;
+        final isDesktop = constraints.maxWidth >= 1150;
 
         return SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
@@ -1108,18 +1108,17 @@ class _JournalsViewState extends State<JournalsView> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
+          Align(
+            alignment: Alignment.centerLeft,
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 _buildStatusFilterChip('all', 'Tất cả (${_journals.length})'),
-                const SizedBox(width: 6),
                 _buildStatusFilterChip('configured', 'Đã cấu hình ($configuredCount)'),
-                const SizedBox(width: 6),
                 _buildStatusFilterChip('unconfigured', 'Chưa có ($unconfiguredCount)'),
                 if (domains.isNotEmpty) ...[
-                  const SizedBox(width: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(

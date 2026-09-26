@@ -294,30 +294,33 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Giám Sát Tác Vụ Khai Phá',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      fontFamily: 'Manrope',
-                      letterSpacing: -0.4,
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Giám Sát Tác Vụ Khai Phá',
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                        letterSpacing: -0.4,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'Giám sát trạng thái các tác vụ khai phá dữ liệu, tra cứu nhật ký và xử lý lại bài lỗi.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textMuted,
-                      fontFamily: 'Manrope',
+                    SizedBox(height: 4),
+                    Text(
+                      'Giám sát trạng thái các tác vụ khai phá dữ liệu, tra cứu nhật ký và xử lý lại bài lỗi.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(width: 12),
               IconButton(
                 onPressed: () => _loadJobs(),
                 icon: const Icon(Icons.refresh_rounded),
@@ -329,20 +332,24 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           const SizedBox(height: 20),
 
           // Filters Toolbar
-          Row(
-            children: [
-              _buildFilterTab('Tất cả'),
-              const SizedBox(width: 8),
-              _buildFilterTab('Đang xử lý'),
-              const SizedBox(width: 8),
-              _buildFilterTab('Hàng đợi'),
-              const SizedBox(width: 8),
-              _buildFilterTab('Hoàn thành'),
-              const SizedBox(width: 8),
-              _buildFilterTab('Thất bại'),
-              const SizedBox(width: 8),
-              _buildFilterTab('Đã hủy'),
-            ],
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _buildFilterTab('Tất cả'),
+                const SizedBox(width: 8),
+                _buildFilterTab('Đang xử lý'),
+                const SizedBox(width: 8),
+                _buildFilterTab('Hàng đợi'),
+                const SizedBox(width: 8),
+                _buildFilterTab('Hoàn thành'),
+                const SizedBox(width: 8),
+                _buildFilterTab('Thất bại'),
+                const SizedBox(width: 8),
+                _buildFilterTab('Đã hủy'),
+              ],
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -473,13 +480,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
+          LayoutBuilder(
+            builder: (context, cardConstraints) {
+              final isNarrowCard = cardConstraints.maxWidth < 700;
+
+              final titleCol = Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
+                  Wrap(
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 8,
+                    runSpacing: 4,
                     children: [
                       Text(
                         journalTitle,
@@ -490,7 +501,6 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                           fontFamily: 'Manrope',
                         ),
                       ),
-                      const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
@@ -510,8 +520,12 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                     style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
                   ),
                 ],
-              ),
-              Row(
+              );
+
+              final actionsWrap = Wrap(
+                spacing: 8,
+                runSpacing: 6,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -529,8 +543,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       ),
                     ),
                   ),
-                  if (failed > 0 || status == 'FAILED') ...[
-                    const SizedBox(width: 8),
+                  if (failed > 0 || status == 'FAILED')
                     ElevatedButton.icon(
                       onPressed: () => _retryJob(jobId),
                       icon: const Icon(Icons.refresh_rounded, size: 14),
@@ -545,9 +558,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         elevation: 0,
                       ),
                     ),
-                  ],
-                  if (status == 'RUNNING' || status == 'PENDING') ...[
-                    const SizedBox(width: 8),
+                  if (status == 'RUNNING' || status == 'PENDING')
                     OutlinedButton.icon(
                       onPressed: () => _confirmCancelJob(jobId, journalTitle),
                       icon: const Icon(Icons.stop_circle_outlined, size: 14, color: AppColors.error),
@@ -568,8 +579,6 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                       ),
                     ),
-                  ],
-                  const SizedBox(width: 8),
                   OutlinedButton.icon(
                     onPressed: () => _confirmDeleteJob(jobId, journalTitle),
                     icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
@@ -591,8 +600,29 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                     ),
                   ),
                 ],
-              ),
-            ],
+              );
+
+              if (isNarrowCard) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    titleCol,
+                    const SizedBox(height: 12),
+                    actionsWrap,
+                  ],
+                );
+              }
+
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(child: titleCol),
+                  const SizedBox(width: 14),
+                  actionsWrap,
+                ],
+              );
+            },
           ),
           const SizedBox(height: 18),
 
@@ -600,11 +630,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                stageText,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+              Expanded(
+                child: Text(
+                  stageText,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 12),
               Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     '${(progress * 100).toInt()}%',
@@ -798,22 +834,30 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   ),
                 ],
               ),
-              content: SizedBox(
-                width: 700,
-                height: 480,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        _buildDialogFilterChip('Tất cả', 'ALL', filter, (val) => setDialogState(() => filter = val)),
-                        const SizedBox(width: 8),
-                        _buildDialogFilterChip('Đã chuẩn hóa TEI', 'NORMALIZED', filter, (val) => setDialogState(() => filter = val)),
-                        const SizedBox(width: 8),
-                        _buildDialogFilterChip('Đã tải PDF', 'FETCHED', filter, (val) => setDialogState(() => filter = val)),
-                        const SizedBox(width: 8),
-                        _buildDialogFilterChip('Lỗi', 'FAILED', filter, (val) => setDialogState(() => filter = val), isError: true),
-                      ],
-                    ),
+              content: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 700,
+                  maxHeight: MediaQuery.of(context).size.height * 0.75,
+                ),
+                child: SizedBox(
+                  width: double.maxFinite,
+                  child: Column(
+                    children: [
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        physics: const BouncingScrollPhysics(),
+                        child: Row(
+                          children: [
+                            _buildDialogFilterChip('Tất cả', 'ALL', filter, (val) => setDialogState(() => filter = val)),
+                            const SizedBox(width: 8),
+                            _buildDialogFilterChip('Đã chuẩn hóa TEI', 'NORMALIZED', filter, (val) => setDialogState(() => filter = val)),
+                            const SizedBox(width: 8),
+                            _buildDialogFilterChip('Đã tải PDF', 'FETCHED', filter, (val) => setDialogState(() => filter = val)),
+                            const SizedBox(width: 8),
+                            _buildDialogFilterChip('Lỗi', 'FAILED', filter, (val) => setDialogState(() => filter = val), isError: true),
+                          ],
+                        ),
+                      ),
                     const SizedBox(height: 12),
                     Expanded(
                       child: FutureBuilder<List<Map<String, dynamic>>>(
@@ -924,7 +968,8 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   ],
                 ),
               ),
-              actions: [
+            ),
+            actions: [
                 if (((metrics?['failed'] as num?)?.toInt() ?? 0) > 0)
                   ElevatedButton.icon(
                     onPressed: () {

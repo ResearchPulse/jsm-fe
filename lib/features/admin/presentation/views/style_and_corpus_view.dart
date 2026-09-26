@@ -51,22 +51,26 @@ class _StyleAndCorpusViewState extends State<StyleAndCorpusView> {
             color: AppColors.surface,
             border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
           ),
-          child: Row(
-            children: [
-              _buildSegmentItem(
-                index: 0,
-                icon: Icons.psychology_rounded,
-                title: 'Hồ Sơ Phong Cách NLP & CARS Moves',
-                subtitle: 'Hyland Stance, CARS Rhetorical Moves, Phân phối câu',
-              ),
-              const SizedBox(width: 12),
-              _buildSegmentItem(
-                index: 1,
-                icon: Icons.layers_rounded,
-                title: 'Kho Corpus Snapshots & Dữ Liệu',
-                subtitle: 'Reference Corpus, Phiên bản kho bài, Tải JSON/CSV',
-              ),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _buildSegmentItem(
+                  index: 0,
+                  icon: Icons.psychology_rounded,
+                  title: 'Hồ Sơ Phong Cách NLP & CARS Moves',
+                  subtitle: 'Hyland Stance, CARS Rhetorical Moves, Phân phối câu',
+                ),
+                const SizedBox(width: 12),
+                _buildSegmentItem(
+                  index: 1,
+                  icon: Icons.layers_rounded,
+                  title: 'Kho Corpus Snapshots & Dữ Liệu',
+                  subtitle: 'Reference Corpus, Phiên bản kho bài, Tải JSON/CSV',
+                ),
+              ],
+            ),
           ),
         ),
 

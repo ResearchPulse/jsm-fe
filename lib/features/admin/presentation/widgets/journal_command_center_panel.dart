@@ -582,13 +582,15 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
             children: [
               const Icon(Icons.flash_on_rounded, size: 13, color: AppColors.primary),
               const SizedBox(width: 4),
-              Text(
-                'Mặc định tối ưu: $_targetArticles bài báo • Năm $_yearFrom–$_yearTo • Tự động chuẩn hóa TEI XML',
-                style: const TextStyle(
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textMuted,
-                  fontFamily: 'Manrope',
+              Expanded(
+                child: Text(
+                  'Mặc định tối ưu: $_targetArticles bài báo • Năm $_yearFrom–$_yearTo • Tự động chuẩn hóa TEI XML',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
               ),
             ],
@@ -618,15 +620,17 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   ),
                   const SizedBox(height: 12),
                   // Target articles presets
-                  Row(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
                         'Số bài báo mục tiêu:',
                         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(height: 6),
                       Wrap(
                         spacing: 6,
+                        runSpacing: 6,
                         children: [50, 100, 200, 300, 500].map((preset) {
                           final isSel = _targetArticles == preset;
                           return InkWell(
@@ -892,7 +896,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                                 : 'Bài nghiên cứu ${processedArticles < totalArticles ? processedArticles + 1 : totalArticles}: Trích xuất cấu trúc câu IMRAD & CARS Moves...')
                             : (isCompleted
                                 ? 'Dữ liệu toàn văn đã chuẩn hóa ($processedArticles bài) và sẵn sàng khảo sát đối chuẩn học thuật.'
-                                : 'Nhấn nút "Khai phá (${_targetArticles} bài)" phía trên để bắt đầu phân tích.'),
+                                : 'Nhấn nút "Khai phá ($_targetArticles bài)" phía trên để bắt đầu phân tích.'),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
@@ -913,16 +917,21 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
 
           // Metric Counters Row
           Container(
+            width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: AppColors.surfaceSoft,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(color: AppColors.border),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: 8,
+              spacing: 12,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     const Icon(Icons.check_circle_outline_rounded, size: 15, color: AppColors.green700),
                     const SizedBox(width: 6),
@@ -939,6 +948,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 ),
                 if (failedCount > 0)
                   Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       const Icon(Icons.warning_amber_rounded, size: 15, color: AppColors.error),
                       const SizedBox(width: 4),
@@ -951,6 +961,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 InkWell(
                   onTap: () => widget.onNavigateToTab(2), // Navigate to Tab 2 (Hệ thống & Giám sát logs)
                   child: const Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         'Xem chi tiết tác vụ & logs',
@@ -995,10 +1006,14 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            runSpacing: 8,
+            spacing: 12,
             children: [
               const Row(
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primary),
                   SizedBox(width: 6),
@@ -1031,40 +1046,67 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           const SizedBox(height: 12),
 
           // 3 Metric Cards Grid
-          Row(
-            children: [
-              // 1. Sentence Lengths
-              Expanded(
-                child: _buildMetricTile(
-                  'Độ dài câu (Từ)',
-                  '$p50Len từ/câu',
-                  'Trung bình: $meanLen • Chuẩn học thuật',
-                  Icons.text_fields_rounded,
-                ),
-              ),
-              const SizedBox(width: 10),
+          LayoutBuilder(
+            builder: (context, box) {
+              final isTight = box.maxWidth < 460;
+              if (isTight) {
+                return Column(
+                  children: [
+                    _buildMetricTile(
+                      'Độ dài câu (Từ)',
+                      '$p50Len từ/câu',
+                      'Trung bình: $meanLen • Chuẩn học thuật',
+                      Icons.text_fields_rounded,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildMetricTile(
+                      'Lập trường Hyland',
+                      '$hedges1k cẩn trọng',
+                      'Boosters: $boosters1k • Stance Neutral: ${neutralStance.toInt()}%',
+                      Icons.psychology_rounded,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildMetricTile(
+                      'CARS Moves (Swales)',
+                      'M1: ${territoryMove.toInt()}%',
+                      'M2 Niche: ${nicheMove.toInt()}% • M3 Solution',
+                      Icons.account_tree_rounded,
+                    ),
+                  ],
+                );
+              }
 
-              // 2. Hyland Stance
-              Expanded(
-                child: _buildMetricTile(
-                  'Lập trường Hyland',
-                  '$hedges1k cẩn trọng',
-                  'Boosters: $boosters1k • Stance Neutral: ${neutralStance.toInt()}%',
-                  Icons.psychology_rounded,
-                ),
-              ),
-              const SizedBox(width: 10),
-
-              // 3. CARS Rhetorical Moves
-              Expanded(
-                child: _buildMetricTile(
-                  'CARS Moves (Swales)',
-                  'M1: ${territoryMove.toInt()}%',
-                  'M2 Niche: ${nicheMove.toInt()}% • M3 Solution',
-                  Icons.account_tree_rounded,
-                ),
-              ),
-            ],
+              return Row(
+                children: [
+                  Expanded(
+                    child: _buildMetricTile(
+                      'Độ dài câu (Từ)',
+                      '$p50Len từ/câu',
+                      'Trung bình: $meanLen • Chuẩn học thuật',
+                      Icons.text_fields_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildMetricTile(
+                      'Lập trường Hyland',
+                      '$hedges1k cẩn trọng',
+                      'Boosters: $boosters1k • Stance: ${supportStance.toInt()}% sup, ${neutralStance.toInt()}% neu',
+                      Icons.psychology_rounded,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: _buildMetricTile(
+                      'CARS Moves (Swales)',
+                      'M1: ${territoryMove.toInt()}%',
+                      'M2 Niche: ${nicheMove.toInt()}% • M3 Solution',
+                      Icons.account_tree_rounded,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),

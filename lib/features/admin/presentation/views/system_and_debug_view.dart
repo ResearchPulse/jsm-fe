@@ -52,29 +52,33 @@ class _SystemAndDebugViewState extends State<SystemAndDebugView> {
             color: AppColors.surface,
             border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
           ),
-          child: Row(
-            children: [
-              _buildSegmentItem(
-                index: 0,
-                icon: Icons.monitor_heart_rounded,
-                title: 'Nhật Ký Tác Vụ & Debug',
-                subtitle: 'Giám sát Celery, logs bóc tách, retry bài lỗi',
-              ),
-              const SizedBox(width: 12),
-              _buildSegmentItem(
-                index: 1,
-                icon: Icons.tune_rounded,
-                title: 'Cài Đặt Dịch Vụ',
-                subtitle: 'MinIO Storage, GROBID Server, OpenAlex Pool',
-              ),
-              const SizedBox(width: 12),
-              _buildSegmentItem(
-                index: 2,
-                icon: Icons.manage_accounts_rounded,
-                title: 'Quản Lý Người Dùng',
-                subtitle: 'Phân quyền Admin, Researcher, Quota API',
-              ),
-            ],
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            physics: const BouncingScrollPhysics(),
+            child: Row(
+              children: [
+                _buildSegmentItem(
+                  index: 0,
+                  icon: Icons.monitor_heart_rounded,
+                  title: 'Nhật Ký Tác Vụ & Debug',
+                  subtitle: 'Giám sát Celery, logs bóc tách, retry bài lỗi',
+                ),
+                const SizedBox(width: 12),
+                _buildSegmentItem(
+                  index: 1,
+                  icon: Icons.tune_rounded,
+                  title: 'Cài Đặt Dịch Vụ',
+                  subtitle: 'MinIO Storage, GROBID Server, OpenAlex Pool',
+                ),
+                const SizedBox(width: 12),
+                _buildSegmentItem(
+                  index: 2,
+                  icon: Icons.manage_accounts_rounded,
+                  title: 'Quản Lý Người Dùng',
+                  subtitle: 'Phân quyền Admin, Researcher, Quota API',
+                ),
+              ],
+            ),
           ),
         ),
 
