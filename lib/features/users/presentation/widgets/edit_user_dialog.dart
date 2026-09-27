@@ -241,21 +241,30 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         value: 'student',
                         child: Text(
                           context.l10n.roleStudentDesc,
-                          style: const TextStyle(fontFamily: 'Manrope', fontSize: 13),
+                          style: const TextStyle(
+                            fontFamily: 'Manrope',
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                       DropdownMenuItem(
                         value: 'lecturer',
                         child: Text(
                           context.l10n.roleLecturerDesc,
-                          style: const TextStyle(fontFamily: 'Manrope', fontSize: 13),
+                          style: const TextStyle(
+                            fontFamily: 'Manrope',
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                       DropdownMenuItem(
                         value: 'admin',
                         child: Text(
                           context.l10n.roleAdminDesc,
-                          style: const TextStyle(fontFamily: 'Manrope', fontSize: 13),
+                          style: const TextStyle(
+                            fontFamily: 'Manrope',
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ],

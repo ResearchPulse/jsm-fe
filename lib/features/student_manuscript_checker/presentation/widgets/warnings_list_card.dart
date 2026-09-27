@@ -232,7 +232,9 @@ class _WarningsListCardState extends State<WarningsListCard> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                context.l10n.localizeAnalysisString(warning.title),
+                                context.l10n.localizeAnalysisString(
+                                  warning.title,
+                                ),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -264,7 +266,9 @@ class _WarningsListCardState extends State<WarningsListCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              context.l10n.localizeAnalysisString(warning.message),
+                              context.l10n.localizeAnalysisString(
+                                warning.message,
+                              ),
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textPrimary,

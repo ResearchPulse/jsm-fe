@@ -1186,9 +1186,8 @@ class AppLocalizations {
   String get clearFilter => isVietnamese ? 'Xóa bộ lọc' : 'Clear filter';
 
   // Journal Recommendations & Pipeline
-  String get journalRecommendationsTitle => isVietnamese
-      ? 'Gợi Ý Tạp Chí Phù Hợp'
-      : 'Journal Recommendations';
+  String get journalRecommendationsTitle =>
+      isVietnamese ? 'Gợi Ý Tạp Chí Phù Hợp' : 'Journal Recommendations';
   String get journalRecommendationsSubtitle => isVietnamese
       ? 'Tìm kiếm các tạp chí trong cơ sở dữ liệu có hồ sơ phong cách viết học thuật tương thích nhất với bản thảo của bạn.'
       : 'Find journals in our database whose academic writing profile best matches your manuscript.';
@@ -1218,13 +1217,11 @@ class AppLocalizations {
       : 'Rank #$rank • $score% Match';
 
   // Recommendations Input Card
-  String get chooseManuscriptSource => isVietnamese
-      ? 'Chọn Nguồn Bản Thảo'
-      : 'Choose Manuscript Source';
+  String get chooseManuscriptSource =>
+      isVietnamese ? 'Chọn Nguồn Bản Thảo' : 'Choose Manuscript Source';
   String get orDivider => isVietnamese ? 'HOẶC' : 'OR';
-  String get availableJournalProfiles => isVietnamese
-      ? 'Hồ Sơ Tạp Chí Sẵn Có'
-      : 'Available Journal Profiles';
+  String get availableJournalProfiles =>
+      isVietnamese ? 'Hồ Sơ Tạp Chí Sẵn Có' : 'Available Journal Profiles';
   String availableJournalsComparisonCount(int count) => isVietnamese
       ? '$count tạp chí hiện có sẵn để đối chiếu trong hệ thống.'
       : '$count journals currently available for comparison in our system.';
@@ -1247,20 +1244,17 @@ class AppLocalizations {
   String get pleaseUploadOrSelectEvaluation => isVietnamese
       ? 'Vui lòng tải lên bản thảo hoặc chọn lịch sử đánh giá.'
       : 'Please upload a manuscript or select an evaluation history.';
-  String get clickToBrowseFiles => isVietnamese
-      ? 'Nhấn để chọn tệp bản thảo'
-      : 'Click to browse files';
+  String get clickToBrowseFiles =>
+      isVietnamese ? 'Nhấn để chọn tệp bản thảo' : 'Click to browse files';
   String get noPreviousEvaluationsHint => isVietnamese
       ? 'Chưa có lịch sử đánh giá nào.\nVui lòng tải lên bản thảo mới.'
       : 'No previous evaluations found.\nPlease upload a manuscript.';
 
   // Recommendations Pipeline Screen
-  String get findingSuitableJournalsTitle => isVietnamese
-      ? 'Đang Tìm Tạp Chí Phù Hợp'
-      : 'Finding Suitable Journals';
-  String evaluatingFile(String file) => isVietnamese
-      ? 'Đang đánh giá: $file'
-      : 'Evaluating: $file';
+  String get findingSuitableJournalsTitle =>
+      isVietnamese ? 'Đang Tìm Tạp Chí Phù Hợp' : 'Finding Suitable Journals';
+  String evaluatingFile(String file) =>
+      isVietnamese ? 'Đang đánh giá: $file' : 'Evaluating: $file';
   String get analyzingAgainstDataset => isVietnamese
       ? 'Đang phân tích bản thảo đối chiếu với bộ dữ liệu tạp chí'
       : 'Analyzing manuscript against closed journal dataset';
@@ -1308,15 +1302,15 @@ class AppLocalizations {
       isVietnamese ? 'Điểm Tương Đồng Mạnh Nhất' : 'Strongest Alignment';
   String get keyDistinction =>
       isVietnamese ? 'Điểm Khác Biệt Chính' : 'Key Distinction';
-  String get viewFullStyleComparison =>
-      isVietnamese ? 'Xem Chi Tiết So Sánh Phong Cách' : 'View Full Style Comparison';
+  String get viewFullStyleComparison => isVietnamese
+      ? 'Xem Chi Tiết So Sánh Phong Cách'
+      : 'View Full Style Comparison';
   String get otherCandidateJournals =>
       isVietnamese ? 'Các Tạp Chí Ứng Viên Khác' : 'Other Candidate Journals';
   String get viewComparisonBtn =>
       isVietnamese ? 'Xem Đối Chiếu' : 'View Comparison';
-  String distinctionLabel(String text) => isVietnamese
-      ? 'Khác biệt: $text'
-      : 'Distinction: $text';
+  String distinctionLabel(String text) =>
+      isVietnamese ? 'Khác biệt: $text' : 'Distinction: $text';
 
   // Dimension Comparison Heatmap
   String get crossJournalHeatmapTitle => isVietnamese
@@ -1335,12 +1329,10 @@ class AppLocalizations {
       isVietnamese ? 'Thủ pháp tu từ (CARS)' : 'Rhetorical Moves';
   String get dimOverallMatch =>
       isVietnamese ? 'Tương Thích Tổng Thể' : 'Overall Match';
-  String get legendStrong =>
-      isVietnamese ? '≥80% Phù hợp cao' : '≥80% Strong';
+  String get legendStrong => isVietnamese ? '≥80% Phù hợp cao' : '≥80% Strong';
   String get legendModerate =>
       isVietnamese ? '60–79% Phù hợp vừa' : '60–79% Moderate';
-  String get legendLow =>
-      isVietnamese ? '<60% Cần chỉnh sửa' : '<60% Low';
+  String get legendLow => isVietnamese ? '<60% Cần chỉnh sửa' : '<60% Low';
 
   // Score Rating Card & Explainability
   String get studentManuscriptLabel =>
@@ -1370,32 +1362,35 @@ class AppLocalizations {
   String get weightEpistemicMarkers => isVietnamese
       ? 'Chỉ dấu lập trường (Hedges, Boosters)'
       : 'Epistemic Markers (Hedges, Boosters)';
-  String weightLabel(String w) =>
-      isVietnamese ? 'Trọng số $w' : 'Weight $w';
+  String weightLabel(String w) => isVietnamese ? 'Trọng số $w' : 'Weight $w';
   String get scoreExplainabilityNote => isVietnamese
       ? 'Lưu ý: Điểm trung bình số học cao không đảm bảo bài báo được chấp nhận. Các sai lệch văn phong nghiêm trọng (như thiếu khoảng trống nghiên cứu) sẽ kích hoạt khuyến nghị Chỉnh sửa.'
       : 'Note: A high numerical average does not guarantee acceptance. Critical stylistic deviations (e.g. missing research gap or zero author presence) flag a Revision recommendation.';
-      
-  String get studentManuscriptFallback => isVietnamese ? 'Bản thảo sinh viên' : 'Student Manuscript';
-  String get scoreBreakdown => isVietnamese ? 'Chi tiết điểm số' : 'Score Breakdown';
+
+  String get studentManuscriptFallback =>
+      isVietnamese ? 'Bản thảo sinh viên' : 'Student Manuscript';
+  String get scoreBreakdown =>
+      isVietnamese ? 'Chi tiết điểm số' : 'Score Breakdown';
   String get spectrumPoor => isVietnamese ? '0 Lệch lớn' : '0 Poor';
   String get spectrumWeak => isVietnamese ? '50 Yếu' : '50 Weak';
   String get spectrumModerate => isVietnamese ? '70 Vừa' : '70 Moderate';
   String get spectrumStrong => isVietnamese ? '85 Mạnh' : '85 Strong';
-  String get styleMatchDistribution => isVietnamese ? 'PHÂN BỐ TƯƠNG THÍCH VĂN PHONG' : 'STYLE MATCH DISTRIBUTION';
-  String countStrong(int count) => isVietnamese ? '$count Tương thích mạnh' : '$count Strong';
-  String countModerate(int count) => isVietnamese ? '$count Tương thích vừa' : '$count Moderate';
-  String countMajorMismatch(int count) => isVietnamese ? '$count Độ lệch lớn' : '$count Major Mismatch';
+  String get styleMatchDistribution => isVietnamese
+      ? 'PHÂN BỐ TƯƠNG THÍCH VĂN PHONG'
+      : 'STYLE MATCH DISTRIBUTION';
+  String countStrong(int count) =>
+      isVietnamese ? '$count Tương thích mạnh' : '$count Strong';
+  String countModerate(int count) =>
+      isVietnamese ? '$count Tương thích vừa' : '$count Moderate';
+  String countMajorMismatch(int count) =>
+      isVietnamese ? '$count Độ lệch lớn' : '$count Major Mismatch';
 
   // Match Levels & Recommendations
-  String get matchStrong =>
-      isVietnamese ? 'TƯƠNG THÍCH MẠNH' : 'STRONG MATCH';
+  String get matchStrong => isVietnamese ? 'TƯƠNG THÍCH MẠNH' : 'STRONG MATCH';
   String get matchModerate =>
       isVietnamese ? 'TƯƠNG THÍCH VỪA' : 'MODERATE MATCH';
-  String get matchWeak =>
-      isVietnamese ? 'TƯƠNG THÍCH YẾU' : 'WEAK MATCH';
-  String get matchPoor =>
-      isVietnamese ? 'ĐỘ LỆCH LỚN' : 'POOR MATCH';
+  String get matchWeak => isVietnamese ? 'TƯƠNG THÍCH YẾU' : 'WEAK MATCH';
+  String get matchPoor => isVietnamese ? 'ĐỘ LỆCH LỚN' : 'POOR MATCH';
 
   String get recReadyForSubmission =>
       isVietnamese ? 'Sẵn sàng nộp bài' : 'Ready for Submission';
@@ -1421,9 +1416,8 @@ class AppLocalizations {
       : 'Excellent harmony across rhetorical moves, sentence length, and academic voice.';
 
   // Priority Improvements Card
-  String get priorityImprovementsTitle => isVietnamese
-      ? 'Các Điểm Ưu Tiên Cải Thiện'
-      : 'Priority Improvements';
+  String get priorityImprovementsTitle =>
+      isVietnamese ? 'Các Điểm Ưu Tiên Cải Thiện' : 'Priority Improvements';
   String get criticalRevisions =>
       isVietnamese ? 'CHỈNH SỬA QUAN TRỌNG' : 'CRITICAL REVISIONS';
   String get recommendedAdjustments =>
@@ -1431,15 +1425,13 @@ class AppLocalizations {
   String get noPriorityIssuesFound => isVietnamese
       ? 'Không phát hiện vấn đề ưu tiên nào. Bản thảo của bạn đáp ứng rất tốt các tiêu chí.'
       : 'No priority issues detected. Your manuscript meets all style benchmarks effectively.';
-  String get issueAuthorVoice => isVietnamese
-      ? 'Ngôi Tác Giả ("We")'
-      : 'Author Voice ("We")';
+  String get issueAuthorVoice =>
+      isVietnamese ? 'Ngôi Tác Giả ("We")' : 'Author Voice ("We")';
   String get issueAuthorVoiceDesc => isVietnamese
       ? 'Hiếm khi sử dụng ngôi tác giả so với tiêu chuẩn thông lệ của tạp chí.'
       : 'Rarely uses author-person references compared to journal standard.';
-  String get issueBoosters => isVietnamese
-      ? 'Từ Khẳng Định (Boosters)'
-      : 'Epistemic Boosters';
+  String get issueBoosters =>
+      isVietnamese ? 'Từ Khẳng Định (Boosters)' : 'Epistemic Boosters';
   String get issueBoostersDesc => isVietnamese
       ? 'Thiếu các từ ngữ khẳng định độ tin cậy thường dùng trong văn cảnh tạp chí.'
       : 'Absence of confidence markers commonly expected in journal discourse.';
@@ -1449,41 +1441,58 @@ class AppLocalizations {
   String get issueResearchGapDesc => isVietnamese
       ? 'Phần Mở đầu thiếu câu chỉ ra khoảng trống nghiên cứu hoặc hạn chế nghiên cứu trước.'
       : 'Introduction lacks a clear, explicit research gap or limitation phrasing.';
-  String issueSectionStyle(String sec) => isVietnamese
-      ? 'Độ Căn Chỉnh Phong Cách $sec'
-      : '$sec Style Alignment';
+  String issueSectionStyle(String sec) =>
+      isVietnamese ? 'Độ Căn Chỉnh Phong Cách $sec' : '$sec Style Alignment';
   String get issueSectionStyleDesc => isVietnamese
       ? 'Các đặc trưng văn phong phân đoạn có độ lệch đáng chú ý so với chuẩn tạp chí.'
       : 'Section stylistic features diverge noticeably from journal benchmark.';
   String get valMissing => isVietnamese ? 'Thiếu' : 'Missing';
   String get valRequired => isVietnamese ? 'Bắt buộc' : 'Required';
-  String get valCriticalMove => isVietnamese ? 'Thủ pháp cốt lõi' : 'Critical move';
+  String get valCriticalMove =>
+      isVietnamese ? 'Thủ pháp cốt lõi' : 'Critical move';
   String get valDivergent => isVietnamese ? 'Khác biệt' : 'Divergent';
   String get valExpected => isVietnamese ? 'Kỳ vọng' : 'Expected';
   String get valReviewNeeded => isVietnamese ? 'Cần xem xét' : 'Review needed';
-  
-  String priorityIssuesCount(int count) => isVietnamese ? '$count Vấn đề' : '$count Issues';
-  String get priorityNoneRequired => isVietnamese ? 'Không yêu cầu' : 'None Required';
-  String get priorityNoMismatch => isVietnamese ? 'Không phát hiện sai lệch phong cách ưu tiên cao. Bản thảo tương thích tốt với các chỉ số cốt lõi của tạp chí.' : 'No high-priority stylistic mismatches detected. Manuscript matches key journal metrics.';
-  String priorityBadge(String priority) => isVietnamese ? 'ƯU TIÊN $priority' : '$priority PRIORITY';
-  String manuscriptMetricPrefix(String val) => isVietnamese ? 'Bản thảo: $val' : 'Manuscript: $val';
-  String journalMetricPrefix(String val) => isVietnamese ? 'Tạp chí: $val' : 'Journal: $val';
+
+  String priorityIssuesCount(int count) =>
+      isVietnamese ? '$count Vấn đề' : '$count Issues';
+  String get priorityNoneRequired =>
+      isVietnamese ? 'Không yêu cầu' : 'None Required';
+  String get priorityNoMismatch => isVietnamese
+      ? 'Không phát hiện sai lệch phong cách ưu tiên cao. Bản thảo tương thích tốt với các chỉ số cốt lõi của tạp chí.'
+      : 'No high-priority stylistic mismatches detected. Manuscript matches key journal metrics.';
+  String priorityBadge(String priority) =>
+      isVietnamese ? 'ƯU TIÊN $priority' : '$priority PRIORITY';
+  String manuscriptMetricPrefix(String val) =>
+      isVietnamese ? 'Bản thảo: $val' : 'Manuscript: $val';
+  String journalMetricPrefix(String val) =>
+      isVietnamese ? 'Tạp chí: $val' : 'Journal: $val';
 
   // Evaluation History Detail Page
-  String get archivedSnapshotAudited => isVietnamese ? 'Bản chụp lưu trữ · Đã kiểm định' : 'Archived Snapshot · Audited';
-  String get targetJournalBenchmark => isVietnamese ? 'Chuẩn mực Tạp chí Mục tiêu' : 'Target Journal Benchmark';
-  String get archivedManuscriptDraft => isVietnamese ? 'Bản nháp lưu trữ' : 'Archived Manuscript Draft';
-  String get manuscriptIdRef => isVietnamese ? 'Mã bản thảo / Tham chiếu' : 'Manuscript ID / Ref';
-  String get journalProfile => isVietnamese ? 'Hồ sơ Tạp chí' : 'Journal Profile';
-  String get preservedV1Profile => isVietnamese ? 'Hồ sơ tiêu chuẩn V1 được bảo tồn' : 'Preserved V1 Benchmark Profile';
-  String get snapshotIntegrity => isVietnamese ? 'Tính toàn vẹn bản chụp' : 'Snapshot Integrity';
-  String get immutableSnapshotNotice => isVietnamese ? 'Bản chụp bất biến (Không tính toán lại)' : 'Exact Immutable Snapshot (Zero Recalculation)';
+  String get archivedSnapshotAudited => isVietnamese
+      ? 'Bản chụp lưu trữ · Đã kiểm định'
+      : 'Archived Snapshot · Audited';
+  String get targetJournalBenchmark =>
+      isVietnamese ? 'Chuẩn mực Tạp chí Mục tiêu' : 'Target Journal Benchmark';
+  String get archivedManuscriptDraft =>
+      isVietnamese ? 'Bản nháp lưu trữ' : 'Archived Manuscript Draft';
+  String get manuscriptIdRef =>
+      isVietnamese ? 'Mã bản thảo / Tham chiếu' : 'Manuscript ID / Ref';
+  String get journalProfile =>
+      isVietnamese ? 'Hồ sơ Tạp chí' : 'Journal Profile';
+  String get preservedV1Profile => isVietnamese
+      ? 'Hồ sơ tiêu chuẩn V1 được bảo tồn'
+      : 'Preserved V1 Benchmark Profile';
+  String get snapshotIntegrity =>
+      isVietnamese ? 'Tính toàn vẹn bản chụp' : 'Snapshot Integrity';
+  String get immutableSnapshotNotice => isVietnamese
+      ? 'Bản chụp bất biến (Không tính toán lại)'
+      : 'Exact Immutable Snapshot (Zero Recalculation)';
 
   // Users Dialogs & Actions
   String get unknownUser => isVietnamese ? 'Chưa rõ' : 'Unknown';
-  String get unauthorizedActionTitle => isVietnamese
-      ? 'Thao tác không được phép'
-      : 'Unauthorized Action';
+  String get unauthorizedActionTitle =>
+      isVietnamese ? 'Thao tác không được phép' : 'Unauthorized Action';
   String userUpdateSuccess(String email) => isVietnamese
       ? 'Đã cập nhật thông tin tài khoản "$email" thành công.'
       : 'User account "$email" updated successfully.';
@@ -1499,9 +1508,8 @@ class AppLocalizations {
       : 'Permanently deleted user account "$email".';
   String get deleteUserTitle =>
       isVietnamese ? 'Xóa tài khoản' : 'Delete Account';
-  String userDeleteError(String e) => isVietnamese
-      ? 'Lỗi khi xóa tài khoản: $e'
-      : 'Error deleting account: $e';
+  String userDeleteError(String e) =>
+      isVietnamese ? 'Lỗi khi xóa tài khoản: $e' : 'Error deleting account: $e';
   String get deleteFailedTitle =>
       isVietnamese ? 'Xóa thất bại' : 'Deletion Failed';
 
@@ -1511,8 +1519,7 @@ class AppLocalizations {
   String get editUserSubtitle => isVietnamese
       ? 'Cập nhật thông tin chi tiết, vai trò hoặc mật khẩu cho người dùng.'
       : 'Update details, role, or password for this user.';
-  String get fullNameRequired =>
-      isVietnamese ? 'Họ và tên *' : 'Full Name *';
+  String get fullNameRequired => isVietnamese ? 'Họ và tên *' : 'Full Name *';
   String get enterFullNameHint =>
       isVietnamese ? 'Nhập họ và tên người dùng' : 'Enter user\'s full name';
   String get accountEmailRequired =>
@@ -1528,9 +1535,8 @@ class AppLocalizations {
   String get roleAdminDesc => isVietnamese
       ? 'Quản trị viên (Admin) - Toàn quyền hệ thống'
       : 'Admin - Full System Access';
-  String get newPasswordOptional => isVietnamese
-      ? 'Mật khẩu mới (Tùy chọn)'
-      : 'New Password (Optional)';
+  String get newPasswordOptional =>
+      isVietnamese ? 'Mật khẩu mới (Tùy chọn)' : 'New Password (Optional)';
   String get passwordKeepBlankHint => isVietnamese
       ? 'Để trống nếu không thay đổi mật khẩu'
       : 'Leave blank to keep existing password';
@@ -1558,15 +1564,13 @@ class AppLocalizations {
   String get ssoAdminRole => isVietnamese
       ? 'Quản trị viên Hệ thống (Admin)'
       : 'System Administrator (Admin)';
-  String get ssoAdminBtn => isVietnamese
-      ? 'Giả lập SSO: ADMIN'
-      : 'Simulate SSO: ADMIN';
+  String get ssoAdminBtn =>
+      isVietnamese ? 'Giả lập SSO: ADMIN' : 'Simulate SSO: ADMIN';
   String get ssoScholarRole => isVietnamese
       ? 'TS. Nguyễn Văn Scholar (User)'
       : 'Dr. Nguyen Van Scholar (User)';
-  String get ssoUserBtn => isVietnamese
-      ? 'Giả lập SSO: USER'
-      : 'Simulate SSO: USER';
+  String get ssoUserBtn =>
+      isVietnamese ? 'Giả lập SSO: USER' : 'Simulate SSO: USER';
 
   // Analysis String Templates
   String get analysisResearchGapAlignment => isVietnamese
@@ -1575,19 +1579,36 @@ class AppLocalizations {
   String get analysisMissingGapDifference => isVietnamese
       ? 'Phần mở đầu chưa nêu bật được khoảng trống nghiên cứu (Missing Gap Statement).'
       : 'Introduction lacks an explicit research gap statement (Missing Gap Statement).';
-  String analysisMedianSentenceLength(String userMedian, String journalTitle, String journalP50) => isVietnamese
+  String analysisMedianSentenceLength(
+    String userMedian,
+    String journalTitle,
+    String journalP50,
+  ) => isVietnamese
       ? 'Độ dài câu trung vị ($userMedian từ) rất tương thích với chuẩn $journalTitle (P50: $journalP50).'
       : 'Median sentence length ($userMedian words) is highly compatible with $journalTitle benchmark (P50: $journalP50).';
-  String analysisSentenceLengthDifference(String userMedian, String journalP10, String journalP90) => isVietnamese
+  String analysisSentenceLengthDifference(
+    String userMedian,
+    String journalP10,
+    String journalP90,
+  ) => isVietnamese
       ? 'Độ dài câu ($userMedian từ) nằm ngoài ngưỡng chuẩn $journalP10 - $journalP90 từ của tạp chí.'
       : 'Sentence length ($userMedian words) falls outside the journal benchmark range ($journalP10 - $journalP90 words).';
-  String analysisVoiceAndPersonAlignment(String userPassive, String userWe) => isVietnamese
+  String analysisVoiceAndPersonAlignment(String userPassive, String userWe) =>
+      isVietnamese
       ? 'Tỷ lệ câu bị động ($userPassive%) và xưng ngôi ($userWe%) đạt độ chuẩn xác cao.'
       : 'Passive voice rate ($userPassive%) and author person usage ($userWe%) closely match benchmark standards.';
-  String analysisPassiveRateDifference(String userPassive, String diff, String journalPassive) => isVietnamese
+  String analysisPassiveRateDifference(
+    String userPassive,
+    String diff,
+    String journalPassive,
+  ) => isVietnamese
       ? 'Tỷ lệ câu bị động ($userPassive%) lệch $diff pp so với mức $journalPassive% của tạp chí.'
       : 'Passive voice rate ($userPassive%) diverges by $diff pp from journal benchmark ($journalPassive%).';
-  String analysisWeRateDifference(String userWe, String diff, String journalWe) => isVietnamese
+  String analysisWeRateDifference(
+    String userWe,
+    String diff,
+    String journalWe,
+  ) => isVietnamese
       ? 'Tỷ lệ xưng ngôi \'We\' ($userWe%) lệch $diff pp so với mức $journalWe%.'
       : 'Author pronoun \'We\' rate ($userWe%) diverges by $diff pp from benchmark ($journalWe%).';
   String get analysisEpistemicAlignment => isVietnamese
@@ -1599,100 +1620,170 @@ class AppLocalizations {
 
   // Match raw string and replace with correct localization
   String localizeAnalysisString(String text) {
-    if (text.contains('khoảng trống nghiên cứu (Research Gap) rất rõ ràng') || text.contains('research gap indicators are well-defined')) {
+    if (text.contains('khoảng trống nghiên cứu (Research Gap) rất rõ ràng') ||
+        text.contains('research gap indicators are well-defined')) {
       return analysisResearchGapAlignment;
     }
-    if (text.contains('chưa nêu bật được khoảng trống') || text.contains('lacks an explicit research gap')) {
+    if (text.contains('chưa nêu bật được khoảng trống') ||
+        text.contains('lacks an explicit research gap')) {
       return analysisMissingGapDifference;
     }
-    
+
     // Độ dài câu trung vị (14.0 từ) rất tương thích với chuẩn IEEE Access (P50: 18.0).
-    final RegExp lengthAlignVi = RegExp(r'Độ dài câu trung vị \(([\d\.]+) từ\) rất tương thích với chuẩn (.+) \(P50: ([\d\.]+)\)');
+    final RegExp lengthAlignVi = RegExp(
+      r'Độ dài câu trung vị \(([\d\.]+) từ\) rất tương thích với chuẩn (.+) \(P50: ([\d\.]+)\)',
+    );
     if (lengthAlignVi.hasMatch(text)) {
       final match = lengthAlignVi.firstMatch(text)!;
-      return analysisMedianSentenceLength(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisMedianSentenceLength(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
-    final RegExp lengthAlignEn = RegExp(r'Median sentence length \(([\d\.]+) words\) is highly compatible with (.+) benchmark \(P50: ([\d\.]+)\)');
+    final RegExp lengthAlignEn = RegExp(
+      r'Median sentence length \(([\d\.]+) words\) is highly compatible with (.+) benchmark \(P50: ([\d\.]+)\)',
+    );
     if (lengthAlignEn.hasMatch(text)) {
       final match = lengthAlignEn.firstMatch(text)!;
-      return analysisMedianSentenceLength(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisMedianSentenceLength(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
 
     // Độ dài câu (14.0 từ) nằm ngoài ngưỡng chuẩn 10.0 - 20.0 từ
-    final RegExp lengthDiffVi = RegExp(r'Độ dài câu \(([\d\.]+) từ\) nằm ngoài ngưỡng chuẩn ([\d\.]+) - ([\d\.]+) từ');
+    final RegExp lengthDiffVi = RegExp(
+      r'Độ dài câu \(([\d\.]+) từ\) nằm ngoài ngưỡng chuẩn ([\d\.]+) - ([\d\.]+) từ',
+    );
     if (lengthDiffVi.hasMatch(text)) {
       final match = lengthDiffVi.firstMatch(text)!;
-      return analysisSentenceLengthDifference(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisSentenceLengthDifference(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
-    final RegExp lengthDiffEn = RegExp(r'Sentence length \(([\d\.]+) words\) falls outside.* range \(([\d\.]+) - ([\d\.]+) words\)');
+    final RegExp lengthDiffEn = RegExp(
+      r'Sentence length \(([\d\.]+) words\) falls outside.* range \(([\d\.]+) - ([\d\.]+) words\)',
+    );
     if (lengthDiffEn.hasMatch(text)) {
       final match = lengthDiffEn.firstMatch(text)!;
-      return analysisSentenceLengthDifference(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisSentenceLengthDifference(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
 
     // Tỷ lệ câu bị động (X%) và xưng ngôi (Y%) đạt độ chuẩn xác cao
-    final RegExp vpAlignVi = RegExp(r'Tỷ lệ câu bị động \(([\d\.]+)%\) và xưng ngôi \(([\d\.]+)%\) đạt độ chuẩn xác');
+    final RegExp vpAlignVi = RegExp(
+      r'Tỷ lệ câu bị động \(([\d\.]+)%\) và xưng ngôi \(([\d\.]+)%\) đạt độ chuẩn xác',
+    );
     if (vpAlignVi.hasMatch(text)) {
       final match = vpAlignVi.firstMatch(text)!;
       return analysisVoiceAndPersonAlignment(match.group(1)!, match.group(2)!);
     }
-    final RegExp vpAlignEn = RegExp(r'Passive voice rate \(([\d\.]+)%\) and author person usage \(([\d\.]+)%\) closely match');
+    final RegExp vpAlignEn = RegExp(
+      r'Passive voice rate \(([\d\.]+)%\) and author person usage \(([\d\.]+)%\) closely match',
+    );
     if (vpAlignEn.hasMatch(text)) {
       final match = vpAlignEn.firstMatch(text)!;
       return analysisVoiceAndPersonAlignment(match.group(1)!, match.group(2)!);
     }
 
     // Tỷ lệ câu bị động (23.9%) lệch 22.0 pp so với mức 1.9%
-    final RegExp pvDiffVi = RegExp(r'Tỷ lệ câu bị động \(([\d\.]+)%\) lệch ([\d\.]+) pp so với mức ([\d\.]+)%');
+    final RegExp pvDiffVi = RegExp(
+      r'Tỷ lệ câu bị động \(([\d\.]+)%\) lệch ([\d\.]+) pp so với mức ([\d\.]+)%',
+    );
     if (pvDiffVi.hasMatch(text)) {
       final match = pvDiffVi.firstMatch(text)!;
-      return analysisPassiveRateDifference(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisPassiveRateDifference(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
-    final RegExp pvDiffEn = RegExp(r'Passive voice rate \(([\d\.]+)%\) diverges by ([\d\.]+) pp from journal benchmark \(([\d\.]+)%\)');
+    final RegExp pvDiffEn = RegExp(
+      r'Passive voice rate \(([\d\.]+)%\) diverges by ([\d\.]+) pp from journal benchmark \(([\d\.]+)%\)',
+    );
     if (pvDiffEn.hasMatch(text)) {
       final match = pvDiffEn.firstMatch(text)!;
-      return analysisPassiveRateDifference(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisPassiveRateDifference(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
 
     // Tỷ lệ xưng ngôi 'We' (0.0%) lệch 5.3 pp so với mức 5.3%
-    final RegExp weDiffVi = RegExp(r"Tỷ lệ xưng ngôi 'We' \(([\d\.]+)%\) lệch ([\d\.]+) pp so với mức ([\d\.]+)%");
+    final RegExp weDiffVi = RegExp(
+      r"Tỷ lệ xưng ngôi 'We' \(([\d\.]+)%\) lệch ([\d\.]+) pp so với mức ([\d\.]+)%",
+    );
     if (weDiffVi.hasMatch(text)) {
       final match = weDiffVi.firstMatch(text)!;
-      return analysisWeRateDifference(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisWeRateDifference(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
-    final RegExp weDiffEn = RegExp(r"Author pronoun 'We' rate \(([\d\.]+)%\) diverges by ([\d\.]+) pp from benchmark \(([\d\.]+)%\)");
+    final RegExp weDiffEn = RegExp(
+      r"Author pronoun 'We' rate \(([\d\.]+)%\) diverges by ([\d\.]+) pp from benchmark \(([\d\.]+)%\)",
+    );
     if (weDiffEn.hasMatch(text)) {
       final match = weDiffEn.firstMatch(text)!;
-      return analysisWeRateDifference(match.group(1)!, match.group(2)!, match.group(3)!);
+      return analysisWeRateDifference(
+        match.group(1)!,
+        match.group(2)!,
+        match.group(3)!,
+      );
     }
 
-    if (text.contains('Mức độ cân bằng từ cẩn trọng') || text.contains('Balanced use of hedges and boosters')) {
+    if (text.contains('Mức độ cân bằng từ cẩn trọng') ||
+        text.contains('Balanced use of hedges and boosters')) {
       return analysisEpistemicAlignment;
     }
-    if (text.contains('Tần suất sử dụng từ khẳng định') || text.contains('Frequency of boosters or hedges diverges')) {
+    if (text.contains('Tần suất sử dụng từ khẳng định') ||
+        text.contains('Frequency of boosters or hedges diverges')) {
       return analysisEpistemicDifference;
     }
 
     // Warning titles
-    if (text.contains('Missing Research Gap Statement') || text.contains('Thiếu tuyên bố khoảng trống')) {
-      return isVietnamese ? 'Thiếu tuyên bố khoảng trống nghiên cứu' : 'Missing Research Gap Statement';
+    if (text.contains('Missing Research Gap Statement') ||
+        text.contains('Thiếu tuyên bố khoảng trống')) {
+      return isVietnamese
+          ? 'Thiếu tuyên bố khoảng trống nghiên cứu'
+          : 'Missing Research Gap Statement';
     }
-    if (text.contains('Sentence Length Variation (Too Long)') || text.contains('Độ dài câu biến thiên (Quá dài)')) {
-      return isVietnamese ? 'Độ dài câu biến thiên (Quá dài)' : 'Sentence Length Variation (Too Long)';
+    if (text.contains('Sentence Length Variation (Too Long)') ||
+        text.contains('Độ dài câu biến thiên (Quá dài)')) {
+      return isVietnamese
+          ? 'Độ dài câu biến thiên (Quá dài)'
+          : 'Sentence Length Variation (Too Long)';
     }
-    if (text.contains('Sentence Length Variation (Too Short)') || text.contains('Độ dài câu biến thiên (Quá ngắn)')) {
-      return isVietnamese ? 'Độ dài câu biến thiên (Quá ngắn)' : 'Sentence Length Variation (Too Short)';
+    if (text.contains('Sentence Length Variation (Too Short)') ||
+        text.contains('Độ dài câu biến thiên (Quá ngắn)')) {
+      return isVietnamese
+          ? 'Độ dài câu biến thiên (Quá ngắn)'
+          : 'Sentence Length Variation (Too Short)';
     }
 
     // Warning messages
-    if (text.contains('chưa xác định rõ khoảng trống nghiên cứu') || text.contains('lacks a clear Research Gap')) {
+    if (text.contains('chưa xác định rõ khoảng trống nghiên cứu') ||
+        text.contains('lacks a clear Research Gap')) {
       return isVietnamese
           ? 'Phần Mở đầu (Introduction) chưa xác định rõ khoảng trống nghiên cứu (Research Gap). Nên bổ sung câu chuyển tiếp chỉ ra hạn chế của các phương pháp trước đó (sử dụng các từ nối như \'However\', \'Despite this\', \'Remains limited\').'
           : 'The Introduction section lacks a clear Research Gap statement. Consider adding transition sentences indicating limitations of prior methods (using connectors like \'However\', \'Despite this\', \'Remains limited\').';
     }
 
-    final RegExp warnLongVi = RegExp(r'Độ dài câu trung vị \(([\d\.]+) từ\) cao hơn phân vị P90 của tạp chí \(([\d\.]+) từ\)');
-    final RegExp warnLongEn = RegExp(r'Median sentence length \(([\d\.]+) words\) is higher than the journal.*?P90 percentile \(([\d\.]+) words\)');
+    final RegExp warnLongVi = RegExp(
+      r'Độ dài câu trung vị \(([\d\.]+) từ\) cao hơn phân vị P90 của tạp chí \(([\d\.]+) từ\)',
+    );
+    final RegExp warnLongEn = RegExp(
+      r'Median sentence length \(([\d\.]+) words\) is higher than the journal.*?P90 percentile \(([\d\.]+) words\)',
+    );
     if (warnLongVi.hasMatch(text) || warnLongEn.hasMatch(text)) {
       final match = warnLongVi.firstMatch(text) ?? warnLongEn.firstMatch(text)!;
       return isVietnamese
@@ -1700,18 +1791,27 @@ class AppLocalizations {
           : 'Median sentence length (${match.group(1)} words) is higher than the journal\'s P90 percentile (${match.group(2)} words). Excessively long sentences can reduce clarity. Consider breaking complex sentences into independent clauses.';
     }
 
-    final RegExp warnShortVi = RegExp(r'Độ dài câu trung vị \(([\d\.]+) từ\) thấp hơn phân vị P10 của tạp chí \(([\d\.]+) từ\)');
-    final RegExp warnShortEn = RegExp(r'Median sentence length \(([\d\.]+) words\) is lower than the journal.*?P10 percentile \(([\d\.]+) words\)');
+    final RegExp warnShortVi = RegExp(
+      r'Độ dài câu trung vị \(([\d\.]+) từ\) thấp hơn phân vị P10 của tạp chí \(([\d\.]+) từ\)',
+    );
+    final RegExp warnShortEn = RegExp(
+      r'Median sentence length \(([\d\.]+) words\) is lower than the journal.*?P10 percentile \(([\d\.]+) words\)',
+    );
     if (warnShortVi.hasMatch(text) || warnShortEn.hasMatch(text)) {
-      final match = warnShortVi.firstMatch(text) ?? warnShortEn.firstMatch(text)!;
+      final match =
+          warnShortVi.firstMatch(text) ?? warnShortEn.firstMatch(text)!;
       return isVietnamese
           ? 'Độ dài câu trung vị (${match.group(1)} từ) thấp hơn phân vị P10 của tạp chí (${match.group(2)} từ). Các câu quá ngắn có thể làm mất đi tính hàn lâm. Hãy sử dụng từ nối và cấu trúc câu phức để diễn đạt chặt chẽ hơn.'
           : 'Median sentence length (${match.group(1)} words) is lower than the journal\'s P10 percentile (${match.group(2)} words). Overly short sentences may lack academic depth. Use connectors and complex sentence structures for cohesion.';
     }
 
     // Summaries
-    final RegExp sumExVi = RegExp(r'Bản thảo thể hiện mức độ tương thích ([\d\.]+)/100 với (.+?)\. Điểm mạnh nổi bật nằm ở (.+?)\.?$');
-    final RegExp sumExEn = RegExp(r'The manuscript demonstrates a ([\d\.]+)/100 compatibility with (.+?)\. Outstanding strength lies in (.+?)\.?$');
+    final RegExp sumExVi = RegExp(
+      r'Bản thảo thể hiện mức độ tương thích ([\d\.]+)/100 với (.+?)\. Điểm mạnh nổi bật nằm ở (.+?)\.?$',
+    );
+    final RegExp sumExEn = RegExp(
+      r'The manuscript demonstrates a ([\d\.]+)/100 compatibility with (.+?)\. Outstanding strength lies in (.+?)\.?$',
+    );
     if (sumExVi.hasMatch(text) || sumExEn.hasMatch(text)) {
       final match = sumExVi.firstMatch(text) ?? sumExEn.firstMatch(text)!;
       return isVietnamese
@@ -1719,8 +1819,12 @@ class AppLocalizations {
           : 'The manuscript demonstrates a ${match.group(1)}/100 compatibility with ${match.group(2)}. Outstanding strength lies in ${match.group(3)}.';
     }
 
-    final RegExp sumModVi = RegExp(r'Bản thảo đạt mức độ phù hợp khá \(([\d\.]+)/100\) với (.+?)\.');
-    final RegExp sumModEn = RegExp(r'shows moderate alignment \(([\d\.]+)/100\) with (.+?)\.');
+    final RegExp sumModVi = RegExp(
+      r'Bản thảo đạt mức độ phù hợp khá \(([\d\.]+)/100\) với (.+?)\.',
+    );
+    final RegExp sumModEn = RegExp(
+      r'shows moderate alignment \(([\d\.]+)/100\) with (.+?)\.',
+    );
     if (sumModVi.hasMatch(text) || sumModEn.hasMatch(text)) {
       final match = sumModVi.firstMatch(text) ?? sumModEn.firstMatch(text)!;
       return isVietnamese
@@ -1728,8 +1832,12 @@ class AppLocalizations {
           : 'The manuscript shows moderate alignment (${match.group(1)}/100) with ${match.group(2)}. However, certain aspects regarding research gap or sentence length should be refined prior to submission.';
     }
 
-    final RegExp sumPoorVi = RegExp(r'Bản thảo có độ lệch đáng kể \(([\d\.]+)/100\) so với chuẩn phong cách của (.+?)\.');
-    final RegExp sumPoorEn = RegExp(r'shows significant deviation \(([\d\.]+)/100\) from (.+?)\.');
+    final RegExp sumPoorVi = RegExp(
+      r'Bản thảo có độ lệch đáng kể \(([\d\.]+)/100\) so với chuẩn phong cách của (.+?)\.',
+    );
+    final RegExp sumPoorEn = RegExp(
+      r'shows significant deviation \(([\d\.]+)/100\) from (.+?)\.',
+    );
     if (sumPoorVi.hasMatch(text) || sumPoorEn.hasMatch(text)) {
       final match = sumPoorVi.firstMatch(text) ?? sumPoorEn.firstMatch(text)!;
       return isVietnamese
@@ -1737,7 +1845,12 @@ class AppLocalizations {
           : 'The manuscript shows significant deviation (${match.group(1)}/100) from ${match.group(2)}\'s style benchmarks. It is recommended to review rhetorical argumentation and academic tone balance.';
     }
 
-    if (text.contains('Cấu trúc cú pháp và giọng văn nghiên cứu nhìn chung rất chuẩn mực') || text.contains('Syntactic structure and research tone are generally well-aligned')) {
+    if (text.contains(
+          'Cấu trúc cú pháp và giọng văn nghiên cứu nhìn chung rất chuẩn mực',
+        ) ||
+        text.contains(
+          'Syntactic structure and research tone are generally well-aligned',
+        )) {
       return isVietnamese
           ? 'Cấu trúc cú pháp và giọng văn nghiên cứu nhìn chung rất chuẩn mực.'
           : 'Syntactic structure and research tone are generally well-aligned with standards.';
@@ -1751,26 +1864,35 @@ class AppLocalizations {
     if (isVietnamese) {
       if (lower.contains('computer science') || lower.contains('technology')) {
         return 'Khoa học máy tính & Công nghệ';
-      } else if (lower.contains('bioinformatics') || lower.contains('computational biology')) {
+      } else if (lower.contains('bioinformatics') ||
+          lower.contains('computational biology')) {
         return 'Tin sinh học & Sinh học tính toán';
       } else if (lower.contains('chemistry') || lower.contains('chemical')) {
         return 'Hóa học & Khoa học vật liệu';
-      } else if (lower.contains('energy') || lower.contains('artificial intelligence') || lower.contains('ai')) {
+      } else if (lower.contains('energy') ||
+          lower.contains('artificial intelligence') ||
+          lower.contains('ai')) {
         return 'Năng lượng & Trí tuệ nhân tạo';
       } else if (lower.contains('engineering')) {
         return 'Kỹ thuật & Công nghệ';
-      } else if (lower.contains('multidisciplinary') || lower.contains('general science')) {
+      } else if (lower.contains('multidisciplinary') ||
+          lower.contains('general science')) {
         return 'Khoa học tổng hợp';
       }
       return field;
     } else {
       if (lower.contains('khoa học máy tính') || lower.contains('công nghệ')) {
         return 'Computer Science & Technology';
-      } else if (lower.contains('tin sinh') || lower.contains('sinh học tính toán')) {
+      } else if (lower.contains('tin sinh') ||
+          lower.contains('sinh học tính toán')) {
         return 'Bioinformatics & Computational Biology';
-      } else if (lower.contains('hóa học') || lower.contains('hóa') || lower.contains('vật liệu')) {
+      } else if (lower.contains('hóa học') ||
+          lower.contains('hóa') ||
+          lower.contains('vật liệu')) {
         return 'Chemistry & Material Sciences';
-      } else if (lower.contains('năng lượng') || lower.contains('trí tuệ nhân tạo') || lower.contains('ai')) {
+      } else if (lower.contains('năng lượng') ||
+          lower.contains('trí tuệ nhân tạo') ||
+          lower.contains('ai')) {
         return 'Energy & Artificial Intelligence';
       } else if (lower.contains('kỹ thuật')) {
         return 'Engineering & Technology';

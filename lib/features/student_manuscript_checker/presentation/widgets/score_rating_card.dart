@@ -217,7 +217,9 @@ class ScoreRatingCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              l10n.howIsScoreCalculated(result.suitabilityScore.toStringAsFixed(1)),
+              l10n.howIsScoreCalculated(
+                result.suitabilityScore.toStringAsFixed(1),
+              ),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,

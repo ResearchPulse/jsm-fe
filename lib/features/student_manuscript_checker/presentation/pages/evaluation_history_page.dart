@@ -86,10 +86,7 @@ class _EvaluationHistoryPageState extends State<EvaluationHistoryPage> {
         listener: (context, state) {
           if (state.errorMessage != null &&
               state.status != EvaluationHistoryStatus.failure) {
-            AppNotification.showError(
-              context,
-              state.errorMessage!,
-            );
+            AppNotification.showError(context, state.errorMessage!);
           }
         },
         builder: (context, state) {
@@ -1381,9 +1378,14 @@ class _EvaluationHistoryPageState extends State<EvaluationHistoryPage> {
           ),
           actions: [
             OutlinedButton(
-              onPressed: isDeleting ? null : () => Navigator.of(dialogCtx).pop(),
+              onPressed: isDeleting
+                  ? null
+                  : () => Navigator.of(dialogCtx).pop(),
               style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
                 side: const BorderSide(color: AppColors.border),
                 foregroundColor: AppColors.textSecondary,
                 shape: RoundedRectangleBorder(
@@ -1404,7 +1406,10 @@ class _EvaluationHistoryPageState extends State<EvaluationHistoryPage> {
                 foregroundColor: Colors.white,
                 disabledBackgroundColor: AppColors.error.withValues(alpha: 0.7),
                 elevation: 0,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 10,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),

@@ -159,7 +159,11 @@ class PriorityImprovementsCard extends StatelessWidget {
                 spacing: 8,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  const Icon(Icons.flag_outlined, size: 18, color: AppColors.primary),
+                  const Icon(
+                    Icons.flag_outlined,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
                   Text(
                     l10n.priorityImprovementsTitle,
                     style: const TextStyle(
@@ -180,7 +184,9 @@ class PriorityImprovementsCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  issues.isEmpty ? l10n.priorityNoneRequired : l10n.priorityIssuesCount(issues.length),
+                  issues.isEmpty
+                      ? l10n.priorityNoneRequired
+                      : l10n.priorityIssuesCount(issues.length),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -382,7 +388,9 @@ class PriorityImprovementsCard extends StatelessWidget {
                                                   BorderRadius.circular(4),
                                             ),
                                             child: Text(
-                                              l10n.priorityBadge(issue.priority),
+                                              l10n.priorityBadge(
+                                                issue.priority,
+                                              ),
                                               style: TextStyle(
                                                 fontSize: 9,
                                                 fontWeight: FontWeight.w800,
@@ -418,11 +426,15 @@ class PriorityImprovementsCard extends StatelessWidget {
                                       runSpacing: 4,
                                       children: [
                                         _buildMetricChip(
-                                          l10n.manuscriptMetricPrefix(issue.manuscriptValue),
+                                          l10n.manuscriptMetricPrefix(
+                                            issue.manuscriptValue,
+                                          ),
                                           isJournal: false,
                                         ),
                                         _buildMetricChip(
-                                          l10n.journalMetricPrefix(issue.journalValue),
+                                          l10n.journalMetricPrefix(
+                                            issue.journalValue,
+                                          ),
                                           isJournal: true,
                                         ),
                                       ],

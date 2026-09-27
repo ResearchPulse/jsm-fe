@@ -490,7 +490,9 @@ class _LoginViewState extends State<LoginView>
                                                   .mockLogin(
                                                     sub: 'mock-sso-admin-id',
                                                     email: 'admin@jsm.edu.vn',
-                                                    name: context.l10n.ssoAdminRole,
+                                                    name: context
+                                                        .l10n
+                                                        .ssoAdminRole,
                                                     role: 'ADMIN',
                                                   ),
                                         style: OutlinedButton.styleFrom(
@@ -571,7 +573,9 @@ class _LoginViewState extends State<LoginView>
                                                   .mockLogin(
                                                     sub: 'mock-sso-user-id',
                                                     email: 'scholar.user@lab.edu.vn',
-                                                    name: context.l10n.ssoScholarRole,
+                                                    name: context
+                                                        .l10n
+                                                        .ssoScholarRole,
                                                     role: 'USER',
                                                   ),
                                         style: OutlinedButton.styleFrom(

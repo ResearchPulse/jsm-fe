@@ -218,7 +218,9 @@ class _UsersViewState extends State<UsersView> {
       });
       AppNotification.showError(
         context,
-        context.l10n.userUpdateError(e.toString().replaceFirst('Exception: ', '')),
+        context.l10n.userUpdateError(
+          e.toString().replaceFirst('Exception: ', ''),
+        ),
         title: context.l10n.updateFailedTitle,
       );
     }
@@ -364,7 +366,9 @@ class _UsersViewState extends State<UsersView> {
                 setState(() => _deletingUserIds.remove(userId));
                 AppNotification.showError(
                   context,
-                  context.l10n.userDeleteError(e.toString().replaceFirst('Exception: ', '')),
+                  context.l10n.userDeleteError(
+                    e.toString().replaceFirst('Exception: ', ''),
+                  ),
                   title: context.l10n.deleteFailedTitle,
                 );
               }
@@ -658,7 +662,8 @@ class _UsersViewState extends State<UsersView> {
 
   Widget _buildUserRow(Map<String, dynamic> user) {
     final userId = user['id']?.toString() ?? '';
-    final fullName = user['full_name'] ?? user['name'] ?? context.l10n.unknownUser;
+    final fullName =
+        user['full_name'] ?? user['name'] ?? context.l10n.unknownUser;
     final email = user['email'] ?? '';
     final origRole = (user['role'] ?? 'student').toString().toLowerCase();
     final origStatus = user['is_active'] != false;

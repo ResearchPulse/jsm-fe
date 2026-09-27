@@ -66,7 +66,10 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildAvailableJournalsInfo(context, state.availableJournalsCount),
+                _buildAvailableJournalsInfo(
+                  context,
+                  state.availableJournalsCount,
+                ),
                 const SizedBox(height: 24),
                 Text(
                   context.l10n.chooseManuscriptSource,
@@ -81,7 +84,10 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 1, child: _buildUploadOption(context, state)),
+                    Expanded(
+                      flex: 1,
+                      child: _buildUploadOption(context, state),
+                    ),
                     const SizedBox(width: 24),
                     Padding(
                       padding: const EdgeInsets.only(top: 60),
@@ -94,7 +100,10 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                       ),
                     ),
                     const SizedBox(width: 24),
-                    Expanded(flex: 1, child: _buildHistoryOption(context, state)),
+                    Expanded(
+                      flex: 1,
+                      child: _buildHistoryOption(context, state),
+                    ),
                   ],
                 ),
                 if (state.errorMessage != null) ...[
@@ -248,7 +257,10 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
         children: [
           Row(
             children: [
-              const Icon(Icons.upload_file_rounded, color: AppColors.textSecondary),
+              const Icon(
+                Icons.upload_file_rounded,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 8),
               Text(
                 context.l10n.uploadManuscriptTab,
@@ -343,7 +355,10 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.history_rounded, color: AppColors.textSecondary),
+                  const Icon(
+                    Icons.history_rounded,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(width: 8),
                   Text(
                     context.l10n.selectEvaluationHistoryTab,
@@ -371,7 +386,9 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                         child: Text(
                           context.l10n.noPreviousEvaluationsHint,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(color: AppColors.textSecondary),
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       )
                     : ListView.separated(

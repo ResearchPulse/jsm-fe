@@ -32,32 +32,32 @@ class RecommendationsDimensionTable extends StatelessWidget {
       (
         context.l10n.dimStructureAlignment,
         (JournalRecommendationItem r) => r.dimensions.structure,
-        false
+        false,
       ),
       (
         context.l10n.dimSentenceStyle,
         (JournalRecommendationItem r) => r.dimensions.sentenceStyle,
-        false
+        false,
       ),
       (
         context.l10n.dimVoicePerson,
         (JournalRecommendationItem r) => r.dimensions.voiceAndPerson,
-        false
+        false,
       ),
       (
         context.l10n.dimEpistemicStyle,
         (JournalRecommendationItem r) => r.dimensions.epistemicStyle,
-        false
+        false,
       ),
       (
         context.l10n.dimRhetoricalMoves,
         (JournalRecommendationItem r) => r.dimensions.rhetoricalMoves,
-        false
+        false,
       ),
       (
         context.l10n.dimOverallMatch,
         (JournalRecommendationItem r) => r.compatibilityScore,
-        true
+        true,
       ),
     ];
 
@@ -73,7 +73,11 @@ class RecommendationsDimensionTable extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.grid_view_rounded, size: 20, color: AppColors.primary),
+              const Icon(
+                Icons.grid_view_rounded,
+                size: 20,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 8),
               Text(
                 context.l10n.crossJournalHeatmapTitle,
@@ -103,13 +107,10 @@ class RecommendationsDimensionTable extends StatelessWidget {
               return SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minWidth: effectiveWidth,
-                  ),
+                  constraints: BoxConstraints(minWidth: effectiveWidth),
                   child: Table(
                     columnWidths: colWidths,
-                    defaultVerticalAlignment:
-                        TableCellVerticalAlignment.middle,
+                    defaultVerticalAlignment: TableCellVerticalAlignment.middle,
                     border: TableBorder.all(
                       color: AppColors.border,
                       borderRadius: BorderRadius.circular(8),
@@ -118,8 +119,9 @@ class RecommendationsDimensionTable extends StatelessWidget {
                     children: [
                       // Header row
                       TableRow(
-                        decoration:
-                            const BoxDecoration(color: AppColors.surfaceSoft),
+                        decoration: const BoxDecoration(
+                          color: AppColors.surfaceSoft,
+                        ),
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(
@@ -222,8 +224,9 @@ class RecommendationsDimensionTable extends StatelessWidget {
                                     fontWeight: isOverall
                                         ? FontWeight.w800
                                         : FontWeight.w700,
-                                    color:
-                                        isOverall ? AppColors.primary : textClr,
+                                    color: isOverall
+                                        ? AppColors.primary
+                                        : textClr,
                                     fontFamily: 'Manrope',
                                   ),
                                 ),

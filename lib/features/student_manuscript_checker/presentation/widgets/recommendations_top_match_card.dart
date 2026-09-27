@@ -141,7 +141,9 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                               if (item.issn != null && item.issn!.isNotEmpty)
                                 _buildTag('ISSN: ${item.issn}'),
                               if (item.field != null && item.field!.isNotEmpty)
-                                _buildTag(context.l10n.localizeField(item.field!)),
+                                _buildTag(
+                                  context.l10n.localizeField(item.field!),
+                                ),
                               if (item.publisher != null &&
                                   item.publisher!.isNotEmpty)
                                 _buildTag(item.publisher!),

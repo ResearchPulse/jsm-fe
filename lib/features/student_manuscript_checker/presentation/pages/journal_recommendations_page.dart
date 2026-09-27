@@ -405,7 +405,8 @@ class _JournalRecommendationsView extends StatelessWidget {
                       child: ScoreRatingCard(
                         result: checkResult,
                         journalTitle: selectedItem.journalName,
-                        filename: state.fileName ??
+                        filename:
+                            state.fileName ??
                             context.l10n.studentManuscriptLabel,
                       ),
                     ),
@@ -420,8 +421,8 @@ class _JournalRecommendationsView extends StatelessWidget {
                 ScoreRatingCard(
                   result: checkResult,
                   journalTitle: selectedItem.journalName,
-                  filename: state.fileName ??
-                      context.l10n.studentManuscriptLabel,
+                  filename:
+                      state.fileName ?? context.l10n.studentManuscriptLabel,
                 ),
                 const SizedBox(height: 16),
                 CompatibilityRadarChart(result: checkResult),

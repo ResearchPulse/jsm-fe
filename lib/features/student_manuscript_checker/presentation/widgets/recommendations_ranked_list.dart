@@ -95,7 +95,9 @@ class RecommendationsRankedList extends StatelessWidget {
                             if (item.issn != null && item.issn!.isNotEmpty)
                               _buildTag('ISSN: ${item.issn}'),
                             if (item.field != null && item.field!.isNotEmpty)
-                              _buildTag(context.l10n.localizeField(item.field!)),
+                              _buildTag(
+                                context.l10n.localizeField(item.field!),
+                              ),
                             if (item.publisher != null &&
                                 item.publisher!.isNotEmpty)
                               _buildTag(
@@ -143,7 +145,9 @@ class RecommendationsRankedList extends StatelessWidget {
                       children: [
                         if (item.notableDifferences.isNotEmpty)
                           Text(
-                            context.l10n.localizeAnalysisString(item.notableDifferences.first),
+                            context.l10n.localizeAnalysisString(
+                              item.notableDifferences.first,
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,

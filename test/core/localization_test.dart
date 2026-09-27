@@ -106,7 +106,8 @@ void main() {
     final l10nVi = AppLocalizations(const Locale('vi'));
 
     test('Localizes Research Gap alignment', () {
-      const rawVi = 'Cấu trúc bước lập luận và chỉ dấu khoảng trống nghiên cứu (Research Gap) rất rõ ràng.';
+      const rawVi =
+          'Cấu trúc bước lập luận và chỉ dấu khoảng trống nghiên cứu (Research Gap) rất rõ ràng.';
       expect(
         l10nEn.localizeAnalysisString(rawVi),
         'Rhetorical move structure and research gap indicators are well-defined.',
@@ -115,7 +116,8 @@ void main() {
     });
 
     test('Localizes Median Sentence Length alignment', () {
-      const rawVi = 'Độ dài câu trung vị (14.0 từ) rất tương thích với chuẩn IEEE Access (P50: 18.0).';
+      const rawVi =
+          'Độ dài câu trung vị (14.0 từ) rất tương thích với chuẩn IEEE Access (P50: 18.0).';
       expect(
         l10nEn.localizeAnalysisString(rawVi),
         'Median sentence length (14.0 words) is highly compatible with IEEE Access benchmark (P50: 18.0).',
@@ -140,7 +142,8 @@ void main() {
     });
 
     test('Localizes Epistemic (Boosters / Hedges) difference', () {
-      const rawVi = 'Tần suất sử dụng từ khẳng định (Boosters) hoặc cẩn trọng (Hedges) có sự khác biệt so với chuẩn xuất bản.';
+      const rawVi =
+          'Tần suất sử dụng từ khẳng định (Boosters) hoặc cẩn trọng (Hedges) có sự khác biệt so với chuẩn xuất bản.';
       expect(
         l10nEn.localizeAnalysisString(rawVi),
         'Frequency of boosters or hedges diverges noticeably from publication benchmarks.',
@@ -149,7 +152,8 @@ void main() {
     });
 
     test('Localizes Passive Voice rate difference', () {
-      const rawVi = 'Tỷ lệ câu bị động (23.9%) lệch 22.0 pp so với mức 1.9% của tạp chí.';
+      const rawVi =
+          'Tỷ lệ câu bị động (23.9%) lệch 22.0 pp so với mức 1.9% của tạp chí.';
       expect(
         l10nEn.localizeAnalysisString(rawVi),
         'Passive voice rate (23.9%) diverges by 22.0 pp from journal benchmark (1.9%).',
