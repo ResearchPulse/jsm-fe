@@ -52,8 +52,7 @@ void main() {
     final repo = _RecordingRepo()..error = Exception('no browser');
     final useCase = LoginUseCase(repo);
 
-    await expectLater(
-        useCase(AuthProvider.web), throwsA(isA<Exception>()));
+    await expectLater(useCase(AuthProvider.web), throwsA(isA<Exception>()));
     expect(repo.provider, AuthProvider.web);
   });
 }

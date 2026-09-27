@@ -4,11 +4,10 @@ import '../../domain/repositories/student_manuscript_repository.dart';
 import 'evaluation_history_state.dart';
 
 class EvaluationHistoryCubit extends Cubit<EvaluationHistoryState> {
-  final StudentManuscriptRepository _repository;
+  final StudentManuscriptRepository repository;
 
-  EvaluationHistoryCubit({required StudentManuscriptRepository repository})
-    : _repository = repository,
-      super(const EvaluationHistoryState());
+  EvaluationHistoryCubit({required this.repository})
+    : super(const EvaluationHistoryState());
 
   /// Loads evaluations and stats based on current filter/sort/pagination state.
   Future<void> loadHistory({bool refreshStats = false}) async {
@@ -20,7 +19,7 @@ class EvaluationHistoryCubit extends Cubit<EvaluationHistoryState> {
     );
 
     try {
-      final responseFuture = _repository.getEvaluationHistory(
+      final responseFuture = repository.getEvaluationHistory(
         page: state.page,
         limit: state.limit,
         sort: state.sort,
@@ -30,7 +29,7 @@ class EvaluationHistoryCubit extends Cubit<EvaluationHistoryState> {
       );
 
       final statsFuture = refreshStats || state.stats.totalEvaluations == 0
-          ? _repository.getEvaluationStats()
+          ? repository.getEvaluationStats()
           : Future.value(state.stats);
 
       final results = await Future.wait([responseFuture, statsFuture]);
@@ -114,7 +113,7 @@ class EvaluationHistoryCubit extends Cubit<EvaluationHistoryState> {
   Future<bool> deleteEvaluation(String id) async {
     emit(state.copyWith(isDeleting: true));
     try {
-      await _repository.deleteEvaluation(id);
+      await repository.deleteEvaluation(id);
       // Reload list and refresh stats
       await loadHistory(refreshStats: true);
       emit(state.copyWith(isDeleting: false));

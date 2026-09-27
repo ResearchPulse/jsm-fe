@@ -40,10 +40,9 @@ Future<PickedManuscriptFile?> pickManuscriptFile() async {
         final jsArrayBuffer = result as JSArrayBuffer;
         final bytes = jsArrayBuffer.toDart.asUint8List();
         if (!completer.isCompleted) {
-          completer.complete(PickedManuscriptFile(
-            name: fileName,
-            bytes: bytes,
-          ));
+          completer.complete(
+            PickedManuscriptFile(name: fileName, bytes: bytes),
+          );
         }
       } else {
         if (!completer.isCompleted) completer.complete(null);

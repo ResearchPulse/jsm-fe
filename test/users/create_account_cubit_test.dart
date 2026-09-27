@@ -26,7 +26,8 @@ void main() {
     blocTest<CreateAccountCubit, CreateAccountState>(
       'emits submitting then success on valid submission',
       build: () => CreateAccountCubit(
-          createAccount: CreateAccountUseCase(_FakeUsersRepository())),
+        createAccount: CreateAccountUseCase(_FakeUsersRepository()),
+      ),
       act: (cubit) => cubit.submit(
         role: UserRole.student,
         email: 's@university.edu',
@@ -35,15 +36,19 @@ void main() {
       ),
       expect: () => [
         isA<CreateAccountSubmitting>(),
-        isA<CreateAccountSuccess>()
-            .having((s) => s.user.email, 'email', 's@university.edu'),
+        isA<CreateAccountSuccess>().having(
+          (s) => s.user.email,
+          'email',
+          's@university.edu',
+        ),
       ],
     );
 
     blocTest<CreateAccountCubit, CreateAccountState>(
       'emits failure (not crash) when the backend rejects the account',
       build: () {
-        final repo = _FakeUsersRepository()..error = const ServerException('Email already used.');
+        final repo = _FakeUsersRepository()
+          ..error = const ServerException('Email already used.');
         return CreateAccountCubit(createAccount: CreateAccountUseCase(repo));
       },
       act: (cubit) => cubit.submit(
@@ -54,14 +59,18 @@ void main() {
       ),
       expect: () => [
         isA<CreateAccountSubmitting>(),
-        isA<CreateAccountFailure>()
-            .having((s) => s.message, 'message', 'Email already used.'),
+        isA<CreateAccountFailure>().having(
+          (s) => s.message,
+          'message',
+          'Email already used.',
+        ),
       ],
     );
 
     test('reset returns to the initial state', () {
       final cubit = CreateAccountCubit(
-          createAccount: CreateAccountUseCase(_FakeUsersRepository()));
+        createAccount: CreateAccountUseCase(_FakeUsersRepository()),
+      );
       cubit.reset();
       expect(cubit.state, isA<CreateAccountInitial>());
     });

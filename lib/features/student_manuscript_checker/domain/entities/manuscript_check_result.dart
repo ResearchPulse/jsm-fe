@@ -87,10 +87,12 @@ class ManuscriptCheckResult extends Equatable {
       ratingLevel: map['rating_level'] as String? ?? 'MODERATE_ALIGNMENT',
       summary: map['summary'] as String? ?? '',
       sectionScores: sectionScores,
-      featureComparison: map['feature_comparison'] != null &&
+      featureComparison:
+          map['feature_comparison'] != null &&
               map['feature_comparison'] is Map<String, dynamic>
           ? FeatureComparison.fromMap(
-              map['feature_comparison'] as Map<String, dynamic>)
+              map['feature_comparison'] as Map<String, dynamic>,
+            )
           : const FeatureComparison(),
       warnings: warnings,
     );
@@ -109,11 +111,11 @@ class ManuscriptCheckResult extends Equatable {
 
   @override
   List<Object?> get props => [
-        suitabilityScore,
-        ratingLevel,
-        summary,
-        sectionScores,
-        featureComparison,
-        warnings,
-      ];
+    suitabilityScore,
+    ratingLevel,
+    summary,
+    sectionScores,
+    featureComparison,
+    warnings,
+  ];
 }

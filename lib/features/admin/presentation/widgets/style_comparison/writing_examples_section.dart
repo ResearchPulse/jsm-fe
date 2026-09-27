@@ -1,6 +1,8 @@
 import '../../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import '../../../../../../app/theme/app_colors.dart';
 import '../../../../../../core/widgets/app_notification.dart';
 
@@ -37,7 +39,11 @@ class WritingExamplesSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.format_quote_rounded, size: 18, color: AppColors.primary),
+              const Icon(
+                Icons.format_quote_rounded,
+                size: 18,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 8),
               Text(
                 context.l10n.writingExamplesTitle,
@@ -53,7 +59,11 @@ class WritingExamplesSection extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             context.l10n.writingExamplesSubtitle,
-            style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textMuted,
+              fontFamily: 'Manrope',
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -72,7 +82,9 @@ class WritingExamplesSection extends StatelessWidget {
 
                     return Expanded(
                       child: Padding(
-                        padding: EdgeInsets.only(right: idx < profiles.length - 1 ? 16 : 0),
+                        padding: EdgeInsets.only(
+                          right: idx < profiles.length - 1 ? 16 : 0,
+                        ),
                         child: _buildExemplarCard(context, p, col),
                       ),
                     );
@@ -99,12 +111,18 @@ class WritingExamplesSection extends StatelessWidget {
     );
   }
 
-  Widget _buildExemplarCard(BuildContext context, Map<String, dynamic> profile, Color color) {
+  Widget _buildExemplarCard(
+    BuildContext context,
+    Map<String, dynamic> profile,
+    Color color,
+  ) {
     final name = profile['journal_name'] ?? 'Tạp chí';
     final exemplar = profile['exemplar'] as Map<String, dynamic>?;
-    final sentence = exemplar?['sentence'] ??
+    final sentence =
+        exemplar?['sentence'] ??
         'We present an empirical evaluation of deep neural models across large-scale scientific corpora to benchmark linguistic variation.';
-    final doi = exemplar?['doi'] ?? 'https://doi.org/10.1371/journal.pone.0297921';
+    final doi =
+        exemplar?['doi'] ?? 'https://doi.org/10.1371/journal.pone.0297921';
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -118,18 +136,30 @@ class WritingExamplesSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
                   name,
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: color),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: color,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.content_copy_rounded, size: 16, color: AppColors.textMuted),
+                icon: const Icon(
+                  Icons.content_copy_rounded,
+                  size: 16,
+                  color: AppColors.textMuted,
+                ),
                 tooltip: context.l10n.copySentenceTooltip,
                 onPressed: () {
                   Clipboard.setData(ClipboardData(text: sentence));
@@ -155,12 +185,19 @@ class WritingExamplesSection extends StatelessWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              const Icon(Icons.link_rounded, size: 14, color: AppColors.textSubtle),
+              const Icon(
+                Icons.link_rounded,
+                size: 14,
+                color: AppColors.textSubtle,
+              ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   doi,
-                  style: const TextStyle(fontSize: 11, color: AppColors.primary),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.primary,
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

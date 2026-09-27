@@ -1,5 +1,7 @@
 import '../../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../../../app/theme/app_colors.dart';
 
 class CarsMovesChart extends StatelessWidget {
@@ -17,9 +19,21 @@ class CarsMovesChart extends StatelessWidget {
     if (profiles.isEmpty) return const SizedBox.shrink();
 
     final movesConfig = [
-      {'title': context.l10n.move1Title, 'sub': context.l10n.move1Sub, 'key': 'territory'},
-      {'title': context.l10n.move2Title, 'sub': context.l10n.move2Sub, 'key': 'niche'},
-      {'title': context.l10n.move3Title, 'sub': context.l10n.move3Sub, 'key': 'occupying'},
+      {
+        'title': context.l10n.move1Title,
+        'sub': context.l10n.move1Sub,
+        'key': 'territory',
+      },
+      {
+        'title': context.l10n.move2Title,
+        'sub': context.l10n.move2Sub,
+        'key': 'niche',
+      },
+      {
+        'title': context.l10n.move3Title,
+        'sub': context.l10n.move3Sub,
+        'key': 'occupying',
+      },
     ];
 
     return Container(
@@ -41,7 +55,11 @@ class CarsMovesChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.account_tree_outlined, size: 18, color: AppColors.primary),
+              const Icon(
+                Icons.account_tree_outlined,
+                size: 18,
+                color: AppColors.primary,
+              ),
               SizedBox(width: 8),
               Text(
                 context.l10n.carsMovesChartTitle,
@@ -57,7 +75,11 @@ class CarsMovesChart extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             context.l10n.carsMovesSubtitle,
-            style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textMuted,
+              fontFamily: 'Manrope',
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -77,11 +99,18 @@ class CarsMovesChart extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimary,
+                        ),
                       ),
                       Text(
                         sub,
-                        style: const TextStyle(fontSize: 11, color: AppColors.textMuted),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textMuted,
+                        ),
                       ),
                     ],
                   ),
@@ -103,12 +132,22 @@ class CarsMovesChart extends StatelessWidget {
                             width: 140,
                             child: Row(
                               children: [
-                                Container(width: 8, height: 8, decoration: BoxDecoration(color: col, shape: BoxShape.circle)),
+                                Container(
+                                  width: 8,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: col,
+                                    shape: BoxShape.circle,
+                                  ),
+                                ),
                                 const SizedBox(width: 6),
                                 Expanded(
                                   child: Text(
                                     name,
-                                    style: const TextStyle(fontSize: 11.5, color: AppColors.textSecondary),
+                                    style: const TextStyle(
+                                      fontSize: 11.5,
+                                      color: AppColors.textSecondary,
+                                    ),
                                     maxLines: 1,
                                     overflow: TextOverflow.ellipsis,
                                   ),
@@ -133,7 +172,11 @@ class CarsMovesChart extends StatelessWidget {
                             child: Text(
                               '$pct%',
                               textAlign: TextAlign.right,
-                              style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold, color: col),
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.bold,
+                                color: col,
+                              ),
                             ),
                           ),
                         ],

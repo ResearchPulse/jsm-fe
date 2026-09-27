@@ -29,9 +29,12 @@ class EvaluationHistoryItem extends Equatable {
       fileName: map['file_name']?.toString() ?? 'manuscript.pdf',
       journalName: map['journal_name']?.toString() ?? 'Target Journal',
       overallScore: (map['overall_score'] as num?)?.toDouble() ?? 0.0,
-      compatibilityLevel: map['compatibility_level']?.toString() ?? 'MODERATE_MATCH',
-      recommendation: map['recommendation']?.toString() ?? 'REVISION_RECOMMENDED',
-      criticalMismatchCount: (map['critical_mismatch_count'] as num?)?.toInt() ?? 0,
+      compatibilityLevel:
+          map['compatibility_level']?.toString() ?? 'MODERATE_MATCH',
+      recommendation:
+          map['recommendation']?.toString() ?? 'REVISION_RECOMMENDED',
+      criticalMismatchCount:
+          (map['critical_mismatch_count'] as num?)?.toInt() ?? 0,
       status: map['status']?.toString() ?? 'COMPLETED',
       createdAt: map['created_at'] != null
           ? DateTime.tryParse(map['created_at'].toString()) ?? DateTime.now()
@@ -41,14 +44,14 @@ class EvaluationHistoryItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        fileName,
-        journalName,
-        overallScore,
-        compatibilityLevel,
-        recommendation,
-        criticalMismatchCount,
-        status,
-        createdAt,
-      ];
+    id,
+    fileName,
+    journalName,
+    overallScore,
+    compatibilityLevel,
+    recommendation,
+    criticalMismatchCount,
+    status,
+    createdAt,
+  ];
 }

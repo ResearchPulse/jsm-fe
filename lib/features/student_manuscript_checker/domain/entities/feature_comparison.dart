@@ -24,15 +24,19 @@ class FeatureComparison extends Equatable {
     final stanceMap = additionalMap['stance'] as Map<String, dynamic>?;
 
     return FeatureComparison(
-      sentenceLength: map['sentence_length'] != null &&
+      sentenceLength:
+          map['sentence_length'] != null &&
               map['sentence_length'] is Map<String, dynamic>
           ? SentenceLengthComparison.fromMap(
-              map['sentence_length'] as Map<String, dynamic>)
+              map['sentence_length'] as Map<String, dynamic>,
+            )
           : null,
-      voiceAndPerson: map['voice_and_person'] != null &&
+      voiceAndPerson:
+          map['voice_and_person'] != null &&
               map['voice_and_person'] is Map<String, dynamic>
           ? VoicePersonComparison.fromMap(
-              map['voice_and_person'] as Map<String, dynamic>)
+              map['voice_and_person'] as Map<String, dynamic>,
+            )
           : null,
       stance: stanceMap != null ? StanceComparison.fromMap(stanceMap) : null,
       additional: additionalMap,
@@ -52,9 +56,9 @@ class FeatureComparison extends Equatable {
 
   @override
   List<Object?> get props => [
-        sentenceLength,
-        voiceAndPerson,
-        stance,
-        additional,
-      ];
+    sentenceLength,
+    voiceAndPerson,
+    stance,
+    additional,
+  ];
 }

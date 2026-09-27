@@ -46,7 +46,8 @@ class _FakeStudentManuscriptRepository implements StudentManuscriptRepository {
     bool includeExemplars = false,
   }) async* {
     if (error != null) throw error!;
-    final res = result ??
+    final res =
+        result ??
         const ManuscriptCheckResult(
           suitabilityScore: 85.0,
           ratingLevel: 'EXCELLENT_ALIGNMENT',
@@ -123,7 +124,6 @@ class _FakeStudentManuscriptRepository implements StudentManuscriptRepository {
   }
 }
 
-
 void main() {
   group('StudentManuscriptCheckerCubit', () {
     test('initial state has default configuration', () {
@@ -150,8 +150,11 @@ void main() {
       },
       act: (cubit) => cubit.loadJournals(),
       expect: () => [
-        isA<StudentManuscriptCheckerInitial>()
-            .having((s) => s.isLoadingJournals, 'isLoadingJournals', isTrue),
+        isA<StudentManuscriptCheckerInitial>().having(
+          (s) => s.isLoadingJournals,
+          'isLoadingJournals',
+          isTrue,
+        ),
         isA<StudentManuscriptCheckerInitial>()
             .having((s) => s.isLoadingJournals, 'isLoadingJournals', isFalse)
             .having((s) => s.availableJournals.length, 'length', 1)
@@ -229,8 +232,11 @@ void main() {
         targetJournalId: 'j-1',
       ),
       expect: () => [
-        isA<StudentManuscriptCheckerFailure>()
-            .having((s) => s.message, 'message', contains('Please provide manuscript text')),
+        isA<StudentManuscriptCheckerFailure>().having(
+          (s) => s.message,
+          'message',
+          contains('Please provide manuscript text'),
+        ),
       ],
     );
 
@@ -248,8 +254,11 @@ void main() {
         targetJournalId: '   ',
       ),
       expect: () => [
-        isA<StudentManuscriptCheckerFailure>()
-            .having((s) => s.message, 'message', contains('target journal ID')),
+        isA<StudentManuscriptCheckerFailure>().having(
+          (s) => s.message,
+          'message',
+          contains('target journal ID'),
+        ),
       ],
     );
 
@@ -258,7 +267,8 @@ void main() {
       build: () {
         final repo = _FakeStudentManuscriptRepository()
           ..error = const ServerException(
-              'Unsupported manuscript file type; use PDF, DOCX, or TXT');
+            'Unsupported manuscript file type; use PDF, DOCX, or TXT',
+          );
         return StudentManuscriptCheckerCubit(
           checkManuscriptUseCase: CheckManuscriptUseCase(repo),
         );
@@ -270,8 +280,11 @@ void main() {
       ),
       expect: () => [
         isA<StudentManuscriptCheckerLoading>(),
-        isA<StudentManuscriptCheckerFailure>()
-            .having((s) => s.message, 'message', contains('Unsupported manuscript file type')),
+        isA<StudentManuscriptCheckerFailure>().having(
+          (s) => s.message,
+          'message',
+          contains('Unsupported manuscript file type'),
+        ),
       ],
     );
 

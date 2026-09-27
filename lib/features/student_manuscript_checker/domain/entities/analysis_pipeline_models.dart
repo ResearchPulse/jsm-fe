@@ -12,21 +12,13 @@ enum PipelineStageType {
   recommendationGeneration,
 }
 
-enum PipelineStepStatus {
-  pending,
-  processing,
-  completed,
-  failed,
-}
+enum PipelineStepStatus { pending, processing, completed, failed }
 
 class PipelineSubTask extends Equatable {
   final String name;
   final PipelineStepStatus status;
 
-  const PipelineSubTask({
-    required this.name,
-    required this.status,
-  });
+  const PipelineSubTask({required this.name, required this.status});
 
   factory PipelineSubTask.fromMap(Map<String, dynamic> map) {
     final statusStr = (map['status'] as String? ?? 'PENDING').toUpperCase();
@@ -41,16 +33,10 @@ class PipelineSubTask extends Equatable {
       status = PipelineStepStatus.pending;
     }
 
-    return PipelineSubTask(
-      name: map['name'] as String? ?? '',
-      status: status,
-    );
+    return PipelineSubTask(name: map['name'] as String? ?? '', status: status);
   }
 
-  PipelineSubTask copyWith({
-    String? name,
-    PipelineStepStatus? status,
-  }) {
+  PipelineSubTask copyWith({String? name, PipelineStepStatus? status}) {
     return PipelineSubTask(
       name: name ?? this.name,
       status: status ?? this.status,
@@ -102,14 +88,14 @@ class PipelineStepState extends Equatable {
 
   @override
   List<Object?> get props => [
-        type,
-        stepNumber,
-        title,
-        status,
-        activeMessage,
-        completionDetail,
-        subtasks,
-      ];
+    type,
+    stepNumber,
+    title,
+    status,
+    activeMessage,
+    completionDetail,
+    subtasks,
+  ];
 }
 
 class AnalysisPipelineProgress extends Equatable {
@@ -163,10 +149,22 @@ class AnalysisPipelineProgress extends Equatable {
           title: 'Analyzing Linguistic Features',
           status: PipelineStepStatus.pending,
           subtasks: [
-            PipelineSubTask(name: 'Sentence length', status: PipelineStepStatus.pending),
-            PipelineSubTask(name: 'Passive voice', status: PipelineStepStatus.pending),
-            PipelineSubTask(name: 'Author voice', status: PipelineStepStatus.pending),
-            PipelineSubTask(name: 'Epistemic markers', status: PipelineStepStatus.pending),
+            PipelineSubTask(
+              name: 'Sentence length',
+              status: PipelineStepStatus.pending,
+            ),
+            PipelineSubTask(
+              name: 'Passive voice',
+              status: PipelineStepStatus.pending,
+            ),
+            PipelineSubTask(
+              name: 'Author voice',
+              status: PipelineStepStatus.pending,
+            ),
+            PipelineSubTask(
+              name: 'Epistemic markers',
+              status: PipelineStepStatus.pending,
+            ),
           ],
         ),
         PipelineStepState(
@@ -175,9 +173,18 @@ class AnalysisPipelineProgress extends Equatable {
           title: 'Analyzing Rhetorical Moves',
           status: PipelineStepStatus.pending,
           subtasks: [
-            PipelineSubTask(name: 'Problem Framing', status: PipelineStepStatus.pending),
-            PipelineSubTask(name: 'Research Gap', status: PipelineStepStatus.pending),
-            PipelineSubTask(name: 'Methodology', status: PipelineStepStatus.pending),
+            PipelineSubTask(
+              name: 'Problem Framing',
+              status: PipelineStepStatus.pending,
+            ),
+            PipelineSubTask(
+              name: 'Research Gap',
+              status: PipelineStepStatus.pending,
+            ),
+            PipelineSubTask(
+              name: 'Methodology',
+              status: PipelineStepStatus.pending,
+            ),
           ],
         ),
         PipelineStepState(
@@ -186,9 +193,18 @@ class AnalysisPipelineProgress extends Equatable {
           title: 'Comparing Journal Style',
           status: PipelineStepStatus.pending,
           subtasks: [
-            PipelineSubTask(name: 'Section structure', status: PipelineStepStatus.pending),
-            PipelineSubTask(name: 'Linguistic style', status: PipelineStepStatus.pending),
-            PipelineSubTask(name: 'Rhetorical profile', status: PipelineStepStatus.pending),
+            PipelineSubTask(
+              name: 'Section structure',
+              status: PipelineStepStatus.pending,
+            ),
+            PipelineSubTask(
+              name: 'Linguistic style',
+              status: PipelineStepStatus.pending,
+            ),
+            PipelineSubTask(
+              name: 'Rhetorical profile',
+              status: PipelineStepStatus.pending,
+            ),
           ],
         ),
         PipelineStepState(
@@ -224,14 +240,18 @@ class AnalysisPipelineProgress extends Equatable {
 
     if (eventType == 'analysis.completed') {
       final resData = event['data'] as Map<String, dynamic>?;
-      final parsedResult = resData != null ? ManuscriptCheckResult.fromMap(resData) : result;
+      final parsedResult = resData != null
+          ? ManuscriptCheckResult.fromMap(resData)
+          : result;
 
       // Mark all steps as completed
       final updatedSteps = steps.map((s) {
         return s.copyWith(
           status: PipelineStepStatus.completed,
           completionDetail: s.completionDetail ?? 'Completed',
-          subtasks: s.subtasks.map((st) => st.copyWith(status: PipelineStepStatus.completed)).toList(),
+          subtasks: s.subtasks
+              .map((st) => st.copyWith(status: PipelineStepStatus.completed))
+              .toList(),
         );
       }).toList();
 
@@ -265,9 +285,12 @@ class AnalysisPipelineProgress extends Equatable {
           return step.copyWith(
             status: PipelineStepStatus.completed,
             completionDetail: detail ?? message,
-            subtasks: eventSubtasks ??
+            subtasks:
+                eventSubtasks ??
                 step.subtasks
-                    .map((st) => st.copyWith(status: PipelineStepStatus.completed))
+                    .map(
+                      (st) => st.copyWith(status: PipelineStepStatus.completed),
+                    )
                     .toList(),
           );
         } else if (isStageStarted) {
@@ -283,7 +306,9 @@ class AnalysisPipelineProgress extends Equatable {
     }).toList();
 
     return copyWith(
-      currentStepIndex: isStageCompleted ? (activeIdx < 7 ? activeIdx + 1 : 7) : activeIdx,
+      currentStepIndex: isStageCompleted
+          ? (activeIdx < 7 ? activeIdx + 1 : 7)
+          : activeIdx,
       overallProgress: progressVal,
       currentMessage: message,
       steps: updatedSteps,
@@ -359,15 +384,15 @@ class AnalysisPipelineProgress extends Equatable {
 
   @override
   List<Object?> get props => [
-        currentStepIndex,
-        totalSteps,
-        overallProgress,
-        currentMessage,
-        steps,
-        isCompleted,
-        isFailed,
-        failedStepTitle,
-        failureMessage,
-        result,
-      ];
+    currentStepIndex,
+    totalSteps,
+    overallProgress,
+    currentMessage,
+    steps,
+    isCompleted,
+    isFailed,
+    failedStepTitle,
+    failureMessage,
+    result,
+  ];
 }

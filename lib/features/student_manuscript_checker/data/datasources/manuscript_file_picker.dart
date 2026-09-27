@@ -7,10 +7,7 @@ class PickedManuscriptFile {
   final String name;
   final Uint8List bytes;
 
-  const PickedManuscriptFile({
-    required this.name,
-    required this.bytes,
-  });
+  const PickedManuscriptFile({required this.name, required this.bytes});
 }
 
 /// Seam for picking manuscript files. Tests can override [picker].

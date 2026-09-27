@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+
 import 'evaluation_history_item.dart';
 
 class EvaluationHistoryResponse extends Equatable {

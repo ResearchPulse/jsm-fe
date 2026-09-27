@@ -214,7 +214,7 @@ class SentenceLengthCard extends StatelessWidget {
                       ),
                       Text(
                         width < 320
-                            ? '${p10.toStringAsFixed(0)}'
+                            ? p10.toStringAsFixed(0)
                             : 'P10 (${p10.toStringAsFixed(0)})',
                         style: const TextStyle(
                           fontSize: 9,
@@ -235,7 +235,7 @@ class SentenceLengthCard extends StatelessWidget {
                       ),
                       Text(
                         width < 320
-                            ? '${p90.toStringAsFixed(0)}'
+                            ? p90.toStringAsFixed(0)
                             : 'P90 (${p90.toStringAsFixed(0)})',
                         style: const TextStyle(
                           fontSize: 9,
@@ -245,7 +245,7 @@ class SentenceLengthCard extends StatelessWidget {
                       ),
                       Text(
                         width < 320
-                            ? '${maxScale.toStringAsFixed(0)}'
+                            ? maxScale.toStringAsFixed(0)
                             : '${maxScale.toStringAsFixed(0)} w',
                         style: const TextStyle(
                           fontSize: 9,

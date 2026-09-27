@@ -456,7 +456,7 @@ class _EvaluationHistoryPageState extends State<EvaluationHistoryPage> {
                     SizedBox(width: double.infinity, child: searchWidget),
                     compatibilityFilter,
                     sortFilter,
-                    if (clearButton != null) clearButton,
+                    ?clearButton,
                   ],
                 ),
         );

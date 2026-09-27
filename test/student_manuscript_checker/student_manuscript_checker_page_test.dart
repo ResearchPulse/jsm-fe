@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jsm_fe/app/theme/app_theme.dart';
 import 'package:jsm_fe/core/widgets/error_view.dart';
-import 'package:jsm_fe/core/widgets/loading_view.dart';
 import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/evaluation_history_response.dart';
 import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/evaluation_history_stats.dart';
 import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/exemplar_item.dart';
@@ -156,10 +155,7 @@ ManuscriptCheckResult _defaultResult({
     ratingLevel: 'EXCELLENT_ALIGNMENT',
     summary:
         'The manuscript shows excellent alignment with the target journal.',
-    sectionScores: const {
-      'INTRO': 92.0,
-      'METHODS': 85.0,
-    },
+    sectionScores: const {'INTRO': 92.0, 'METHODS': 85.0},
     featureComparison: const FeatureComparison(
       sentenceLength: SentenceLengthComparison(
         userMedian: 19.5,
@@ -208,9 +204,7 @@ ManuscriptCheckResult _defaultResult({
   );
 }
 
-Widget _buildTestApp({
-  required StudentManuscriptCheckerCubit cubit,
-}) {
+Widget _buildTestApp({required StudentManuscriptCheckerCubit cubit}) {
   return MaterialApp(
     theme: AppTheme.lightTheme,
     home: StudentManuscriptCheckerPage(cubit: cubit),
@@ -219,8 +213,9 @@ Widget _buildTestApp({
 
 void main() {
   group('StudentManuscriptCheckerPage Widget Tests', () {
-    testWidgets('renders input form with journal selection and sample loader',
-        (tester) async {
+    testWidgets('renders input form with journal selection and sample loader', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1280, 1024);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(() {
@@ -242,89 +237,113 @@ void main() {
       expect(find.text('Direct Text / Draft'), findsOneWidget);
       expect(find.text('Upload File'), findsOneWidget);
       expect(find.text('Load Sample Manuscript'), findsOneWidget);
-      expect(find.text('Include validated exemplars from journal corpus'),
-          findsOneWidget);
-      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'),
-          findsOneWidget);
+      expect(
+        find.text('Include validated exemplars from journal corpus'),
+        findsOneWidget,
+      );
+      expect(
+        find.widgetWithText(ElevatedButton, 'Check Alignment'),
+        findsOneWidget,
+      );
 
       // Tap "Load Sample Manuscript"
       await tester.tap(find.text('Load Sample Manuscript'));
       await tester.pumpAndSettle();
 
-      expect(find.textContaining('Recent deep learning architectures'),
-          findsOneWidget);
+      expect(
+        find.textContaining('Recent deep learning architectures'),
+        findsOneWidget,
+      );
     });
 
     testWidgets(
-        'submitting valid manuscript shows loading then full results dashboard',
-        (tester) async {
-      tester.view.physicalSize = const Size(1280, 1200);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
+      'submitting valid manuscript shows loading then full results dashboard',
+      (tester) async {
+        tester.view.physicalSize = const Size(1280, 1200);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
 
-      final repo = _SlowRepo();
-      final cubit = StudentManuscriptCheckerCubit(
-        checkManuscriptUseCase: CheckManuscriptUseCase(repo),
-        getAvailableJournalsUseCase: GetAvailableJournalsUseCase(repo),
-      );
-      await cubit.loadJournals();
+        final repo = _SlowRepo();
+        final cubit = StudentManuscriptCheckerCubit(
+          checkManuscriptUseCase: CheckManuscriptUseCase(repo),
+          getAvailableJournalsUseCase: GetAvailableJournalsUseCase(repo),
+        );
+        await cubit.loadJournals();
 
-      await tester.pumpWidget(_buildTestApp(cubit: cubit));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_buildTestApp(cubit: cubit));
+        await tester.pumpAndSettle();
 
-      // Load sample text
-      await tester.tap(find.text('Load Sample Manuscript'));
-      await tester.pumpAndSettle();
+        // Load sample text
+        await tester.tap(find.text('Load Sample Manuscript'));
+        await tester.pumpAndSettle();
 
-      // Scroll submit button into view and submit
-      final submitFinder =
-          find.widgetWithText(ElevatedButton, 'Check Alignment');
-      await tester.ensureVisible(submitFinder);
-      await tester.pumpAndSettle();
+        // Scroll submit button into view and submit
+        final submitFinder = find.widgetWithText(
+          ElevatedButton,
+          'Check Alignment',
+        );
+        await tester.ensureVisible(submitFinder);
+        await tester.pumpAndSettle();
 
-      await tester.tap(submitFinder);
-      await tester.pump();
-      await tester.pump();
+        await tester.tap(submitFinder);
+        await tester.pump();
+        await tester.pump();
 
-      // Verify Loading View during background delay
-      expect(find.byType(ManuscriptAnalysisLoadingView), findsOneWidget);
-      expect(find.byType(CircularProgressIndicator), findsWidgets);
+        // Verify Loading View during background delay
+        expect(find.byType(ManuscriptAnalysisLoadingView), findsOneWidget);
+        expect(find.byType(CircularProgressIndicator), findsWidgets);
 
-      // Settle once background check completes
-      await tester.pumpAndSettle();
+        // Settle once background check completes
+        await tester.pumpAndSettle();
 
-      // Verify Success Dashboard & New Components
-      expect(find.text('88.5'), findsOneWidget);
-      expect(find.text('MODERATE MATCH'), findsOneWidget); // Critical mismatch override turns 88.5 with missing GAP into MODERATE MATCH
-      expect(find.text('Compatibility by Dimension'), findsOneWidget); // Radar Chart
-      expect(find.text('Priority Improvements'), findsOneWidget); // Action Card
-      
-      // Verify Missing GAP alert card inside Priority Issues
-      expect(find.text('Missing Research Gap'), findsWidgets);
+        // Verify Success Dashboard & New Components
+        expect(find.text('88.5'), findsOneWidget);
+        expect(find.text('MODERATE MATCH'), findsOneWidget); // Critical mismatch override turns 88.5 with missing GAP into MODERATE MATCH
+        expect(
+          find.text('Compatibility by Dimension'),
+          findsOneWidget,
+        ); // Radar Chart
+        expect(
+          find.text('Priority Improvements'),
+          findsOneWidget,
+        ); // Action Card
 
-      // Verify Breakdown Cards
-      expect(find.text('Section Alignment Scores'), findsOneWidget);
-      expect(find.text('Sentence Length Analysis'), findsOneWidget);
-      expect(find.text('Voice & Person Comparison'), findsOneWidget);
-      expect(find.text('Stance & Epistemic Markers'), findsOneWidget);
-      expect(find.text('Rhetorical Move Analysis'), findsOneWidget);
-      expect(find.text('Stylistic Deviation Matrix'), findsOneWidget); // Matrix Card
-      expect(find.text('Diagnostics & Validated Evidence'), findsOneWidget); // Diagnostics Card
+        // Verify Missing GAP alert card inside Priority Issues
+        expect(find.text('Missing Research Gap'), findsWidgets);
 
-      // Verify Reset Action
-      expect(find.text('New Check'), findsOneWidget);
-      await tester.tap(find.text('New Check'));
-      await tester.pumpAndSettle();
+        // Verify Breakdown Cards
+        expect(find.text('Section Alignment Scores'), findsOneWidget);
+        expect(find.text('Sentence Length Analysis'), findsOneWidget);
+        expect(find.text('Voice & Person Comparison'), findsOneWidget);
+        expect(find.text('Stance & Epistemic Markers'), findsOneWidget);
+        expect(find.text('Rhetorical Move Analysis'), findsOneWidget);
+        expect(
+          find.text('Stylistic Deviation Matrix'),
+          findsOneWidget,
+        ); // Matrix Card
+        expect(
+          find.text('Diagnostics & Validated Evidence'),
+          findsOneWidget,
+        ); // Diagnostics Card
 
-      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'),
-          findsOneWidget);
-    });
+        // Verify Reset Action
+        expect(find.text('New Check'), findsOneWidget);
+        await tester.tap(find.text('New Check'));
+        await tester.pumpAndSettle();
 
-    testWidgets('shows ErrorView when failure state is emitted',
-        (tester) async {
+        expect(
+          find.widgetWithText(ElevatedButton, 'Check Alignment'),
+          findsOneWidget,
+        );
+      },
+    );
+
+    testWidgets('shows ErrorView when failure state is emitted', (
+      tester,
+    ) async {
       final repo = _MockRepo();
       final cubit = StudentManuscriptCheckerCubit(
         checkManuscriptUseCase: CheckManuscriptUseCase(repo),
@@ -333,24 +352,32 @@ void main() {
       await tester.pumpWidget(_buildTestApp(cubit: cubit));
       await tester.pumpAndSettle();
 
-      cubit.emit(const StudentManuscriptCheckerFailure(
-        message: 'Could not connect to analysis service.',
-      ));
+      cubit.emit(
+        const StudentManuscriptCheckerFailure(
+          message: 'Could not connect to analysis service.',
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.byType(ErrorView), findsOneWidget);
-      expect(find.text('Could not connect to analysis service.'), findsOneWidget);
+      expect(
+        find.text('Could not connect to analysis service.'),
+        findsOneWidget,
+      );
       expect(find.text('Return to Submission Form'), findsOneWidget);
 
       await tester.tap(find.text('Return to Submission Form'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'),
-          findsOneWidget);
+      expect(
+        find.widgetWithText(ElevatedButton, 'Check Alignment'),
+        findsOneWidget,
+      );
     });
 
-    testWidgets('shows Empty view when manuscript has no readable sections',
-        (tester) async {
+    testWidgets('shows Empty view when manuscript has no readable sections', (
+      tester,
+    ) async {
       final repo = _MockRepo();
       final cubit = StudentManuscriptCheckerCubit(
         checkManuscriptUseCase: CheckManuscriptUseCase(repo),
@@ -359,9 +386,11 @@ void main() {
       await tester.pumpWidget(_buildTestApp(cubit: cubit));
       await tester.pumpAndSettle();
 
-      cubit.emit(const StudentManuscriptCheckerEmpty(
-        message: 'The manuscript is empty or contains no readable sections.',
-      ));
+      cubit.emit(
+        const StudentManuscriptCheckerEmpty(
+          message: 'The manuscript is empty or contains no readable sections.',
+        ),
+      );
       await tester.pumpAndSettle();
 
       expect(find.text('No Manuscript Sections Found'), findsOneWidget);
@@ -370,96 +399,111 @@ void main() {
       await tester.tap(find.text('Submit Another Draft'));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(ElevatedButton, 'Check Alignment'), findsOneWidget);
-    });
-
-    testWidgets('renders results dashboard without overflow on narrow viewport (360px)',
-        (tester) async {
-      tester.view.physicalSize = const Size(360, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
-
-      final repo = _MockRepo();
-      final cubit = StudentManuscriptCheckerCubit(
-        checkManuscriptUseCase: CheckManuscriptUseCase(repo),
+      expect(
+        find.widgetWithText(ElevatedButton, 'Check Alignment'),
+        findsOneWidget,
       );
-
-      cubit.emit(StudentManuscriptCheckerSuccess(
-        result: _defaultResult(),
-        manuscriptFileName: 'thesis_chapter1.pdf',
-        targetJournalId: 'j-uuid-101',
-        targetJournalTitle: 'IEEE Transactions on Software Engineering',
-        includeExemplars: false,
-      ));
-
-      await tester.pumpWidget(_buildTestApp(cubit: cubit));
-      await tester.pumpAndSettle();
-
-      // Verify key widgets are rendered without throwing any layout overflow exceptions
-      expect(find.text('88.5'), findsOneWidget);
-      expect(find.text('STYLE MATCH DISTRIBUTION'), findsOneWidget);
-      expect(find.text('Priority Improvements'), findsOneWidget);
-      expect(tester.takeException(), isNull);
     });
 
-    testWidgets('renders results dashboard without overflow on ultra-narrow viewport (320px)',
-        (tester) async {
-      tester.view.physicalSize = const Size(320, 800);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
+    testWidgets(
+      'renders results dashboard without overflow on narrow viewport (360px)',
+      (tester) async {
+        tester.view.physicalSize = const Size(360, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
 
-      final repo = _MockRepo();
-      final cubit = StudentManuscriptCheckerCubit(
-        checkManuscriptUseCase: CheckManuscriptUseCase(repo),
-      );
+        final repo = _MockRepo();
+        final cubit = StudentManuscriptCheckerCubit(
+          checkManuscriptUseCase: CheckManuscriptUseCase(repo),
+        );
 
-      cubit.emit(StudentManuscriptCheckerSuccess(
-        result: _defaultResult(),
-        manuscriptFileName: 'thesis_chapter1.pdf',
-        targetJournalId: 'j-uuid-101',
-        targetJournalTitle: 'IEEE Transactions on Software Engineering',
-        includeExemplars: false,
-      ));
+        cubit.emit(
+          StudentManuscriptCheckerSuccess(
+            result: _defaultResult(),
+            manuscriptFileName: 'thesis_chapter1.pdf',
+            targetJournalId: 'j-uuid-101',
+            targetJournalTitle: 'IEEE Transactions on Software Engineering',
+            includeExemplars: false,
+          ),
+        );
 
-      await tester.pumpWidget(_buildTestApp(cubit: cubit));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_buildTestApp(cubit: cubit));
+        await tester.pumpAndSettle();
 
-      expect(find.text('88.5'), findsOneWidget);
-    });
+        // Verify key widgets are rendered without throwing any layout overflow exceptions
+        expect(find.text('88.5'), findsOneWidget);
+        expect(find.text('STYLE MATCH DISTRIBUTION'), findsOneWidget);
+        expect(find.text('Priority Improvements'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
 
-    testWidgets('renders results dashboard without overflow on tablet viewport (768px)',
-        (tester) async {
-      tester.view.physicalSize = const Size(768, 1024);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(() {
-        tester.view.resetPhysicalSize();
-        tester.view.resetDevicePixelRatio();
-      });
+    testWidgets(
+      'renders results dashboard without overflow on ultra-narrow viewport (320px)',
+      (tester) async {
+        tester.view.physicalSize = const Size(320, 800);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
 
-      final repo = _MockRepo();
-      final cubit = StudentManuscriptCheckerCubit(
-        checkManuscriptUseCase: CheckManuscriptUseCase(repo),
-      );
+        final repo = _MockRepo();
+        final cubit = StudentManuscriptCheckerCubit(
+          checkManuscriptUseCase: CheckManuscriptUseCase(repo),
+        );
 
-      cubit.emit(StudentManuscriptCheckerSuccess(
-        result: _defaultResult(),
-        manuscriptFileName: 'thesis_chapter1.pdf',
-        targetJournalId: 'j-uuid-101',
-        targetJournalTitle: 'IEEE Transactions on Software Engineering',
-        includeExemplars: false,
-      ));
+        cubit.emit(
+          StudentManuscriptCheckerSuccess(
+            result: _defaultResult(),
+            manuscriptFileName: 'thesis_chapter1.pdf',
+            targetJournalId: 'j-uuid-101',
+            targetJournalTitle: 'IEEE Transactions on Software Engineering',
+            includeExemplars: false,
+          ),
+        );
 
-      await tester.pumpWidget(_buildTestApp(cubit: cubit));
-      await tester.pumpAndSettle();
+        await tester.pumpWidget(_buildTestApp(cubit: cubit));
+        await tester.pumpAndSettle();
 
-      expect(find.text('88.5'), findsOneWidget);
-      expect(tester.takeException(), isNull);
-    });
+        expect(find.text('88.5'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'renders results dashboard without overflow on tablet viewport (768px)',
+      (tester) async {
+        tester.view.physicalSize = const Size(768, 1024);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(() {
+          tester.view.resetPhysicalSize();
+          tester.view.resetDevicePixelRatio();
+        });
+
+        final repo = _MockRepo();
+        final cubit = StudentManuscriptCheckerCubit(
+          checkManuscriptUseCase: CheckManuscriptUseCase(repo),
+        );
+
+        cubit.emit(
+          StudentManuscriptCheckerSuccess(
+            result: _defaultResult(),
+            manuscriptFileName: 'thesis_chapter1.pdf',
+            targetJournalId: 'j-uuid-101',
+            targetJournalTitle: 'IEEE Transactions on Software Engineering',
+            includeExemplars: false,
+          ),
+        );
+
+        await tester.pumpWidget(_buildTestApp(cubit: cubit));
+        await tester.pumpAndSettle();
+
+        expect(find.text('88.5'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      },
+    );
   });
 }

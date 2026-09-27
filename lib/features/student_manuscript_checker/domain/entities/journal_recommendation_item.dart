@@ -39,12 +39,12 @@ class RecommendationDimensionScores extends Equatable {
 
   @override
   List<Object?> get props => [
-        structure,
-        sentenceStyle,
-        voiceAndPerson,
-        epistemicStyle,
-        rhetoricalMoves,
-      ];
+    structure,
+    sentenceStyle,
+    voiceAndPerson,
+    epistemicStyle,
+    rhetoricalMoves,
+  ];
 }
 
 class JournalRecommendationItem extends Equatable {
@@ -104,22 +104,30 @@ class JournalRecommendationItem extends Equatable {
       field: map['field'] as String?,
       publisher: map['publisher'] as String?,
       homepageUrl: map['homepage_url'] as String?,
-      compatibilityScore: (map['compatibility_score'] as num?)?.toDouble() ?? 0.0,
-      compatibilityLevel: map['compatibility_level'] as String? ?? 'MODERATE_MATCH',
+      compatibilityScore:
+          (map['compatibility_score'] as num?)?.toDouble() ?? 0.0,
+      compatibilityLevel:
+          map['compatibility_level'] as String? ?? 'MODERATE_MATCH',
       dimensions: RecommendationDimensionScores.fromMap(
         map['dimensions'] as Map<String, dynamic>? ?? {},
       ),
       dataCoverage: map['data_coverage'] as String? ?? 'HIGH',
       paperCount: (map['paper_count'] as num?)?.toInt() ?? 0,
-      comparedDimensionsCount: (map['compared_dimensions_count'] as num?)?.toInt() ?? 5,
-      totalDimensionsCount: (map['total_dimensions_count'] as num?)?.toInt() ?? 5,
-      strongestDimension: map['strongest_dimension'] as String? ?? 'RHETORICAL_MOVES',
-      weakestDimension: map['weakest_dimension'] as String? ?? 'VOICE_AND_PERSON',
-      strongAlignments: (map['strong_alignments'] as List<dynamic>?)
+      comparedDimensionsCount:
+          (map['compared_dimensions_count'] as num?)?.toInt() ?? 5,
+      totalDimensionsCount:
+          (map['total_dimensions_count'] as num?)?.toInt() ?? 5,
+      strongestDimension:
+          map['strongest_dimension'] as String? ?? 'RHETORICAL_MOVES',
+      weakestDimension:
+          map['weakest_dimension'] as String? ?? 'VOICE_AND_PERSON',
+      strongAlignments:
+          (map['strong_alignments'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],
-      notableDifferences: (map['notable_differences'] as List<dynamic>?)
+      notableDifferences:
+          (map['notable_differences'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],
@@ -129,24 +137,24 @@ class JournalRecommendationItem extends Equatable {
 
   @override
   List<Object?> get props => [
-        rank,
-        journalId,
-        journalName,
-        issn,
-        field,
-        publisher,
-        homepageUrl,
-        compatibilityScore,
-        compatibilityLevel,
-        dimensions,
-        dataCoverage,
-        paperCount,
-        comparedDimensionsCount,
-        totalDimensionsCount,
-        strongestDimension,
-        weakestDimension,
-        strongAlignments,
-        notableDifferences,
-        checkResult,
-      ];
+    rank,
+    journalId,
+    journalName,
+    issn,
+    field,
+    publisher,
+    homepageUrl,
+    compatibilityScore,
+    compatibilityLevel,
+    dimensions,
+    dataCoverage,
+    paperCount,
+    comparedDimensionsCount,
+    totalDimensionsCount,
+    strongestDimension,
+    weakestDimension,
+    strongAlignments,
+    notableDifferences,
+    checkResult,
+  ];
 }

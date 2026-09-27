@@ -36,9 +36,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
     _fullNameController = TextEditingController(
       text: widget.user['full_name'] ?? widget.user['name'] ?? '',
     );
-    _emailController = TextEditingController(
-      text: widget.user['email'] ?? '',
-    );
+    _emailController = TextEditingController(text: widget.user['email'] ?? '');
     _passwordController = TextEditingController();
     _selectedRole = (widget.user['role'] ?? 'student').toString().toLowerCase();
     if (!['student', 'lecturer', 'admin'].contains(_selectedRole)) {
@@ -133,7 +131,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         ],
                       ),
                       IconButton(
-                        onPressed: _isSubmitting ? null : () => Navigator.of(context).pop(),
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded, size: 20),
                         color: AppColors.textSubtle,
                         tooltip: 'Đóng',
@@ -161,8 +161,11 @@ class _EditUserDialogState extends State<EditUserDialog> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.error_outline_rounded,
-                              color: AppColors.error, size: 18),
+                          const Icon(
+                            Icons.error_outline_rounded,
+                            color: AppColors.error,
+                            size: 18,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
@@ -362,8 +365,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       OutlinedButton(
-                        onPressed:
-                            _isSubmitting ? null : () => Navigator.of(context).pop(),
+                        onPressed: _isSubmitting
+                            ? null
+                            : () => Navigator.of(context).pop(),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 18,
@@ -373,7 +377,10 @@ class _EditUserDialogState extends State<EditUserDialog> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text('Hủy', style: TextStyle(fontFamily: 'Manrope')),
+                        child: const Text(
+                          'Hủy',
+                          style: TextStyle(fontFamily: 'Manrope'),
+                        ),
                       ),
                       const SizedBox(width: 12),
                       ElevatedButton(

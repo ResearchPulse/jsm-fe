@@ -73,11 +73,11 @@ class _AccountFormState extends State<_AccountForm> {
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<CreateAccountCubit>().submit(
-            role: widget.role,
-            email: _email.text,
-            fullName: _fullName.text,
-            password: _password.text,
-          );
+        role: widget.role,
+        email: _email.text,
+        fullName: _fullName.text,
+        password: _password.text,
+      );
     }
   }
 
@@ -92,8 +92,7 @@ class _AccountFormState extends State<_AccountForm> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(widget.title,
-                  style: Theme.of(context).textTheme.titleLarge),
+              Text(widget.title, style: Theme.of(context).textTheme.titleLarge),
               const SizedBox(height: 24),
               if (state is CreateAccountFailure) ...[
                 ErrorView(message: state.message),
@@ -162,14 +161,18 @@ class _SuccessView extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.check_circle_outline_rounded,
-            size: 48, color: Colors.green),
+        const Icon(
+          Icons.check_circle_outline_rounded,
+          size: 48,
+          color: Colors.green,
+        ),
         const SizedBox(height: 12),
-        Text('Account created',
-            style: Theme.of(context).textTheme.titleLarge),
+        Text('Account created', style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: 8),
-        Text('${user.name ?? 'User'} <${user.email}> was created '
-            'successfully.'),
+        Text(
+          '${user.name ?? 'User'} <${user.email}> was created '
+          'successfully.',
+        ),
         const SizedBox(height: 24),
         SizedBox(
           width: double.infinity,

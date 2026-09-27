@@ -1,5 +1,7 @@
 import '../../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../../../app/theme/app_colors.dart';
 
 class StanceDistributionChart extends StatelessWidget {
@@ -38,7 +40,11 @@ class StanceDistributionChart extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.balance_rounded, size: 18, color: AppColors.primary),
+                  const Icon(
+                    Icons.balance_rounded,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
                   SizedBox(width: 8),
                   Text(
                     context.l10n.stanceDistributionTitle,
@@ -54,9 +60,15 @@ class StanceDistributionChart extends StatelessWidget {
               // Legend
               Row(
                 children: [
-                  _buildLegendItem(context.l10n.stanceNeutral, AppColors.primary),
+                  _buildLegendItem(
+                    context.l10n.stanceNeutral,
+                    AppColors.primary,
+                  ),
                   const SizedBox(width: 12),
-                  _buildLegendItem(context.l10n.stanceSupport, AppColors.green700),
+                  _buildLegendItem(
+                    context.l10n.stanceSupport,
+                    AppColors.green700,
+                  ),
                   const SizedBox(width: 12),
                   _buildLegendItem(context.l10n.stanceRefute, AppColors.red700),
                 ],
@@ -66,7 +78,11 @@ class StanceDistributionChart extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             context.l10n.stanceDistributionSubtitle,
-            style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textMuted,
+              fontFamily: 'Manrope',
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -77,7 +93,8 @@ class StanceDistributionChart extends StatelessWidget {
 
             final neutral = (stance?['neutral'] as num?)?.toDouble() ?? 0.70;
             final support = (stance?['support'] as num?)?.toDouble() ?? 0.20;
-            final contradict = (stance?['contradict'] as num?)?.toDouble() ?? 0.10;
+            final contradict =
+                (stance?['contradict'] as num?)?.toDouble() ?? 0.10;
 
             final neuPct = (neutral * 100).round();
             final supPct = (support * 100).round();
@@ -91,7 +108,11 @@ class StanceDistributionChart extends StatelessWidget {
                     width: 140,
                     child: Text(
                       name,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -107,14 +128,19 @@ class StanceDistributionChart extends StatelessWidget {
                               Expanded(
                                 flex: neuPct,
                                 child: Tooltip(
-                                  message: '$name: ${context.l10n.stanceNeutral} $neuPct%',
+                                  message:
+                                      '$name: ${context.l10n.stanceNeutral} $neuPct%',
                                   child: Container(
                                     color: AppColors.primary,
                                     alignment: Alignment.center,
                                     child: neuPct >= 15
                                         ? Text(
                                             '$neuPct%',
-                                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           )
                                         : null,
                                   ),
@@ -124,14 +150,19 @@ class StanceDistributionChart extends StatelessWidget {
                               Expanded(
                                 flex: supPct,
                                 child: Tooltip(
-                                  message: '$name: ${context.l10n.stanceSupport} $supPct%',
+                                  message:
+                                      '$name: ${context.l10n.stanceSupport} $supPct%',
                                   child: Container(
                                     color: AppColors.green700,
                                     alignment: Alignment.center,
                                     child: supPct >= 15
                                         ? Text(
                                             '$supPct%',
-                                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           )
                                         : null,
                                   ),
@@ -141,14 +172,19 @@ class StanceDistributionChart extends StatelessWidget {
                               Expanded(
                                 flex: conPct,
                                 child: Tooltip(
-                                  message: '$name: ${context.l10n.stanceRefute} $conPct%',
+                                  message:
+                                      '$name: ${context.l10n.stanceRefute} $conPct%',
                                   child: Container(
                                     color: AppColors.red700,
                                     alignment: Alignment.center,
                                     child: conPct >= 15
                                         ? Text(
                                             '$conPct%',
-                                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           )
                                         : null,
                                   ),
@@ -175,10 +211,20 @@ class StanceDistributionChart extends StatelessWidget {
         Container(
           width: 8,
           height: 8,
-          decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(2)),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(2),
+          ),
         ),
         const SizedBox(width: 4),
-        Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 11,
+            color: AppColors.textSecondary,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ],
     );
   }

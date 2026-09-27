@@ -37,7 +37,8 @@ class _UsersViewState extends State<UsersView> {
     super.initState();
     final authRepo = context.read<AuthRepository?>();
     _apiClient = UsersApiClient(
-      tokenProvider: () async => authRepo != null ? await authRepo.currentToken() : null,
+      tokenProvider: () async =>
+          authRepo != null ? await authRepo.currentToken() : null,
     );
     _loadUsers();
   }
@@ -144,19 +145,28 @@ class _UsersViewState extends State<UsersView> {
     );
   }
 
-  Future<void> _saveUserChanges(String userId, String email, String fullName) async {
+  Future<void> _saveUserChanges(
+    String userId,
+    String email,
+    String fullName,
+  ) async {
     final newRole = _editedRoles[userId];
     final newStatus = _editedStatuses[userId];
 
     if (newRole == null && newStatus == null) return;
 
     // Safety check: Don't deactivate or demote last admin
-    final user = _users.firstWhere((u) => u['id']?.toString() == userId, orElse: () => {});
-    final isCurrentlyAdmin = (user['role'] ?? '').toString().toLowerCase() == 'admin';
+    final user = _users.firstWhere(
+      (u) => u['id']?.toString() == userId,
+      orElse: () => {},
+    );
+    final isCurrentlyAdmin =
+        (user['role'] ?? '').toString().toLowerCase() == 'admin';
     final isCurrentlyActive = user['is_active'] != false;
 
     if (isCurrentlyAdmin && isCurrentlyActive) {
-      final isDemotingOrDeactivating = (newStatus == false) || (newRole != null && newRole != 'admin');
+      final isDemotingOrDeactivating =
+          (newStatus == false) || (newRole != null && newRole != 'admin');
       if (isDemotingOrDeactivating && _activeAdminCount <= 1) {
         AppNotification.showError(
           context,
@@ -221,7 +231,12 @@ class _UsersViewState extends State<UsersView> {
     });
   }
 
-  void _confirmDeleteUser(String userId, String fullName, String email, bool isAdmin) {
+  void _confirmDeleteUser(
+    String userId,
+    String fullName,
+    String email,
+    bool isAdmin,
+  ) {
     if (isAdmin && _activeAdminCount <= 1) {
       AppNotification.showError(
         context,
@@ -238,7 +253,11 @@ class _UsersViewState extends State<UsersView> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 24),
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: AppColors.error,
+              size: 24,
+            ),
             const SizedBox(width: 8),
             Text(
               context.l10n.confirmDeleteUserTitle,
@@ -259,7 +278,11 @@ class _UsersViewState extends State<UsersView> {
             children: [
               Text(
                 context.l10n.confirmDeleteUserDesc,
-                style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                  fontFamily: 'Manrope',
+                ),
               ),
               const SizedBox(height: 12),
               Container(
@@ -275,12 +298,21 @@ class _UsersViewState extends State<UsersView> {
                   children: [
                     Text(
                       fullName.isNotEmpty ? fullName : 'User',
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       email,
-                      style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                   ],
                 ),
@@ -288,7 +320,12 @@ class _UsersViewState extends State<UsersView> {
               const SizedBox(height: 12),
               Text(
                 context.l10n.confirmDeleteUserWarning,
-                style: const TextStyle(fontSize: 12, color: AppColors.error, fontFamily: 'Manrope', height: 1.4),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.error,
+                  fontFamily: 'Manrope',
+                  height: 1.4,
+                ),
               ),
             ],
           ),
@@ -296,7 +333,13 @@ class _UsersViewState extends State<UsersView> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(context.l10n.cancel, style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
+            child: Text(
+              context.l10n.cancel,
+              style: const TextStyle(
+                color: AppColors.textMuted,
+                fontFamily: 'Manrope',
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -329,9 +372,17 @@ class _UsersViewState extends State<UsersView> {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            child: Text(context.l10n.deletePermanently, style: const TextStyle(fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
+            child: Text(
+              context.l10n.deletePermanently,
+              style: const TextStyle(
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Manrope',
+              ),
+            ),
           ),
         ],
       ),
@@ -444,7 +495,9 @@ class _UsersViewState extends State<UsersView> {
             ),
             child: LayoutBuilder(
               builder: (context, tableConstraints) {
-                final tableWidth = tableConstraints.maxWidth > 920 ? tableConstraints.maxWidth : 920.0;
+                final tableWidth = tableConstraints.maxWidth > 920
+                    ? tableConstraints.maxWidth
+                    : 920.0;
                 return SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   physics: const BouncingScrollPhysics(),
@@ -454,7 +507,10 @@ class _UsersViewState extends State<UsersView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 14,
+                          ),
                           decoration: const BoxDecoration(
                             color: AppColors.surfaceSoft,
                             borderRadius: BorderRadius.only(
@@ -466,26 +522,63 @@ class _UsersViewState extends State<UsersView> {
                             children: [
                               Expanded(
                                 flex: 3,
-                                child: Text(context.l10n.colFullName, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(
+                                  context.l10n.colFullName,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textSubtle,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
                               ),
                               Expanded(
                                 flex: 4,
-                                child: Text(context.l10n.colAccountEmail, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(
+                                  context.l10n.colAccountEmail,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textSubtle,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
                               ),
                               Expanded(
                                 flex: 3,
-                                child: Text(context.l10n.colRole, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(
+                                  context.l10n.colRole,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textSubtle,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
                               ),
                               Expanded(
                                 flex: 2,
-                                child: Text(context.l10n.colStatus, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope')),
+                                child: Text(
+                                  context.l10n.colStatus,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textSubtle,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
                               ),
                               SizedBox(
                                 width: 80,
                                 child: Text(
                                   context.l10n.colActions,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textSubtle,
+                                    fontFamily: 'Manrope',
+                                  ),
                                 ),
                               ),
                             ],
@@ -503,13 +596,26 @@ class _UsersViewState extends State<UsersView> {
                             child: Center(
                               child: Column(
                                 children: [
-                                  const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
+                                  const Icon(
+                                    Icons.error_outline_rounded,
+                                    color: AppColors.error,
+                                    size: 36,
+                                  ),
                                   const SizedBox(height: 8),
-                                  Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+                                  Text(
+                                    _error!,
+                                    style: const TextStyle(
+                                      color: AppColors.textSecondary,
+                                      fontFamily: 'Manrope',
+                                    ),
+                                  ),
                                   const SizedBox(height: 12),
                                   OutlinedButton.icon(
                                     onPressed: _loadUsers,
-                                    icon: const Icon(Icons.refresh_rounded, size: 16),
+                                    icon: const Icon(
+                                      Icons.refresh_rounded,
+                                      size: 16,
+                                    ),
                                     label: Text(context.l10n.retry),
                                   ),
                                 ],
@@ -522,7 +628,10 @@ class _UsersViewState extends State<UsersView> {
                             child: Center(
                               child: Text(
                                 context.l10n.noUsersFound,
-                                style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+                                style: const TextStyle(
+                                  color: AppColors.textMuted,
+                                  fontFamily: 'Manrope',
+                                ),
                               ),
                             ),
                           )
@@ -530,7 +639,10 @@ class _UsersViewState extends State<UsersView> {
                           for (int i = 0; i < _users.length; i++) ...[
                             _buildUserRow(_users[i]),
                             if (i < _users.length - 1)
-                              const Divider(height: 1, color: AppColors.borderSoft),
+                              const Divider(
+                                height: 1,
+                                color: AppColors.borderSoft,
+                              ),
                           ],
                       ],
                     ),
@@ -554,8 +666,11 @@ class _UsersViewState extends State<UsersView> {
     final currentRole = _editedRoles[userId] ?? origRole;
     final currentStatus = _editedStatuses[userId] ?? origStatus;
 
-    final isRoleEdited = _editedRoles.containsKey(userId) && _editedRoles[userId] != origRole;
-    final isStatusEdited = _editedStatuses.containsKey(userId) && _editedStatuses[userId] != origStatus;
+    final isRoleEdited =
+        _editedRoles.containsKey(userId) && _editedRoles[userId] != origRole;
+    final isStatusEdited =
+        _editedStatuses.containsKey(userId) &&
+        _editedStatuses[userId] != origStatus;
     final isDirty = isRoleEdited || isStatusEdited;
 
     final isSaving = _savingUserIds.contains(userId);
@@ -573,7 +688,12 @@ class _UsersViewState extends State<UsersView> {
             flex: 3,
             child: Text(
               fullName,
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                fontFamily: 'Manrope',
+              ),
             ),
           ),
 
@@ -586,13 +706,22 @@ class _UsersViewState extends State<UsersView> {
               children: [
                 Text(
                   email,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
                 Text(
                   '${context.l10n.joined}: ${_formatDate(user['created_at'] ?? user['createdAt'])}',
-                  style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
               ],
             ),
@@ -606,15 +735,24 @@ class _UsersViewState extends State<UsersView> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  border: isRoleEdited ? Border.all(color: AppColors.primary, width: 1.5) : null,
+                  border: isRoleEdited
+                      ? Border.all(color: AppColors.primary, width: 1.5)
+                      : null,
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<String>(
-                    value: ['student', 'lecturer', 'admin'].contains(currentRole) ? currentRole : 'student',
+                    value:
+                        ['student', 'lecturer', 'admin'].contains(currentRole)
+                        ? currentRole
+                        : 'student',
                     isDense: true,
                     borderRadius: BorderRadius.circular(8),
                     dropdownColor: AppColors.surface,
-                    icon: const Icon(Icons.arrow_drop_down_rounded, size: 18, color: AppColors.textSubtle),
+                    icon: const Icon(
+                      Icons.arrow_drop_down_rounded,
+                      size: 18,
+                      color: AppColors.textSubtle,
+                    ),
                     items: [
                       DropdownMenuItem(
                         value: 'student',
@@ -654,7 +792,9 @@ class _UsersViewState extends State<UsersView> {
               child: Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  border: isStatusEdited ? Border.all(color: AppColors.primary, width: 1.5) : null,
+                  border: isStatusEdited
+                      ? Border.all(color: AppColors.primary, width: 1.5)
+                      : null,
                 ),
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<bool>(
@@ -662,16 +802,32 @@ class _UsersViewState extends State<UsersView> {
                     isDense: true,
                     borderRadius: BorderRadius.circular(8),
                     dropdownColor: AppColors.surface,
-                    icon: const Icon(Icons.arrow_drop_down_rounded, size: 18, color: AppColors.textSubtle),
+                    icon: const Icon(
+                      Icons.arrow_drop_down_rounded,
+                      size: 18,
+                      color: AppColors.textSubtle,
+                    ),
                     items: [
                       DropdownMenuItem(
                         value: true,
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.check_circle_rounded, size: 14, color: AppColors.green700),
+                            const Icon(
+                              Icons.check_circle_rounded,
+                              size: 14,
+                              color: AppColors.green700,
+                            ),
                             const SizedBox(width: 6),
-                            Text(context.l10n.activeStatus, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.green700, fontFamily: 'Manrope')),
+                            Text(
+                              context.l10n.activeStatus,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.green700,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -680,9 +836,21 @@ class _UsersViewState extends State<UsersView> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Icon(Icons.cancel_rounded, size: 14, color: AppColors.error),
+                            const Icon(
+                              Icons.cancel_rounded,
+                              size: 14,
+                              color: AppColors.error,
+                            ),
                             const SizedBox(width: 6),
-                            Text(context.l10n.inactiveStatus, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.error, fontFamily: 'Manrope')),
+                            Text(
+                              context.l10n.inactiveStatus,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.error,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -716,59 +884,73 @@ class _UsersViewState extends State<UsersView> {
                     ),
                   )
                 : isDirty
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Tooltip(
-                            message: context.l10n.saveChanges,
-                            child: InkWell(
-                              onTap: () => _saveUserChanges(userId, email, fullName),
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Tooltip(
+                        message: context.l10n.saveChanges,
+                        child: InkWell(
+                          onTap: () =>
+                              _saveUserChanges(userId, email, fullName),
+                          borderRadius: BorderRadius.circular(6),
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
                               borderRadius: BorderRadius.circular(6),
-                              child: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary,
-                                  borderRadius: BorderRadius.circular(6),
-                                ),
-                                child: const Icon(Icons.check_rounded, size: 16, color: Colors.white),
-                              ),
+                            ),
+                            child: const Icon(
+                              Icons.check_rounded,
+                              size: 16,
+                              color: Colors.white,
                             ),
                           ),
-                          const SizedBox(width: 6),
-                          Tooltip(
-                            message: context.l10n.cancelChanges,
-                            child: InkWell(
-                              onTap: () => _discardUserChanges(userId),
-                              borderRadius: BorderRadius.circular(6),
-                              child: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  color: AppColors.surfaceSoft,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: AppColors.border),
-                                ),
-                                child: const Icon(Icons.close_rounded, size: 16, color: AppColors.textSubtle),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                    : Center(
-                        child: _SubtleDeleteButton(
-                          isLastAdmin: isLastAdmin,
-                          onPressed: isLastAdmin
-                              ? () {
-                                  AppNotification.showError(
-                                    context,
-                                    context.l10n.cannotDeleteLastAdmin,
-                                    title: 'Thao tác không được phép',
-                                  );
-                                }
-                              : () => _confirmDeleteUser(userId, fullName, email, isAdmin),
                         ),
                       ),
+                      const SizedBox(width: 6),
+                      Tooltip(
+                        message: context.l10n.cancelChanges,
+                        child: InkWell(
+                          onTap: () => _discardUserChanges(userId),
+                          borderRadius: BorderRadius.circular(6),
+                          child: Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: AppColors.surfaceSoft,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: AppColors.border),
+                            ),
+                            child: const Icon(
+                              Icons.close_rounded,
+                              size: 16,
+                              color: AppColors.textSubtle,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : Center(
+                    child: _SubtleDeleteButton(
+                      isLastAdmin: isLastAdmin,
+                      onPressed: isLastAdmin
+                          ? () {
+                              AppNotification.showError(
+                                context,
+                                context.l10n.cannotDeleteLastAdmin,
+                                title: 'Thao tác không được phép',
+                              );
+                            }
+                          : () => _confirmDeleteUser(
+                              userId,
+                              fullName,
+                              email,
+                              isAdmin,
+                            ),
+                    ),
+                  ),
           ),
         ],
       ),
@@ -829,7 +1011,10 @@ class _ActionCard extends StatelessWidget {
                   child: Icon(icon, color: AppColors.primary, size: 22),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.surfaceSoft,
                     borderRadius: BorderRadius.circular(6),
@@ -880,7 +1065,11 @@ class _ActionCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward_rounded, size: 14, color: AppColors.primary),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 14,
+                  color: AppColors.primary,
+                ),
               ],
             ),
           ],

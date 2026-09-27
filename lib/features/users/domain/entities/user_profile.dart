@@ -6,11 +6,7 @@ class UserProfile extends Equatable {
   final String email;
   final String? name;
 
-  const UserProfile({
-    required this.id,
-    required this.email,
-    this.name,
-  });
+  const UserProfile({required this.id, required this.email, this.name});
 
   @override
   List<Object?> get props => [id, email, name];

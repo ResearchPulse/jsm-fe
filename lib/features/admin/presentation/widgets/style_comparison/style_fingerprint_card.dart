@@ -1,5 +1,7 @@
 import '../../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../../../app/theme/app_colors.dart';
 import '../style_radar_chart.dart';
 
@@ -22,12 +24,10 @@ class StyleFingerprintCard extends StatefulWidget {
 class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
   FingerprintViewMode _viewMode = FingerprintViewMode.radar;
 
-
-
-@override
+  @override
   Widget build(BuildContext context) {
     if (widget.profiles.isEmpty) return const SizedBox.shrink();
-    
+
     final axisTitles = [
       context.l10n.radarAxisSentenceLength,
       context.l10n.radarAxisLexicalDensity,
@@ -40,7 +40,9 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
     final datasets = <RadarDataset>[];
     for (int i = 0; i < widget.profiles.length; i++) {
       final color = widget.colors[i % widget.colors.length];
-      datasets.add(RadarDataset.fromProfile(widget.profiles[i], color, context.l10n));
+      datasets.add(
+        RadarDataset.fromProfile(widget.profiles[i], color, context.l10n),
+      );
     }
 
     return Container(
@@ -65,10 +67,16 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.fingerprint_rounded, size: 20, color: AppColors.primary),
+                  const Icon(
+                    Icons.fingerprint_rounded,
+                    size: 20,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(width: 8),
                   Text(
-                    widget.profiles.length == 1 ? context.l10n.styleFingerprintTitle : context.l10n.multiStyleFingerprintTitle,
+                    widget.profiles.length == 1
+                        ? context.l10n.styleFingerprintTitle
+                        : context.l10n.multiStyleFingerprintTitle,
                     style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
@@ -89,7 +97,10 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
                       ),
                       ButtonSegment(
                         value: FingerprintViewMode.parallel,
-                        icon: const Icon(Icons.stacked_line_chart_rounded, size: 14),
+                        icon: const Icon(
+                          Icons.stacked_line_chart_rounded,
+                          size: 14,
+                        ),
                         label: Text(context.l10n.parallelCoordinates),
                       ),
                     ],
@@ -100,7 +111,11 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
                       });
                     },
                     style: SegmentedButton.styleFrom(
-                      textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Manrope',
+                      ),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                     ),
                   ),
@@ -111,17 +126,17 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
           const SizedBox(height: 6),
           Text(
             context.l10n.styleFingerprintSubtitle,
-            style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textMuted,
+              fontFamily: 'Manrope',
+            ),
           ),
           const SizedBox(height: 20),
 
           // Chart Display
           if (_viewMode == FingerprintViewMode.radar)
-            StyleRadarChart(
-              datasets: datasets,
-              height: 340,
-              showLegend: true,
-            )
+            StyleRadarChart(datasets: datasets, height: 340, showLegend: true)
           else
             _buildParallelCoordinates(datasets, axisTitles),
         ],
@@ -129,7 +144,10 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
     );
   }
 
-  Widget _buildParallelCoordinates(List<RadarDataset> datasets, List<String> axisTitles) {
+  Widget _buildParallelCoordinates(
+    List<RadarDataset> datasets,
+    List<String> axisTitles,
+  ) {
     return Column(
       children: [
         // Legend
@@ -151,12 +169,19 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
                   Container(
                     width: 10,
                     height: 10,
-                    decoration: BoxDecoration(color: ds.color, shape: BoxShape.circle),
+                    decoration: BoxDecoration(
+                      color: ds.color,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                   const SizedBox(width: 6),
                   Text(
                     ds.name,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                 ],
               ),
@@ -184,10 +209,7 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
                       left: i * axisSpacing - 0.5,
                       top: 10,
                       height: h,
-                      child: Container(
-                        width: 1,
-                        color: AppColors.border,
-                      ),
+                      child: Container(width: 1, color: AppColors.border),
                     ),
                     Positioned(
                       left: i * axisSpacing - 45,
@@ -196,7 +218,11 @@ class _StyleFingerprintCardState extends State<StyleFingerprintCard> {
                       child: Text(
                         axisTitles[i],
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 10.5, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                        style: const TextStyle(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondary,
+                        ),
                       ),
                     ),
                   ],

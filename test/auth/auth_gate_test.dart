@@ -55,21 +55,22 @@ class _StubRepo implements AuthRepository {
 }
 
 Widget _gate(AuthRepository repo) => RepositoryProvider<AuthRepository>.value(
-      value: repo,
-      child: BlocProvider<AuthCubit>(
-        create: (_) => AuthCubit(
-          loginUseCase: LoginUseCase(repo),
-          logoutUseCase: LogoutUseCase(repo),
-          restoreSessionUseCase: RestoreSessionUseCase(repo),
-          repository: repo,
-        )..checkSession(),
-        child: const MaterialApp(home: AuthGate()),
-      ),
-    );
+  value: repo,
+  child: BlocProvider<AuthCubit>(
+    create: (_) => AuthCubit(
+      loginUseCase: LoginUseCase(repo),
+      logoutUseCase: LogoutUseCase(repo),
+      restoreSessionUseCase: RestoreSessionUseCase(repo),
+      repository: repo,
+    )..checkSession(),
+    child: const MaterialApp(home: AuthGate()),
+  ),
+);
 
 void main() {
-  testWidgets('startup unauthenticated: shows Login, never Home',
-      (tester) async {
+  testWidgets('startup unauthenticated: shows Login, never Home', (
+    tester,
+  ) async {
     await tester.pumpWidget(_gate(_StubRepo()));
     await tester.pumpAndSettle(); // checkSession -> unauthenticated
     expect(find.byType(LoginPage), findsOneWidget);
@@ -79,15 +80,17 @@ void main() {
   testWidgets('authenticated: shows the app home', (tester) async {
     final repo = _StubRepo()
       ..callbackResult = AuthResult(
-          user: AuthUser(sub: 'u1', email: 'user@example.com'));
+        user: AuthUser(sub: 'u1', email: 'user@example.com'),
+      );
     await tester.pumpWidget(_gate(repo));
     await tester.pumpAndSettle();
     expect(find.text('Journal Dashboard'), findsOneWidget);
     expect(find.byType(LoginPage), findsNothing);
   });
 
-  testWidgets('sign-out from home returns to login (never stays authed)',
-      (tester) async {
+  testWidgets('sign-out from home returns to login (never stays authed)', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
@@ -97,7 +100,8 @@ void main() {
 
     final repo = _StubRepo()
       ..callbackResult = AuthResult(
-          user: AuthUser(sub: 'u1', email: 'user@example.com'));
+        user: AuthUser(sub: 'u1', email: 'user@example.com'),
+      );
     await tester.pumpWidget(_gate(repo));
     await tester.pumpAndSettle();
     expect(find.text('Journal Dashboard'), findsOneWidget);
@@ -108,7 +112,9 @@ void main() {
     await tester.pumpAndSettle();
 
     final signOutFinder = find.byWidgetPredicate(
-      (widget) => widget is Text && (widget.data == 'Sign out' || widget.data == 'Đăng xuất'),
+      (widget) =>
+          widget is Text &&
+          (widget.data == 'Sign out' || widget.data == 'Đăng xuất'),
     );
     await tester.tap(signOutFinder);
     await tester.pumpAndSettle();
@@ -118,8 +124,9 @@ void main() {
     expect(find.text('Journal Dashboard'), findsNothing);
   });
 
-  testWidgets('loading state shows the loading UI, not login or home',
-      (tester) async {
+  testWidgets('loading state shows the loading UI, not login or home', (
+    tester,
+  ) async {
     final repo = _SlowRepo();
     await tester.pumpWidget(_gate(repo));
     await tester.pump();
@@ -141,18 +148,21 @@ void main() {
     expect(find.byType(ElevatedButton), findsOneWidget);
   });
 
-  testWidgets('session restoration: stored session -> authenticated',
-      (tester) async {
+  testWidgets('session restoration: stored session -> authenticated', (
+    tester,
+  ) async {
     final repo = _StubRepo()
-      ..storedSession =
-          AuthSession(user: AuthUser(sub: 'u1', email: 'user@example.com'));
+      ..storedSession = AuthSession(
+        user: AuthUser(sub: 'u1', email: 'user@example.com'),
+      );
     await tester.pumpWidget(_gate(repo));
     await tester.pumpAndSettle();
     expect(find.text('Journal Dashboard'), findsOneWidget);
   });
 
-  testWidgets('admin authenticated: routes directly to AdminDashboardPage',
-      (tester) async {
+  testWidgets('admin authenticated: routes directly to AdminDashboardPage', (
+    tester,
+  ) async {
     tester.view.physicalSize = const Size(1440, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(() {

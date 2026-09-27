@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
@@ -142,12 +144,22 @@ class _JobMonitorViewState extends State<JobMonitorView> {
         ),
         content: Text(
           context.l10n.confirmCancelDesc(journalTitle),
-          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+          style: const TextStyle(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+            fontFamily: 'Manrope',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(context.l10n.dismiss, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+            child: Text(
+              context.l10n.dismiss,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontFamily: 'Manrope',
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -155,9 +167,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            child: Text(context.l10n.stopTask, style: const TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
+            child: Text(
+              context.l10n.stopTask,
+              style: const TextStyle(
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -200,12 +220,22 @@ class _JobMonitorViewState extends State<JobMonitorView> {
         ),
         content: Text(
           context.l10n.confirmCancelDesc(journalTitle),
-          style: const TextStyle(fontSize: 13, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+          style: const TextStyle(
+            fontSize: 13,
+            color: AppColors.textSecondary,
+            fontFamily: 'Manrope',
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: Text(context.l10n.dismiss, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+            child: Text(
+              context.l10n.dismiss,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontFamily: 'Manrope',
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
@@ -213,9 +243,17 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               backgroundColor: AppColors.error,
               foregroundColor: Colors.white,
               elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
-            child: Text(context.l10n.deleteJob, style: const TextStyle(fontFamily: 'Manrope', fontWeight: FontWeight.w600)),
+            child: Text(
+              context.l10n.deleteJob,
+              style: const TextStyle(
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
         ],
       ),
@@ -244,15 +282,26 @@ class _JobMonitorViewState extends State<JobMonitorView> {
   int _currentStageNumber(String step, String status) {
     if (status.toUpperCase() == 'COMPLETED') return 6;
     final s = step.toUpperCase();
-    if (s.contains('QUEUED') || s.contains('PENDING') || s.contains('HARVEST')) return 1;
+    if (s.contains('QUEUED') ||
+        s.contains('PENDING') ||
+        s.contains('HARVEST')) {
+      return 1;
+    }
     if (s.contains('FETCH')) return 2;
     if (s.contains('GROBID') || s.contains('PARS')) return 3;
     if (s.contains('NORM')) return 4;
-    if (s.contains('NLP') || s.contains('MOVE') || s.contains('STANCE')) return 5;
+    if (s.contains('NLP') || s.contains('MOVE') || s.contains('STANCE')) {
+      return 5;
+    }
     return 6;
   }
 
-  String _stageDescription(BuildContext context, int stageNum, String step, String status) {
+  String _stageDescription(
+    BuildContext context,
+    int stageNum,
+    String step,
+    String status,
+  ) {
     if (status.toUpperCase() == 'COMPLETED') {
       return context.l10n.stageCompleted;
     }
@@ -364,9 +413,19 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               child: Center(
                 child: Column(
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      color: AppColors.error,
+                      size: 36,
+                    ),
                     const SizedBox(height: 8),
-                    Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+                    Text(
+                      _error!,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () => _loadJobs(),
@@ -383,11 +442,19 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               child: Center(
                 child: Column(
                   children: [
-                    const Icon(Icons.monitor_heart_outlined, size: 48, color: AppColors.slate300),
+                    const Icon(
+                      Icons.monitor_heart_outlined,
+                      size: 48,
+                      color: AppColors.slate300,
+                    ),
                     const SizedBox(height: 12),
                     Text(
                       context.l10n.noJobsFound,
-                      style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope', fontSize: 14),
+                      style: const TextStyle(
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                        fontSize: 14,
+                      ),
                     ),
                   ],
                 ),
@@ -417,7 +484,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary : AppColors.surface,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: isSelected ? AppColors.primary : AppColors.border),
+          border: Border.all(
+            color: isSelected ? AppColors.primary : AppColors.border,
+          ),
         ),
         child: Text(
           label,
@@ -501,14 +570,21 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.surfaceSoft,
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
                           'ISSN: $issn',
-                          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                            fontFamily: 'Manrope',
+                          ),
                         ),
                       ),
                     ],
@@ -516,7 +592,11 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   const SizedBox(height: 4),
                   Text(
                     '${context.l10n.jobIdLabel}: $jobId',
-                    style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                 ],
               );
@@ -555,7 +635,11 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       child: ElevatedButton.icon(
                         onPressed: () => _retryJob(jobId),
                         icon: const Icon(Icons.refresh_rounded, size: 14),
-                        label: Text(failed > 0 ? context.l10n.retryFailedArticles(failed) : context.l10n.retry),
+                        label: Text(
+                          failed > 0
+                              ? context.l10n.retryFailedArticles(failed)
+                              : context.l10n.retry,
+                        ),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.error,
                           foregroundColor: Colors.white,
@@ -563,7 +647,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           visualDensity: VisualDensity.compact,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                           elevation: 0,
                         ),
                       ),
@@ -573,7 +659,11 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       height: 26,
                       child: OutlinedButton.icon(
                         onPressed: () => _confirmCancelJob(jobId, journalTitle),
-                        icon: const Icon(Icons.stop_circle_outlined, size: 14, color: AppColors.error),
+                        icon: const Icon(
+                          Icons.stop_circle_outlined,
+                          size: 14,
+                          color: AppColors.error,
+                        ),
                         label: Text(
                           context.l10n.cancelJob,
                           style: const TextStyle(
@@ -585,12 +675,16 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                           ),
                         ),
                         style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: AppColors.error.withAlpha(120)),
+                          side: BorderSide(
+                            color: AppColors.error.withAlpha(120),
+                          ),
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           visualDensity: VisualDensity.compact,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
@@ -598,7 +692,11 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                     height: 26,
                     child: OutlinedButton.icon(
                       onPressed: () => _confirmDeleteJob(jobId, journalTitle),
-                      icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
+                      icon: const Icon(
+                        Icons.delete_outline_rounded,
+                        size: 14,
+                        color: AppColors.error,
+                      ),
                       label: Text(
                         context.l10n.deleteJob,
                         style: const TextStyle(
@@ -611,12 +709,16 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       ),
                       style: OutlinedButton.styleFrom(
                         side: BorderSide(color: AppColors.error.withAlpha(120)),
-                        backgroundColor: AppColors.error.withAlpha(10), // Subtle red tint
+                        backgroundColor: AppColors.error.withAlpha(
+                          10,
+                        ), // Subtle red tint
                         padding: const EdgeInsets.symmetric(horizontal: 10),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         visualDensity: VisualDensity.compact,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
                   ),
@@ -626,11 +728,7 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               if (isNarrowCard) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    titleCol,
-                    const SizedBox(height: 12),
-                    actionsWrap,
-                  ],
+                  children: [titleCol, const SizedBox(height: 12), actionsWrap],
                 );
               }
 
@@ -654,7 +752,12 @@ class _JobMonitorViewState extends State<JobMonitorView> {
               Expanded(
                 child: Text(
                   stageText,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -665,7 +768,12 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                 children: [
                   Text(
                     '${(progress * 100).toInt()}%',
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                   if (totalArticles > 0) ...[
                     const SizedBox(width: 8),
@@ -744,19 +852,39 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                   ],
                 ),
                 OutlinedButton.icon(
-                  onPressed: () => _showJobArticlesDialog(context, jobId, journalTitle, metrics, status: status),
-                  icon: const Icon(Icons.format_list_bulleted_rounded, size: 14, color: AppColors.textSecondary),
+                  onPressed: () => _showJobArticlesDialog(
+                    context,
+                    jobId,
+                    journalTitle,
+                    metrics,
+                    status: status,
+                  ),
+                  icon: const Icon(
+                    Icons.format_list_bulleted_rounded,
+                    size: 14,
+                    color: AppColors.textSecondary,
+                  ),
                   label: Text(
                     context.l10n.articleDetails,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                   style: OutlinedButton.styleFrom(
                     backgroundColor: AppColors.surface,
                     side: const BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                   ),
                 ),
               ],
@@ -815,9 +943,14 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: AppColors.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               titlePadding: const EdgeInsets.fromLTRB(24, 20, 16, 12),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 24,
+                vertical: 8,
+              ),
               title: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -838,7 +971,10 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          context.l10n.jobMetricsSummary(jobId, (metrics?['total_articles'] as num?)?.toInt() ?? 0),
+                          context.l10n.jobMetricsSummary(
+                            jobId,
+                            (metrics?['total_articles'] as num?)?.toInt() ?? 0,
+                          ),
                           style: const TextStyle(
                             fontSize: 12,
                             color: AppColors.textMuted,
@@ -869,128 +1005,198 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                         physics: const BouncingScrollPhysics(),
                         child: Row(
                           children: [
-                            _buildDialogFilterChip(context.l10n.filterAll, 'ALL', filter, (val) => setDialogState(() => filter = val)),
+                            _buildDialogFilterChip(
+                              context.l10n.filterAll,
+                              'ALL',
+                              filter,
+                              (val) => setDialogState(() => filter = val),
+                            ),
                             const SizedBox(width: 8),
-                            _buildDialogFilterChip(context.l10n.filterNormalizedTEI, 'NORMALIZED', filter, (val) => setDialogState(() => filter = val)),
+                            _buildDialogFilterChip(
+                              context.l10n.filterNormalizedTEI,
+                              'NORMALIZED',
+                              filter,
+                              (val) => setDialogState(() => filter = val),
+                            ),
                             const SizedBox(width: 8),
-                            _buildDialogFilterChip(context.l10n.filterFetchedPDF, 'FETCHED', filter, (val) => setDialogState(() => filter = val)),
+                            _buildDialogFilterChip(
+                              context.l10n.filterFetchedPDF,
+                              'FETCHED',
+                              filter,
+                              (val) => setDialogState(() => filter = val),
+                            ),
                             const SizedBox(width: 8),
-                            _buildDialogFilterChip(context.l10n.filterError, 'FAILED', filter, (val) => setDialogState(() => filter = val), isError: true),
+                            _buildDialogFilterChip(
+                              context.l10n.filterError,
+                              'FAILED',
+                              filter,
+                              (val) => setDialogState(() => filter = val),
+                              isError: true,
+                            ),
                           ],
                         ),
                       ),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: FutureBuilder<List<Map<String, dynamic>>>(
-                        future: _apiClient.getJobArticles(jobId, perPage: 100),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
-                            return const Center(child: CircularProgressIndicator());
-                          }
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Text(
-                                context.l10n.errorLoadingArticles + snapshot.error.toString(),
-                                style: const TextStyle(color: AppColors.error, fontFamily: 'Manrope'),
-                              ),
-                            );
-                          }
-                          final allArticles = snapshot.data ?? [];
-                          final filtered = allArticles.where((a) {
-                            if (filter == 'ALL') return true;
-                            return (a['status'] ?? '').toString().toUpperCase() == filter;
-                          }).toList();
-
-                          if (filtered.isEmpty) {
-                            return Center(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Icon(Icons.inbox_outlined, size: 40, color: AppColors.slate300),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    allArticles.isEmpty
-                                        ? context.l10n.noArticlesInJob
-                                        : context.l10n.noArticlesWithStatus,
-                                    style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope', fontSize: 13),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: FutureBuilder<List<Map<String, dynamic>>>(
+                          future: _apiClient.getJobArticles(
+                            jobId,
+                            perPage: 100,
+                          ),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text(
+                                  context.l10n.errorLoadingArticles +
+                                      snapshot.error.toString(),
+                                  style: const TextStyle(
+                                    color: AppColors.error,
+                                    fontFamily: 'Manrope',
                                   ),
-                                ],
-                              ),
-                            );
-                          }
+                                ),
+                              );
+                            }
+                            final allArticles = snapshot.data ?? [];
+                            final filtered = allArticles.where((a) {
+                              if (filter == 'ALL') return true;
+                              return (a['status'] ?? '')
+                                      .toString()
+                                      .toUpperCase() ==
+                                  filter;
+                            }).toList();
 
-                          return ListView.separated(
-                            itemCount: filtered.length,
-                            separatorBuilder: (ctx, i) => const Divider(height: 1, color: AppColors.border),
-                            itemBuilder: (context, index) {
-                              final art = filtered[index];
-                              final artStatus = (art['status'] ?? '').toString().toUpperCase();
-                              final artTitle = (art['title'] ?? context.l10n.untitledArticle).toString();
-                              final doi = (art['doi'] ?? 'N/A').toString();
-                              final year = art['year']?.toString() ?? 'N/A';
-                              final errorMsg = art['error_message']?.toString();
-
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                            if (filtered.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    _buildArticleStatusIcon(artStatus),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            artTitle,
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
-                                              color: AppColors.textPrimary,
-                                              fontFamily: 'Manrope',
-                                            ),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                'DOI: $doi',
-                                                style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
-                                              ),
-                                              const SizedBox(width: 12),
-                                              Text(
-                                                context.l10n.yearLabel + year.toString(),
-                                                style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
-                                              ),
-                                            ],
-                                          ),
-                                          if (errorMsg != null && errorMsg.isNotEmpty) ...[
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Lỗi: $errorMsg',
-                                              style: const TextStyle(fontSize: 11, color: AppColors.error, fontFamily: 'Manrope'),
-                                            ),
-                                          ],
-                                        ],
+                                    const Icon(
+                                      Icons.inbox_outlined,
+                                      size: 40,
+                                      color: AppColors.slate300,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      allArticles.isEmpty
+                                          ? context.l10n.noArticlesInJob
+                                          : context.l10n.noArticlesWithStatus,
+                                      style: const TextStyle(
+                                        color: AppColors.textMuted,
+                                        fontFamily: 'Manrope',
+                                        fontSize: 13,
                                       ),
                                     ),
-                                    const SizedBox(width: 12),
-                                    _buildArticleStatusBadge(artStatus),
                                   ],
                                 ),
                               );
-                            },
-                          );
-                        },
+                            }
+
+                            return ListView.separated(
+                              itemCount: filtered.length,
+                              separatorBuilder: (ctx, i) => const Divider(
+                                height: 1,
+                                color: AppColors.border,
+                              ),
+                              itemBuilder: (context, index) {
+                                final art = filtered[index];
+                                final artStatus = (art['status'] ?? '')
+                                    .toString()
+                                    .toUpperCase();
+                                final artTitle =
+                                    (art['title'] ??
+                                            context.l10n.untitledArticle)
+                                        .toString();
+                                final doi = (art['doi'] ?? 'N/A').toString();
+                                final year = art['year']?.toString() ?? 'N/A';
+                                final errorMsg = art['error_message']
+                                    ?.toString();
+
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 4,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      _buildArticleStatusIcon(artStatus),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              artTitle,
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: AppColors.textPrimary,
+                                                fontFamily: 'Manrope',
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Row(
+                                              children: [
+                                                Text(
+                                                  'DOI: $doi',
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                    color: AppColors.textMuted,
+                                                    fontFamily: 'Manrope',
+                                                  ),
+                                                ),
+                                                const SizedBox(width: 12),
+                                                Text(
+                                                  context.l10n.yearLabel +
+                                                      year.toString(),
+                                                  style: const TextStyle(
+                                                    fontSize: 11,
+                                                    color: AppColors.textMuted,
+                                                    fontFamily: 'Manrope',
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            if (errorMsg != null &&
+                                                errorMsg.isNotEmpty) ...[
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                'Lỗi: $errorMsg',
+                                                style: const TextStyle(
+                                                  fontSize: 11,
+                                                  color: AppColors.error,
+                                                  fontFamily: 'Manrope',
+                                                ),
+                                              ),
+                                            ],
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      _buildArticleStatusBadge(artStatus),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            actions: [
+              actions: [
                 if (((metrics?['failed'] as num?)?.toInt() ?? 0) > 0)
                   ElevatedButton.icon(
                     onPressed: () {
@@ -998,12 +1204,21 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                       _retryJob(jobId);
                     },
                     icon: const Icon(Icons.refresh_rounded, size: 14),
-                    label: Text(context.l10n.retryFailedArticlesBtn((metrics?['failed'] as num?)?.toInt() ?? 0)),
+                    label: Text(
+                      context.l10n.retryFailedArticlesBtn(
+                        (metrics?['failed'] as num?)?.toInt() ?? 0,
+                      ),
+                    ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.error,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 OutlinedButton.icon(
@@ -1011,20 +1226,37 @@ class _JobMonitorViewState extends State<JobMonitorView> {
                     Navigator.of(ctx).pop();
                     _confirmDeleteJob(jobId, journalTitle);
                   },
-                  icon: const Icon(Icons.delete_outline_rounded, size: 14, color: AppColors.error),
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    size: 14,
+                    color: AppColors.error,
+                  ),
                   label: const Text(
                     'Xóa tác vụ',
-                    style: TextStyle(fontFamily: 'Manrope', color: AppColors.error, fontSize: 13, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      fontFamily: 'Manrope',
+                      color: AppColors.error,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: AppColors.error.withAlpha(120)),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text(context.l10n.close, style: const TextStyle(fontFamily: 'Manrope')),
+                  child: Text(
+                    context.l10n.close,
+                    style: const TextStyle(fontFamily: 'Manrope'),
+                  ),
                 ),
               ],
             );
@@ -1034,7 +1266,13 @@ class _JobMonitorViewState extends State<JobMonitorView> {
     );
   }
 
-  Widget _buildDialogFilterChip(String label, String value, String current, Function(String) onSelect, {bool isError = false}) {
+  Widget _buildDialogFilterChip(
+    String label,
+    String value,
+    String current,
+    Function(String) onSelect, {
+    bool isError = false,
+  }) {
     final isSelected = current == value;
     return InkWell(
       onTap: () => onSelect(value),
@@ -1057,7 +1295,9 @@ class _JobMonitorViewState extends State<JobMonitorView> {
           style: TextStyle(
             fontSize: 12,
             fontWeight: FontWeight.w600,
-            color: isSelected ? Colors.white : (isError ? AppColors.error : AppColors.textSecondary),
+            color: isSelected
+                ? Colors.white
+                : (isError ? AppColors.error : AppColors.textSecondary),
             fontFamily: 'Manrope',
           ),
         ),
@@ -1068,16 +1308,36 @@ class _JobMonitorViewState extends State<JobMonitorView> {
   Widget _buildArticleStatusIcon(String status) {
     switch (status) {
       case 'NORMALIZED':
-        return const Icon(Icons.check_circle_rounded, size: 18, color: AppColors.green700);
+        return const Icon(
+          Icons.check_circle_rounded,
+          size: 18,
+          color: AppColors.green700,
+        );
       case 'PARSED':
-        return const Icon(Icons.integration_instructions_outlined, size: 18, color: AppColors.primary);
+        return const Icon(
+          Icons.integration_instructions_outlined,
+          size: 18,
+          color: AppColors.primary,
+        );
       case 'FETCHED':
-        return const Icon(Icons.download_done_rounded, size: 18, color: Color(0xFF6366F1));
+        return const Icon(
+          Icons.download_done_rounded,
+          size: 18,
+          color: Color(0xFF6366F1),
+        );
       case 'FAILED':
-        return const Icon(Icons.error_outline_rounded, size: 18, color: AppColors.error);
+        return const Icon(
+          Icons.error_outline_rounded,
+          size: 18,
+          color: AppColors.error,
+        );
       case 'HARVESTED':
       default:
-        return const Icon(Icons.schedule_rounded, size: 18, color: AppColors.textMuted);
+        return const Icon(
+          Icons.schedule_rounded,
+          size: 18,
+          color: AppColors.textMuted,
+        );
     }
   }
 
@@ -1116,7 +1376,12 @@ class _JobMonitorViewState extends State<JobMonitorView> {
       ),
       child: Text(
         txt,
-        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: col, fontFamily: 'Manrope'),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          color: col,
+          fontFamily: 'Manrope',
+        ),
       ),
     );
   }

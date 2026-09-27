@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
@@ -52,7 +53,9 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
     super.didUpdateWidget(oldWidget);
     if (widget.selectedJournalId != null &&
         widget.selectedJournalId != oldWidget.selectedJournalId &&
-        _profiles.any((p) => p['journal_id']?.toString() == widget.selectedJournalId)) {
+        _profiles.any(
+          (p) => p['journal_id']?.toString() == widget.selectedJournalId,
+        )) {
       final jId = widget.selectedJournalId!;
       if (!_selectedCompareIds.contains(jId)) {
         setState(() {
@@ -81,7 +84,9 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
         // Initialize compare selection (up to 2 by default, or widget selected)
         if (_selectedCompareIds.isEmpty && list.isNotEmpty) {
           if (widget.selectedJournalId != null &&
-              list.any((p) => p['journal_id']?.toString() == widget.selectedJournalId)) {
+              list.any(
+                (p) => p['journal_id']?.toString() == widget.selectedJournalId,
+              )) {
             final other = list.firstWhere(
               (p) => p['journal_id']?.toString() != widget.selectedJournalId,
               orElse: () => list.first,
@@ -113,10 +118,7 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
 
   void _addJournalSlot() {
     if (_selectedCompareIds.length >= 3) {
-      AppNotification.showWarning(
-        context,
-        context.l10n.compareMaxLimit,
-      );
+      AppNotification.showWarning(context, context.l10n.compareMaxLimit);
       return;
     }
 
@@ -220,8 +222,13 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.green700,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 18,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
           ],
@@ -230,11 +237,7 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
         if (isNarrow) {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              titleCol,
-              const SizedBox(height: 12),
-              controlsWrap,
-            ],
+            children: [titleCol, const SizedBox(height: 12), controlsWrap],
           );
         }
 
@@ -358,10 +361,7 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
             const SizedBox(height: 28),
 
             // SECTION 6: Rhetorical Structure — CARS Moves Comparison
-            CarsMovesChart(
-              profiles: selectedProfiles,
-              colors: _compareColors,
-            ),
+            CarsMovesChart(profiles: selectedProfiles, colors: _compareColors),
             const SizedBox(height: 28),
 
             // SECTION 7: Style Difference Matrix (Heatmap)
@@ -406,10 +406,16 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.tune_rounded, size: 18, color: AppColors.primary),
+                  const Icon(
+                    Icons.tune_rounded,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(width: 8),
                   Text(
-                    context.l10n.comparisonJournalsCount(_selectedCompareIds.length),
+                    context.l10n.comparisonJournalsCount(
+                      _selectedCompareIds.length,
+                    ),
                     style: const TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
@@ -422,8 +428,14 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
               Text(
                 _selectedCompareIds.length == 1
                     ? context.l10n.singleViewHint
-                    : context.l10n.comparingJournalsParallel(_selectedCompareIds.length),
-                style: const TextStyle(fontSize: 11.5, color: AppColors.textSubtle, fontWeight: FontWeight.w600),
+                    : context.l10n.comparingJournalsParallel(
+                        _selectedCompareIds.length,
+                      ),
+                style: const TextStyle(
+                  fontSize: 11.5,
+                  color: AppColors.textSubtle,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -434,7 +446,11 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
               for (int i = 0; i < _selectedCompareIds.length; i++) ...[
                 if (i > 0) const SizedBox(width: 14),
                 Expanded(
-                  child: _buildDropdownSlot(i, _selectedCompareIds[i], _profiles),
+                  child: _buildDropdownSlot(
+                    i,
+                    _selectedCompareIds[i],
+                    _profiles,
+                  ),
                 ),
               ],
               if (_selectedCompareIds.length < 3) ...[
@@ -462,7 +478,10 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
             decoration: BoxDecoration(
               color: AppColors.blue50,
               shape: BoxShape.circle,
-              border: Border.all(color: AppColors.primary.withAlpha(160), width: 1.5),
+              border: Border.all(
+                color: AppColors.primary.withAlpha(160),
+                width: 1.5,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: AppColors.primary.withAlpha(20),
@@ -482,7 +501,11 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
     );
   }
 
-  Widget _buildDropdownSlot(int index, String currentId, List<Map<String, dynamic>> profiles) {
+  Widget _buildDropdownSlot(
+    int index,
+    String currentId,
+    List<Map<String, dynamic>> profiles,
+  ) {
     final color = _compareColors[index % _compareColors.length];
     return Container(
       height: 76,
@@ -531,7 +554,11 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
                   borderRadius: BorderRadius.circular(12),
                   child: const Padding(
                     padding: EdgeInsets.all(2),
-                    child: Icon(Icons.close_rounded, size: 16, color: AppColors.textSubtle),
+                    child: Icon(
+                      Icons.close_rounded,
+                      size: 16,
+                      color: AppColors.textSubtle,
+                    ),
                   ),
                 ),
             ],
@@ -539,16 +566,23 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
           const SizedBox(height: 2),
           DropdownButtonHideUnderline(
             child: DropdownButton<String>(
-              value: profiles.any((p) => p['journal_id']?.toString() == currentId)
+              value:
+                  profiles.any((p) => p['journal_id']?.toString() == currentId)
                   ? currentId
-                  : (profiles.isNotEmpty ? profiles.first['journal_id']?.toString() : null),
+                  : (profiles.isNotEmpty
+                        ? profiles.first['journal_id']?.toString()
+                        : null),
               isExpanded: true,
               isDense: true,
               dropdownColor: AppColors.surface,
               borderRadius: BorderRadius.circular(12),
               focusColor: Colors.transparent,
               elevation: 4,
-              icon: Icon(Icons.keyboard_arrow_down_rounded, color: color, size: 20),
+              icon: Icon(
+                Icons.keyboard_arrow_down_rounded,
+                color: color,
+                size: 20,
+              ),
               style: const TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
@@ -589,9 +623,19 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
       child: Center(
         child: Column(
           children: [
-            const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: AppColors.error,
+              size: 36,
+            ),
             const SizedBox(height: 8),
-            Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+            Text(
+              _error!,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontFamily: 'Manrope',
+              ),
+            ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: _loadProfiles,
@@ -610,7 +654,10 @@ class _ProfilesReviewViewState extends State<ProfilesReviewView> {
       child: Center(
         child: Text(
           context.l10n.noProfilesExtracted,
-          style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+          style: const TextStyle(
+            color: AppColors.textMuted,
+            fontFamily: 'Manrope',
+          ),
         ),
       ),
     );

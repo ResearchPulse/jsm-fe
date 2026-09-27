@@ -1,13 +1,10 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../../app/theme/app_colors.dart';
 
-enum AppNotificationType {
-  success,
-  error,
-  warning,
-  info,
-}
+enum AppNotificationType { success, error, warning, info }
 
 class AppNotification {
   static final AppNotification _instance = AppNotification._internal();
@@ -258,10 +255,7 @@ class _NotificationCard extends StatefulWidget {
   final _NotificationItemData data;
   final VoidCallback onDismiss;
 
-  const _NotificationCard({
-    required this.data,
-    required this.onDismiss,
-  });
+  const _NotificationCard({required this.data, required this.onDismiss});
 
   @override
   State<_NotificationCard> createState() => _NotificationCardState();
@@ -292,13 +286,10 @@ class _NotificationCardState extends State<_NotificationCard>
       curve: Curves.easeOutCubic,
     );
 
-    _slideAnim = Tween<Offset>(
-      begin: const Offset(1.15, 0),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _animController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnim = Tween<Offset>(begin: const Offset(1.15, 0), end: Offset.zero)
+        .animate(
+          CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
+        );
 
     _animController.forward();
     _startTimer();
@@ -459,11 +450,7 @@ class _NotificationCardState extends State<_NotificationCard>
                             color: _accentBgColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Icon(
-                            iconData,
-                            color: _accentColor,
-                            size: 20,
-                          ),
+                          child: Icon(iconData, color: _accentColor, size: 20),
                         ),
                         const SizedBox(width: 12),
 

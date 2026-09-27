@@ -143,7 +143,7 @@ class RecommendationsDimensionTable extends StatelessWidget {
                   return TableRow(
                     decoration: BoxDecoration(
                       color: isOverall
-                          ? AppColors.primarySoft.withOpacity(0.3)
+                          ? AppColors.primarySoft.withValues(alpha: 0.3)
                           : Colors.transparent,
                     ),
                     children: [
@@ -233,7 +233,7 @@ class RecommendationsDimensionTable extends StatelessWidget {
           height: 12,
           decoration: BoxDecoration(
             color: bgColor,
-            border: Border.all(color: textColor.withOpacity(0.5)),
+            border: Border.all(color: textColor.withValues(alpha: 0.5)),
             borderRadius: BorderRadius.circular(3),
           ),
         ),

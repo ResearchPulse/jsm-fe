@@ -1,6 +1,9 @@
 import '../../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../../../app/theme/app_colors.dart';
+
 import 'dart:math' as math;
 
 class SentenceDistributionChart extends StatelessWidget {
@@ -45,7 +48,11 @@ class SentenceDistributionChart extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.horizontal_distribute_rounded, size: 18, color: AppColors.primary),
+              const Icon(
+                Icons.horizontal_distribute_rounded,
+                size: 18,
+                color: AppColors.primary,
+              ),
               SizedBox(width: 8),
               Text(
                 context.l10n.sentenceDistributionTitle,
@@ -61,7 +68,11 @@ class SentenceDistributionChart extends StatelessWidget {
           const SizedBox(height: 6),
           Text(
             context.l10n.sentenceDistributionSubtitle,
-            style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+            style: TextStyle(
+              fontSize: 12,
+              color: AppColors.textMuted,
+              fontFamily: 'Manrope',
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -73,9 +84,27 @@ class SentenceDistributionChart extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('0 ${context.l10n.unitWords}', style: TextStyle(fontSize: 10, color: AppColors.textSubtle)),
-                    Text('${(maxP90 / 2).toInt()} ${context.l10n.unitWords}', style: const TextStyle(fontSize: 10, color: AppColors.textSubtle)),
-                    Text('${maxP90.toInt()} ${context.l10n.unitWords}', style: const TextStyle(fontSize: 10, color: AppColors.textSubtle)),
+                    Text(
+                      '0 ${context.l10n.unitWords}',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textSubtle,
+                      ),
+                    ),
+                    Text(
+                      '${(maxP90 / 2).toInt()} ${context.l10n.unitWords}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textSubtle,
+                      ),
+                    ),
+                    Text(
+                      '${maxP90.toInt()} ${context.l10n.unitWords}',
+                      style: const TextStyle(
+                        fontSize: 10,
+                        color: AppColors.textSubtle,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -106,13 +135,20 @@ class SentenceDistributionChart extends StatelessWidget {
                         Container(
                           width: 8,
                           height: 8,
-                          decoration: BoxDecoration(color: col, shape: BoxShape.circle),
+                          decoration: BoxDecoration(
+                            color: col,
+                            shape: BoxShape.circle,
+                          ),
                         ),
                         const SizedBox(width: 6),
                         Expanded(
                           child: Text(
                             name,
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textPrimary,
+                            ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -150,7 +186,9 @@ class SentenceDistributionChart extends StatelessWidget {
                                   decoration: BoxDecoration(
                                     color: col.withAlpha(40),
                                     borderRadius: BorderRadius.circular(4),
-                                    border: Border.all(color: col.withAlpha(120)),
+                                    border: Border.all(
+                                      color: col.withAlpha(120),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -176,14 +214,18 @@ class SentenceDistributionChart extends StatelessWidget {
                               Positioned(
                                 left: x50 - 5,
                                 child: Tooltip(
-                                  message: '$name: P10=$p10 | P50=$p50 | P90=$p90',
+                                  message:
+                                      '$name: P10=$p10 | P50=$p50 | P90=$p90',
                                   child: Container(
                                     width: 10,
                                     height: 10,
                                     decoration: BoxDecoration(
                                       color: col,
                                       shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: 1.5),
+                                      border: Border.all(
+                                        color: Colors.white,
+                                        width: 1.5,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -200,7 +242,11 @@ class SentenceDistributionChart extends StatelessWidget {
                     child: Text(
                       '${p10.toInt()}-${p50.toInt()}-${p90.toInt()}',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ),
                 ],

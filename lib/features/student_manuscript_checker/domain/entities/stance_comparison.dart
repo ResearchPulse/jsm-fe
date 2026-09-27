@@ -19,8 +19,7 @@ class StanceComparison extends Equatable {
 
   factory StanceComparison.fromMap(Map<String, dynamic> map) {
     return StanceComparison(
-      userHedgeRate:
-          (map['user_hedge_rate_per_1k'] as num?)?.toDouble() ?? 0.0,
+      userHedgeRate: (map['user_hedge_rate_per_1k'] as num?)?.toDouble() ?? 0.0,
       journalHedgeRate:
           (map['journal_hedge_rate_per_1k'] as num?)?.toDouble() ?? 0.0,
       userBoosterRate:
@@ -41,9 +40,9 @@ class StanceComparison extends Equatable {
 
   @override
   List<Object?> get props => [
-        userHedgeRate,
-        journalHedgeRate,
-        userBoosterRate,
-        journalBoosterRate,
-      ];
+    userHedgeRate,
+    journalHedgeRate,
+    userBoosterRate,
+    journalBoosterRate,
+  ];
 }

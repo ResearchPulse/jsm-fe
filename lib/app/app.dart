@@ -42,9 +42,7 @@ class App extends StatelessWidget {
         ],
         child: MultiBlocProvider(
           providers: [
-            BlocProvider<LocaleCubit>(
-              create: (_) => LocaleCubit(),
-            ),
+            BlocProvider<LocaleCubit>(create: (_) => LocaleCubit()),
             BlocProvider<HomeCubit>(
               create: (context) => HomeCubit(
                 getFeaturedJournalsUseCase: GetFeaturedJournalsUseCase(
@@ -59,10 +57,7 @@ class App extends StatelessWidget {
                 title: 'journal system miner - HyperDataLab',
                 theme: AppTheme.lightTheme,
                 locale: locale,
-                supportedLocales: const [
-                  Locale('en'),
-                  Locale('vi'),
-                ],
+                supportedLocales: const [Locale('en'), Locale('vi')],
                 localizationsDelegates: const [
                   AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,

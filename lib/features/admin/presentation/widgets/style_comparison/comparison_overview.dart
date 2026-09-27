@@ -1,6 +1,9 @@
 import '../../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../../../app/theme/app_colors.dart';
+
 import 'dart:math' as math;
 
 class ComparisonOverview extends StatelessWidget {
@@ -19,12 +22,47 @@ class ComparisonOverview extends StatelessWidget {
 
     // Key Metrics to display
     final metrics = [
-      _buildMetricConfig(context.l10n.metricSentenceLength, 'mean_length', context.l10n.unitWordsPerSentence, true),
-      _buildMetricConfig(context.l10n.metricLexicalDensity, 'lexical_density', '%', false, isPercent: true),
-      _buildMetricConfig(context.l10n.metricHedges, 'hedges_per_1k', context.l10n.unitPer1kWords, true),
-      _buildMetricConfig(context.l10n.metricBoosters, 'boosters_per_1k', context.l10n.unitPer1kWords, true),
-      _buildMetricConfig(context.l10n.metricNeutralStance, 'neutral', '%', false, isStance: true, isPercent: true),
-      _buildMetricConfig(context.l10n.metricCarsCoverage, 'cars', '%', false, isCars: true, isPercent: true),
+      _buildMetricConfig(
+        context.l10n.metricSentenceLength,
+        'mean_length',
+        context.l10n.unitWordsPerSentence,
+        true,
+      ),
+      _buildMetricConfig(
+        context.l10n.metricLexicalDensity,
+        'lexical_density',
+        '%',
+        false,
+        isPercent: true,
+      ),
+      _buildMetricConfig(
+        context.l10n.metricHedges,
+        'hedges_per_1k',
+        context.l10n.unitPer1kWords,
+        true,
+      ),
+      _buildMetricConfig(
+        context.l10n.metricBoosters,
+        'boosters_per_1k',
+        context.l10n.unitPer1kWords,
+        true,
+      ),
+      _buildMetricConfig(
+        context.l10n.metricNeutralStance,
+        'neutral',
+        '%',
+        false,
+        isStance: true,
+        isPercent: true,
+      ),
+      _buildMetricConfig(
+        context.l10n.metricCarsCoverage,
+        'cars',
+        '%',
+        false,
+        isCars: true,
+        isPercent: true,
+      ),
     ];
 
     return Column(
@@ -42,17 +80,20 @@ class ComparisonOverview extends StatelessWidget {
         const SizedBox(height: 16),
         LayoutBuilder(
           builder: (context, constraints) {
-            final crossAxisCount = constraints.maxWidth < 600 ? 1 : constraints.maxWidth < 900 ? 2 : 3;
-            final width = (constraints.maxWidth - (crossAxisCount - 1) * 16) / crossAxisCount;
+            final crossAxisCount = constraints.maxWidth < 600
+                ? 1
+                : constraints.maxWidth < 900
+                ? 2
+                : 3;
+            final width =
+                (constraints.maxWidth - (crossAxisCount - 1) * 16) /
+                crossAxisCount;
 
             return Wrap(
               spacing: 16,
               runSpacing: 16,
               children: metrics.map((config) {
-                return SizedBox(
-                  width: width,
-                  child: _buildMetricCard(config),
-                );
+                return SizedBox(width: width, child: _buildMetricCard(config));
               }).toList(),
             );
           },
@@ -62,8 +103,14 @@ class ComparisonOverview extends StatelessWidget {
   }
 
   Map<String, dynamic> _buildMetricConfig(
-      String title, String key, String unit, bool lowerIsBetter,
-      {bool isPercent = false, bool isStance = false, bool isCars = false}) {
+    String title,
+    String key,
+    String unit,
+    bool lowerIsBetter, {
+    bool isPercent = false,
+    bool isStance = false,
+    bool isCars = false,
+  }) {
     return {
       'title': title,
       'key': key,
@@ -100,7 +147,7 @@ class ComparisonOverview extends StatelessWidget {
 
     double maxVal = values.reduce(math.max);
     double minVal = values.reduce(math.min);
-    
+
     // Fallback for visual scale max to avoid dividing by zero or filling 100% when shouldn't
     double scaleMax = maxVal == 0 ? 1 : maxVal * 1.2;
     if (isPercent) scaleMax = 1.0; // percentages max is 1 (100%)
@@ -112,7 +159,7 @@ class ComparisonOverview extends StatelessWidget {
 
     String diffText = '';
     Color diffColor = AppColors.textMuted;
-    
+
     if (profiles.length == 2) {
       double diff = values[1] - values[0];
       String sign = diff > 0 ? '+' : '';
@@ -121,7 +168,9 @@ class ComparisonOverview extends StatelessWidget {
       } else {
         diffText = 'Δ $sign${diff.toStringAsFixed(1)} $unit';
       }
-      diffColor = diff.abs() > (isPercent ? 0.05 : maxVal * 0.1) ? AppColors.primary : AppColors.textMuted; // highlight if diff > 10%
+      diffColor = diff.abs() > (isPercent ? 0.05 : maxVal * 0.1)
+          ? AppColors.primary
+          : AppColors.textMuted; // highlight if diff > 10%
     } else if (profiles.length == 3) {
       double maxDiff = maxVal - minVal;
       if (isPercent) {
@@ -162,7 +211,10 @@ class ComparisonOverview extends StatelessWidget {
               ),
               if (profiles.length > 1)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: diffColor.withAlpha(15),
                     borderRadius: BorderRadius.circular(4),
@@ -183,7 +235,9 @@ class ComparisonOverview extends StatelessWidget {
           Column(
             children: List.generate(profiles.length, (index) {
               final val = values[index];
-              final wFactor = scaleMax == 0 ? 0.0 : (val / scaleMax).clamp(0.0, 1.0);
+              final wFactor = scaleMax == 0
+                  ? 0.0
+                  : (val / scaleMax).clamp(0.0, 1.0);
               return Padding(
                 padding: const EdgeInsets.only(bottom: 6),
                 child: Row(
@@ -192,7 +246,11 @@ class ComparisonOverview extends StatelessWidget {
                       width: 12,
                       child: Text(
                         'J${index + 1}',
-                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: colors[index]),
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                          color: colors[index],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 8),

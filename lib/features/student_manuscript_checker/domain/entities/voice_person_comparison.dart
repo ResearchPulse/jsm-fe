@@ -1,4 +1,5 @@
 import 'dart:developer' as developer;
+
 import 'package:equatable/equatable.dart';
 
 /// Voice and person metrics comparison (passive voice, we/author person usage).
@@ -82,10 +83,10 @@ class VoicePersonComparison extends Equatable {
 
   @override
   List<Object?> get props => [
-        userPassiveRate,
-        journalPassiveRate,
-        userWeRate,
-        journalWeRate,
-        unit,
-      ];
+    userPassiveRate,
+    journalPassiveRate,
+    userWeRate,
+    journalWeRate,
+    unit,
+  ];
 }

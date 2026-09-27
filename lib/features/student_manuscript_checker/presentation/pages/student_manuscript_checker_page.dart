@@ -5,7 +5,6 @@ import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/widgets/error_view.dart';
 import '../../../../core/widgets/language_switcher.dart';
-import '../../../../core/widgets/loading_view.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../data/repositories/student_manuscript_repository_impl.dart';
 import '../../domain/repositories/student_manuscript_repository.dart';

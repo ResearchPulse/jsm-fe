@@ -146,7 +146,9 @@ class RecommendationsComparisonChart extends StatelessWidget {
                                     boxShadow: isTop
                                         ? [
                                             BoxShadow(
-                                              color: color.withOpacity(0.3),
+                                              color: color.withValues(
+                                                alpha: 0.3,
+                                              ),
                                               blurRadius: 4,
                                               offset: const Offset(0, 1),
                                             ),

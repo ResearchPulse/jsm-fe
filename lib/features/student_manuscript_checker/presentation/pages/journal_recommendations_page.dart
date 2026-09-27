@@ -30,11 +30,7 @@ class JournalRecommendationsPage extends StatelessWidget {
   final StudentManuscriptRepository? repository;
   final JournalRecommendationsCubit? cubit;
 
-  const JournalRecommendationsPage({
-    super.key,
-    this.repository,
-    this.cubit,
-  });
+  const JournalRecommendationsPage({super.key, this.repository, this.cubit});
 
   @override
   Widget build(BuildContext context) {
@@ -67,14 +63,12 @@ class JournalRecommendationsPage extends StatelessWidget {
       child: MultiBlocProvider(
         providers: [
           BlocProvider<JournalRecommendationsCubit>(
-            create: (context) => JournalRecommendationsCubit(
-              repository: repo,
-            )..init(),
+            create: (context) =>
+                JournalRecommendationsCubit(repository: repo)..init(),
           ),
           BlocProvider<EvaluationHistoryCubit>(
-            create: (context) => EvaluationHistoryCubit(
-              repository: repo,
-            )..loadHistory(),
+            create: (context) =>
+                EvaluationHistoryCubit(repository: repo)..loadHistory(),
           ),
         ],
         child: const _JournalRecommendationsView(),

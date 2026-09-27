@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../auth/domain/entities/auth_user.dart';
 import '../../../auth/presentation/cubit/auth_cubit.dart';
@@ -30,11 +31,10 @@ class AdminSidebar extends StatelessWidget {
       duration: duration,
       curve: curve,
       width: isCollapsed ? 76 : 260,
+      height: double.infinity,
       decoration: const BoxDecoration(
         color: AppColors.sidebarBackground,
-        border: Border(
-          right: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-        ),
+        border: Border(right: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +107,8 @@ class AdminSidebar extends StatelessWidget {
                     hoverColor: const Color(0xFFF0F7FC),
                     focusColor: Colors.transparent,
                     highlightColor: Colors.transparent,
-                    splashColor: const Color(0xFF0071BC).withValues(alpha: 0.08),
+                    splashColor: const Color(0xFF0071BC)
+                        .withValues(alpha: 0.08),
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: Image.asset(
@@ -156,7 +157,10 @@ class AdminSidebar extends StatelessWidget {
                     ),
                     tooltip: context.l10n.collapseSidebar,
                     padding: const EdgeInsets.all(4),
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
                     style: IconButton.styleFrom(
                       hoverColor: const Color(0xFFF0F7FC),
                       highlightColor: Colors.transparent,
@@ -169,8 +173,11 @@ class AdminSidebar extends StatelessWidget {
   }
 
   String _getInitials(String name) {
-    final parts =
-        name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    final parts = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
     if (parts.isEmpty) return 'A';
     return parts.take(2).map((p) => p[0].toUpperCase()).join();
   }
@@ -191,9 +198,15 @@ class AdminSidebar extends StatelessWidget {
     final role = (user?.role ?? 'ADMIN').toUpperCase();
     final initials = _getInitials(displayName);
     final bool isAdminRole = role == 'ADMIN';
-    final Color badgeBg = isAdminRole ? const Color(0xFFFEE2E2) : const Color(0xFFF0FDFA);
-    final Color badgeText = isAdminRole ? const Color(0xFFDC2626) : const Color(0xFF0D9488);
-    final Color badgeBorder = isAdminRole ? const Color(0xFFFECACA) : const Color(0xFF99F6E4);
+    final Color badgeBg = isAdminRole
+        ? const Color(0xFFFEE2E2)
+        : const Color(0xFFF0FDFA);
+    final Color badgeText = isAdminRole
+        ? const Color(0xFFDC2626)
+        : const Color(0xFF0D9488);
+    final Color badgeBorder = isAdminRole
+        ? const Color(0xFFFECACA)
+        : const Color(0xFF99F6E4);
 
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 180),
@@ -276,9 +289,13 @@ class AdminSidebar extends StatelessWidget {
                     hoverColor: const Color(0xFFF0F7FC),
                     focusColor: Colors.transparent,
                     highlightColor: Colors.transparent,
-                    splashColor: const Color(0xFF0071BC).withValues(alpha: 0.08),
+                    splashColor: const Color(0xFF0071BC)
+                        .withValues(alpha: 0.08),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
                       child: Row(
                         children: [
                           CircleAvatar(
@@ -314,11 +331,17 @@ class AdminSidebar extends StatelessWidget {
                                 Row(
                                   children: [
                                     Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                        vertical: 1.5,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: badgeBg,
                                         borderRadius: BorderRadius.circular(4),
-                                        border: Border.all(color: badgeBorder, width: 0.5),
+                                        border: Border.all(
+                                          color: badgeBorder,
+                                          width: 0.5,
+                                        ),
                                       ),
                                       child: Text(
                                         role,
@@ -433,12 +456,14 @@ class AdminSidebar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
           child: Row(
             children: [
-              const Icon(Icons.person_outline_rounded, size: 16, color: Color(0xFF64748B)),
+              const Icon(
+                Icons.person_outline_rounded,
+                size: 16,
+                color: Color(0xFF64748B),
+              ),
               SizedBox(width: 10),
               Text(
                 context.l10n.accountProfile,
@@ -459,12 +484,14 @@ class AdminSidebar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
           child: Row(
             children: [
-              const Icon(Icons.home_outlined, size: 16, color: Color(0xFF64748B)),
+              const Icon(
+                Icons.home_outlined,
+                size: 16,
+                color: Color(0xFF64748B),
+              ),
               SizedBox(width: 10),
               Text(
                 context.l10n.backToHome,
@@ -493,7 +520,11 @@ class AdminSidebar extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.logout_rounded, size: 16, color: Color(0xFFDC2626)),
+              const Icon(
+                Icons.logout_rounded,
+                size: 16,
+                color: Color(0xFFDC2626),
+              ),
               SizedBox(width: 10),
               Text(
                 context.l10n.signOut,
@@ -606,9 +637,7 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
           child: SizedBox(
             height: 42,
             child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: isCollapsed ? 0 : 12,
-              ),
+              padding: EdgeInsets.symmetric(horizontal: isCollapsed ? 0 : 12),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 160),
                 transitionBuilder: (child, animation) =>
@@ -671,11 +700,7 @@ class _SidebarNavItemState extends State<_SidebarNavItem> {
     );
 
     if (isCollapsed) {
-      return Tooltip(
-        message: widget.title,
-        preferBelow: false,
-        child: item,
-      );
+      return Tooltip(message: widget.title, preferBelow: false, child: item);
     }
     return item;
   }

@@ -18,10 +18,8 @@ class StudentManuscriptApiClient {
   final http.Client _client;
   final Future<String?> Function()? tokenProvider;
 
-  StudentManuscriptApiClient({
-    this.tokenProvider,
-    http.Client? client,
-  }) : _client = client ?? http.Client();
+  StudentManuscriptApiClient({this.tokenProvider, http.Client? client})
+    : _client = client ?? http.Client();
 
   /// Submits a manuscript file to be checked against a target journal style profile.
   Future<ManuscriptCheckResult> checkManuscript({
@@ -44,11 +42,7 @@ class StudentManuscriptApiClient {
     request.fields['include_exemplars'] = includeExemplars.toString();
 
     request.files.add(
-      http.MultipartFile.fromBytes(
-        'file',
-        fileBytes,
-        filename: filename,
-      ),
+      http.MultipartFile.fromBytes('file', fileBytes, filename: filename),
     );
 
     http.StreamedResponse streamedResponse;
@@ -106,11 +100,7 @@ class StudentManuscriptApiClient {
     request.fields['include_exemplars'] = includeExemplars.toString();
 
     request.files.add(
-      http.MultipartFile.fromBytes(
-        'file',
-        fileBytes,
-        filename: filename,
-      ),
+      http.MultipartFile.fromBytes('file', fileBytes, filename: filename),
     );
 
     http.StreamedResponse streamedResponse;
@@ -212,11 +202,13 @@ class StudentManuscriptApiClient {
       'limit': limit.toString(),
       'sort': sort,
       if (journal != null && journal.isNotEmpty) 'journal': journal,
-      if (compatibility != null && compatibility.isNotEmpty) 'compatibility': compatibility,
+      if (compatibility != null && compatibility.isNotEmpty)
+        'compatibility': compatibility,
       if (search != null && search.isNotEmpty) 'search': search,
     };
 
-    final uri = Uri.parse(ApiEndpoints.studentEvaluations).replace(queryParameters: queryParams);
+    final uri = Uri.parse(ApiEndpoints.studentEvaluations)
+        .replace(queryParameters: queryParams);
     final headers = <String, String>{
       'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
@@ -225,7 +217,10 @@ class StudentManuscriptApiClient {
     final response = await _client.get(uri, headers: headers);
     if (response.statusCode != 200) {
       final msg = _extractErrorMessage(response);
-      throw ServerException(msg ?? 'Failed to load evaluation history', response.statusCode);
+      throw ServerException(
+        msg ?? 'Failed to load evaluation history',
+        response.statusCode,
+      );
     }
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
@@ -264,7 +259,10 @@ class StudentManuscriptApiClient {
     final response = await _client.get(uri, headers: headers);
     if (response.statusCode != 200) {
       final msg = _extractErrorMessage(response);
-      throw ServerException(msg ?? 'Failed to load evaluation details', response.statusCode);
+      throw ServerException(
+        msg ?? 'Failed to load evaluation details',
+        response.statusCode,
+      );
     }
 
     final decoded = jsonDecode(response.body) as Map<String, dynamic>;
@@ -285,7 +283,10 @@ class StudentManuscriptApiClient {
     final response = await _client.delete(uri, headers: headers);
     if (response.statusCode != 200) {
       final msg = _extractErrorMessage(response);
-      throw ServerException(msg ?? 'Failed to delete evaluation', response.statusCode);
+      throw ServerException(
+        msg ?? 'Failed to delete evaluation',
+        response.statusCode,
+      );
     }
   }
 
@@ -331,12 +332,16 @@ class StudentManuscriptApiClient {
       if (data != null) {
         return JournalRecommendationResponse.fromMap(data);
       }
-      throw const ServerException('Empty recommendation response from server.', 200);
+      throw const ServerException(
+        'Empty recommendation response from server.',
+        200,
+      );
     }
 
     final errorMsg = _extractErrorMessage(response);
     throw ServerException(
-      errorMsg ?? 'Failed to get journal recommendations (${response.statusCode})',
+      errorMsg ??
+          'Failed to get journal recommendations (${response.statusCode})',
       response.statusCode,
     );
   }
@@ -347,7 +352,8 @@ class StudentManuscriptApiClient {
       if (body is Map<String, dynamic>) {
         if (body['error'] is Map<String, dynamic>) {
           final err = body['error'] as Map<String, dynamic>;
-          if (err['message'] is String && (err['message'] as String).isNotEmpty) {
+          if (err['message'] is String &&
+              (err['message'] as String).isNotEmpty) {
             return err['message'] as String;
           }
         }
@@ -360,7 +366,8 @@ class StudentManuscriptApiClient {
             if (msg is String && msg.isNotEmpty) return msg;
           }
         }
-        if (body['message'] is String && (body['message'] as String).isNotEmpty) {
+        if (body['message'] is String &&
+            (body['message'] as String).isNotEmpty) {
           return body['message'] as String;
         }
       }

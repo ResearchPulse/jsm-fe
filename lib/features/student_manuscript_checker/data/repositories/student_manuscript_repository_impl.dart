@@ -12,10 +12,11 @@ class StudentManuscriptRepositoryImpl implements StudentManuscriptRepository {
   final StudentManuscriptApiClient apiClient;
 
   StudentManuscriptRepositoryImpl({AuthRepository? authRepository})
-      : apiClient = StudentManuscriptApiClient(
-          tokenProvider:
-              authRepository != null ? () => authRepository.currentToken() : null,
-        );
+    : apiClient = StudentManuscriptApiClient(
+        tokenProvider: authRepository != null
+            ? () => authRepository.currentToken()
+            : null,
+      );
 
   /// Direct injection constructor for tests.
   StudentManuscriptRepositoryImpl.withClient(this.apiClient);
@@ -36,14 +37,12 @@ class StudentManuscriptRepositoryImpl implements StudentManuscriptRepository {
     }
 
     if (fileBytes.isEmpty) {
-      throw const ServerException(
-        'The manuscript is empty.',
-        400,
-      );
+      throw const ServerException('The manuscript is empty.', 400);
     }
 
-    final cleanFilename =
-        filename.trim().isEmpty ? 'manuscript.txt' : filename.trim();
+    final cleanFilename = filename.trim().isEmpty
+        ? 'manuscript.txt'
+        : filename.trim();
 
     return apiClient.checkManuscript(
       fileBytes: fileBytes,
@@ -61,8 +60,9 @@ class StudentManuscriptRepositoryImpl implements StudentManuscriptRepository {
     bool includeExemplars = false,
   }) {
     final cleanJournalId = targetJournalId.trim();
-    final cleanFilename =
-        filename.trim().isEmpty ? 'manuscript.txt' : filename.trim();
+    final cleanFilename = filename.trim().isEmpty
+        ? 'manuscript.txt'
+        : filename.trim();
 
     return apiClient.checkManuscriptStream(
       fileBytes: fileBytes,
@@ -131,4 +131,3 @@ class StudentManuscriptRepositoryImpl implements StudentManuscriptRepository {
     );
   }
 }
-

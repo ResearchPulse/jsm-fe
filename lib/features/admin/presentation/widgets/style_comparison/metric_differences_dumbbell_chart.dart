@@ -1,6 +1,9 @@
 import '../../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../../../app/theme/app_colors.dart';
+
 import 'dart:math' as math;
 
 class MetricDifferencesDumbbellChart extends StatefulWidget {
@@ -14,10 +17,12 @@ class MetricDifferencesDumbbellChart extends StatefulWidget {
   });
 
   @override
-  State<MetricDifferencesDumbbellChart> createState() => _MetricDifferencesDumbbellChartState();
+  State<MetricDifferencesDumbbellChart> createState() =>
+      _MetricDifferencesDumbbellChartState();
 }
 
-class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbellChart> {
+class _MetricDifferencesDumbbellChartState
+    extends State<MetricDifferencesDumbbellChart> {
   bool _sortByDifference = true;
 
   @override
@@ -27,11 +32,37 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
     }
 
     final configs = [
-      _buildConfig(context.l10n.sentenceLengthLabel, 'mean_length', context.l10n.unitWordsPerSentence, false),
-      _buildConfig(context.l10n.lexicalDensityLabel, 'lexical_density', '%', true),
-      _buildConfig(context.l10n.hedgingLabel, 'hedges_per_1k', context.l10n.unitPer1kWords, false),
-      _buildConfig(context.l10n.boostersLabel, 'boosters_per_1k', context.l10n.unitPer1kWords, false),
-      _buildConfig(context.l10n.neutralStanceLabel, 'neutral', '%', true, isStance: true),
+      _buildConfig(
+        context.l10n.sentenceLengthLabel,
+        'mean_length',
+        context.l10n.unitWordsPerSentence,
+        false,
+      ),
+      _buildConfig(
+        context.l10n.lexicalDensityLabel,
+        'lexical_density',
+        '%',
+        true,
+      ),
+      _buildConfig(
+        context.l10n.hedgingLabel,
+        'hedges_per_1k',
+        context.l10n.unitPer1kWords,
+        false,
+      ),
+      _buildConfig(
+        context.l10n.boostersLabel,
+        'boosters_per_1k',
+        context.l10n.unitPer1kWords,
+        false,
+      ),
+      _buildConfig(
+        context.l10n.neutralStanceLabel,
+        'neutral',
+        '%',
+        true,
+        isStance: true,
+      ),
     ];
 
     // Compute values
@@ -67,13 +98,17 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
       rows.sort((a, b) {
         final confA = a['config'] as Map<String, dynamic>;
         final confB = b['config'] as Map<String, dynamic>;
-        
+
         final diffA = a['diff'] as double;
-        final maxA = (a['maxVal'] as double) == 0 ? 1.0 : (a['maxVal'] as double);
+        final maxA = (a['maxVal'] as double) == 0
+            ? 1.0
+            : (a['maxVal'] as double);
         final scoreA = confA['isPercent'] ? diffA : (diffA / maxA);
 
         final diffB = b['diff'] as double;
-        final maxB = (b['maxVal'] as double) == 0 ? 1.0 : (b['maxVal'] as double);
+        final maxB = (b['maxVal'] as double) == 0
+            ? 1.0
+            : (b['maxVal'] as double);
         final scoreB = confB['isPercent'] ? diffB : (diffB / maxB);
 
         return scoreB.compareTo(scoreA); // descending
@@ -102,7 +137,11 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
             children: [
               Row(
                 children: [
-                  const Icon(Icons.compare_arrows_rounded, size: 18, color: AppColors.primary),
+                  const Icon(
+                    Icons.compare_arrows_rounded,
+                    size: 18,
+                    color: AppColors.primary,
+                  ),
                   SizedBox(width: 8),
                   Text(
                     context.l10n.metricDifferencesTitle,
@@ -124,8 +163,14 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                   const SizedBox(width: 8),
                   SegmentedButton<bool>(
                     segments: [
-                      ButtonSegment(value: true, label: Text(context.l10n.largestSort)),
-                      ButtonSegment(value: false, label: Text(context.l10n.defaultSort)),
+                      ButtonSegment(
+                        value: true,
+                        label: Text(context.l10n.largestSort),
+                      ),
+                      ButtonSegment(
+                        value: false,
+                        label: Text(context.l10n.defaultSort),
+                      ),
                     ],
                     selected: {_sortByDifference},
                     onSelectionChanged: (set) {
@@ -134,7 +179,11 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                       });
                     },
                     style: SegmentedButton.styleFrom(
-                      textStyle: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                      textStyle: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Manrope',
+                      ),
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                     ),
                   ),
@@ -149,7 +198,13 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
     );
   }
 
-  Map<String, dynamic> _buildConfig(String title, String key, String unit, bool isPercent, {bool isStance = false}) {
+  Map<String, dynamic> _buildConfig(
+    String title,
+    String key,
+    String unit,
+    bool isPercent, {
+    bool isStance = false,
+  }) {
     return {
       'title': title,
       'key': key,
@@ -162,18 +217,19 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
   Widget _buildDumbbellRow(Map<String, dynamic> rowData) {
     final config = rowData['config'] as Map<String, dynamic>;
     final values = rowData['values'] as List<double>;
-    
+
     final title = config['title'] as String;
     final isPercent = config['isPercent'] as bool;
-    
+
     final minVal = rowData['minVal'] as double;
     final maxVal = rowData['maxVal'] as double;
-    
+
     // Scale computation
-    final globalMax = maxVal == 0 ? 1.0 : maxVal * 1.2; 
+    final globalMax = maxVal == 0 ? 1.0 : maxVal * 1.2;
     final globalMin = minVal == 0 ? 0.0 : minVal * 0.8;
-    
-    String formatVal(double v) => isPercent ? '${(v * 100).toStringAsFixed(0)}%' : v.toStringAsFixed(1);
+
+    String formatVal(double v) =>
+        isPercent ? '${(v * 100).toStringAsFixed(0)}%' : v.toStringAsFixed(1);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 24),
@@ -185,7 +241,11 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
             children: [
               Text(
                 title,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                style: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
@@ -195,7 +255,11 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                 ),
                 child: Text(
                   'Δ ${formatVal(maxVal - minVal)}',
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700, color: AppColors.textMuted),
+                  style: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textMuted,
+                  ),
                 ),
               ),
             ],
@@ -206,21 +270,29 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
             child: LayoutBuilder(
               builder: (context, constraints) {
                 final width = constraints.maxWidth;
-                
+
                 // Helper to get X coordinate
                 double getX(double v) {
                   if (globalMax == globalMin) return width / 2;
-                  if (isPercent) return width * v; // 0 to 100% scale for percentages
+                  if (isPercent) {
+                    return width * v; // 0 to 100% scale for percentages
+                  }
                   return width * ((v - globalMin) / (globalMax - globalMin));
                 }
 
                 // Collect points
                 List<Map<String, dynamic>> points = [];
                 for (int i = 0; i < values.length; i++) {
-                  points.add({'val': values[i], 'color': widget.colors[i], 'index': i});
+                  points.add({
+                    'val': values[i],
+                    'color': widget.colors[i],
+                    'index': i,
+                  });
                 }
-                
-                points.sort((a, b) => (a['val'] as double).compareTo(b['val'] as double));
+
+                points.sort(
+                  (a, b) => (a['val'] as double).compareTo(b['val'] as double),
+                );
 
                 final lineStart = getX(points.first['val']);
                 final lineEnd = getX(points.last['val']);
@@ -233,12 +305,9 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                     Positioned(
                       left: 0,
                       right: 0,
-                      child: Container(
-                        height: 1,
-                        color: AppColors.borderSoft,
-                      ),
+                      child: Container(height: 1, color: AppColors.borderSoft),
                     ),
-                    
+
                     // Connecting Line
                     if (points.length > 1)
                       Positioned(
@@ -249,13 +318,13 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                           color: AppColors.textSubtle.withAlpha(80),
                         ),
                       ),
-                      
+
                     // Dots
                     ...points.map((pt) {
                       final val = pt['val'] as double;
                       final col = pt['color'] as Color;
                       final x = getX(val);
-                      
+
                       return Positioned(
                         left: x - 6, // center dot
                         child: Container(
@@ -264,9 +333,15 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                           decoration: BoxDecoration(
                             color: col,
                             shape: BoxShape.circle,
-                            border: Border.all(color: AppColors.surface, width: 2),
+                            border: Border.all(
+                              color: AppColors.surface,
+                              width: 2,
+                            ),
                             boxShadow: [
-                              BoxShadow(color: col.withAlpha(100), blurRadius: 4),
+                              BoxShadow(
+                                color: col.withAlpha(100),
+                                blurRadius: 4,
+                              ),
                             ],
                           ),
                         ),
@@ -282,7 +357,11 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                           offset: const Offset(-10, 0),
                           child: Text(
                             formatVal(points.first['val']),
-                            style: TextStyle(fontSize: 10, color: points.first['color'], fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: points.first['color'],
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
@@ -294,7 +373,11 @@ class _MetricDifferencesDumbbellChartState extends State<MetricDifferencesDumbbe
                             offset: const Offset(-10, 0),
                             child: Text(
                               formatVal(points.last['val']),
-                              style: TextStyle(fontSize: 10, color: points.last['color'], fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: points.last['color'],
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),

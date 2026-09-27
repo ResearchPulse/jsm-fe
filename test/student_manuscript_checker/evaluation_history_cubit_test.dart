@@ -126,8 +126,11 @@ void main() {
       build: () => EvaluationHistoryCubit(repository: repo),
       act: (cubit) => cubit.loadHistory(refreshStats: true),
       expect: () => [
-        isA<EvaluationHistoryState>()
-            .having((s) => s.status, 'status', EvaluationHistoryStatus.loading),
+        isA<EvaluationHistoryState>().having(
+          (s) => s.status,
+          'status',
+          EvaluationHistoryStatus.loading,
+        ),
         isA<EvaluationHistoryState>()
             .having((s) => s.status, 'status', EvaluationHistoryStatus.success)
             .having((s) => s.items.length, 'items count', 1)
@@ -146,8 +149,11 @@ void main() {
         isA<EvaluationHistoryState>()
             .having((s) => s.search, 'search', 'nature')
             .having((s) => s.status, 'status', EvaluationHistoryStatus.loading),
-        isA<EvaluationHistoryState>()
-            .having((s) => s.status, 'status', EvaluationHistoryStatus.success),
+        isA<EvaluationHistoryState>().having(
+          (s) => s.status,
+          'status',
+          EvaluationHistoryStatus.success,
+        ),
       ],
     );
 
@@ -162,8 +168,11 @@ void main() {
         isA<EvaluationHistoryState>()
             .having((s) => s.compatibility, 'compatibility', 'STRONG_MATCH')
             .having((s) => s.status, 'status', EvaluationHistoryStatus.loading),
-        isA<EvaluationHistoryState>()
-            .having((s) => s.status, 'status', EvaluationHistoryStatus.success),
+        isA<EvaluationHistoryState>().having(
+          (s) => s.status,
+          'status',
+          EvaluationHistoryStatus.success,
+        ),
       ],
     );
 
@@ -180,8 +189,11 @@ void main() {
             .having((s) => s.search, 'search', '')
             .having((s) => s.compatibility, 'compatibility', isNull)
             .having((s) => s.status, 'status', EvaluationHistoryStatus.loading),
-        isA<EvaluationHistoryState>()
-            .having((s) => s.status, 'status', EvaluationHistoryStatus.success),
+        isA<EvaluationHistoryState>().having(
+          (s) => s.status,
+          'status',
+          EvaluationHistoryStatus.success,
+        ),
       ],
     );
 
@@ -190,15 +202,24 @@ void main() {
       build: () => EvaluationHistoryCubit(repository: repo),
       act: (cubit) => cubit.deleteEvaluation('eval-1'),
       expect: () => [
-        isA<EvaluationHistoryState>()
-            .having((s) => s.isDeleting, 'isDeleting', true),
-        isA<EvaluationHistoryState>()
-            .having((s) => s.status, 'status', EvaluationHistoryStatus.loading),
+        isA<EvaluationHistoryState>().having(
+          (s) => s.isDeleting,
+          'isDeleting',
+          true,
+        ),
+        isA<EvaluationHistoryState>().having(
+          (s) => s.status,
+          'status',
+          EvaluationHistoryStatus.loading,
+        ),
         isA<EvaluationHistoryState>()
             .having((s) => s.status, 'status', EvaluationHistoryStatus.success)
             .having((s) => s.items.length, 'items after delete', 0),
-        isA<EvaluationHistoryState>()
-            .having((s) => s.isDeleting, 'isDeleting', false),
+        isA<EvaluationHistoryState>().having(
+          (s) => s.isDeleting,
+          'isDeleting',
+          false,
+        ),
       ],
     );
   });

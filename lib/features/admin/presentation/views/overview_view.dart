@@ -1,6 +1,8 @@
 import '../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../auth/domain/repositories/auth_repository.dart';
 import '../../../users/data/datasources/users_api_client.dart';
@@ -100,7 +102,6 @@ class _OverviewViewState extends State<OverviewView> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -148,7 +149,10 @@ class _OverviewViewState extends State<OverviewView> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.blue50,
                         borderRadius: BorderRadius.circular(8),
@@ -156,7 +160,11 @@ class _OverviewViewState extends State<OverviewView> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.hub_rounded, size: 14, color: AppColors.primary),
+                          const Icon(
+                            Icons.hub_rounded,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
                           SizedBox(width: 6),
                           Text(
                             context.l10n.dataMinerCoordination,
@@ -172,24 +180,37 @@ class _OverviewViewState extends State<OverviewView> {
                     ),
                     const SizedBox(width: 12),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
-                        color: isHealthy ? AppColors.green50 : const Color(0xFFFEF3C7),
+                        color: isHealthy
+                            ? AppColors.green50
+                            : const Color(0xFFFEF3C7),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
-                            isHealthy ? Icons.check_circle_outline_rounded : Icons.info_outline_rounded,
+                            isHealthy
+                                ? Icons.check_circle_outline_rounded
+                                : Icons.info_outline_rounded,
                             size: 14,
-                            color: isHealthy ? AppColors.green700 : const Color(0xFFD97706),
+                            color: isHealthy
+                                ? AppColors.green700
+                                : const Color(0xFFD97706),
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            isHealthy ? context.l10n.pipelineReady : context.l10n.systemSyncing,
+                            isHealthy
+                                ? context.l10n.pipelineReady
+                                : context.l10n.systemSyncing,
                             style: TextStyle(
-                              color: isHealthy ? AppColors.green700 : const Color(0xFFD97706),
+                              color: isHealthy
+                                  ? AppColors.green700
+                                  : const Color(0xFFD97706),
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Manrope',
@@ -242,7 +263,10 @@ class _OverviewViewState extends State<OverviewView> {
                   backgroundColor: AppColors.primary,
                   foregroundColor: AppColors.onPrimary,
                   elevation: 0,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 14,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -256,7 +280,10 @@ class _OverviewViewState extends State<OverviewView> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.textPrimary,
                   side: const BorderSide(color: AppColors.border),
-                  padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 12,
+                  ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -291,8 +318,12 @@ class _OverviewViewState extends State<OverviewView> {
             _buildKpiCard(
               width: itemWidth.clamp(220, 400),
               title: context.l10n.jobsRunningTotal,
-              value: _isLoading ? '...' : '$_runningJobsCount / $_totalJobsCount',
-              delta: _grobidAlive ? 'Grobid & Pipeline active' : 'Grobid Standby',
+              value: _isLoading
+                  ? '...'
+                  : '$_runningJobsCount / $_totalJobsCount',
+              delta: _grobidAlive
+                  ? 'Grobid & Pipeline active'
+                  : 'Grobid Standby',
               deltaPositive: _grobidAlive,
               icon: Icons.monitor_heart_rounded,
               iconColor: const Color(0xFFD97706),
@@ -397,16 +428,22 @@ class _OverviewViewState extends State<OverviewView> {
             Row(
               children: [
                 Icon(
-                  deltaPositive ? Icons.check_circle_outline_rounded : Icons.info_outline_rounded,
+                  deltaPositive
+                      ? Icons.check_circle_outline_rounded
+                      : Icons.info_outline_rounded,
                   size: 13,
-                  color: deltaPositive ? AppColors.green700 : AppColors.textMuted,
+                  color: deltaPositive
+                      ? AppColors.green700
+                      : AppColors.textMuted,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   delta,
                   style: TextStyle(
                     fontSize: 11,
-                    color: deltaPositive ? AppColors.green700 : AppColors.textMuted,
+                    color: deltaPositive
+                        ? AppColors.green700
+                        : AppColors.textMuted,
                     fontFamily: 'Manrope',
                     fontWeight: FontWeight.w600,
                   ),
@@ -424,7 +461,10 @@ class _OverviewViewState extends State<OverviewView> {
       _PipelineStageData(
         number: 1,
         title: context.l10n.categoryAndConfig,
-        subtitle: context.l10n.journalsAndConfigsCount(_journalsCount, _configsCount),
+        subtitle: context.l10n.journalsAndConfigsCount(
+          _journalsCount,
+          _configsCount,
+        ),
         status: context.l10n.systemReady,
         icon: Icons.tune_rounded,
         targetTab: 1,
@@ -433,7 +473,9 @@ class _OverviewViewState extends State<OverviewView> {
         number: 2,
         title: 'Grobid TEI Parse',
         subtitle: context.l10n.runningJobsCountLabel(_runningJobsCount),
-        status: _runningJobsCount > 0 ? context.l10n.running : context.l10n.systemReady,
+        status: _runningJobsCount > 0
+            ? context.l10n.running
+            : context.l10n.systemReady,
         icon: Icons.monitor_heart_rounded,
         targetTab: 3,
       ),
@@ -499,8 +541,13 @@ class _OverviewViewState extends State<OverviewView> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ],
@@ -513,7 +560,11 @@ class _OverviewViewState extends State<OverviewView> {
                 if (i < stages.length - 1)
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 6),
-                    child: Icon(Icons.arrow_forward_rounded, size: 16, color: AppColors.slate300),
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      size: 16,
+                      color: AppColors.slate300,
+                    ),
                   ),
               ],
             ],
@@ -632,7 +683,13 @@ class _OverviewViewState extends State<OverviewView> {
                   Padding(
                     padding: const EdgeInsets.all(24),
                     child: Center(
-                      child: Text(context.l10n.noRecentJobs, style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
+                      child: Text(
+                        context.l10n.noRecentJobs,
+                        style: const TextStyle(
+                          color: AppColors.textMuted,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
                     ),
                   )
                 else
@@ -701,8 +758,13 @@ class _OverviewViewState extends State<OverviewView> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     side: const BorderSide(color: AppColors.border),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ],

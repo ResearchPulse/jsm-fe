@@ -22,11 +22,12 @@ class AuthRepositoryImpl implements AuthRepository {
   final http.Client? httpClient;
 
   AuthRepositoryImpl({AuthLauncher? launcher, this.httpClient})
-      : launcher = launcher ??
-            // Web: the browser navigates to the SSO page and back.
-            // Desktop: the system browser opens; a loopback server on the
-            // configured redirect port receives the callback in-process.
-            (kIsWeb ? SsoAuthLauncher() : DesktopSsoLauncher());
+    : launcher =
+          launcher ??
+          // Web: the browser navigates to the SSO page and back.
+          // Desktop: the system browser opens; a loopback server on the
+          // configured redirect port receives the callback in-process.
+          (kIsWeb ? SsoAuthLauncher() : DesktopSsoLauncher());
 
   @override
   Future<void> login(AuthProvider provider) async {
@@ -49,7 +50,8 @@ class AuthRepositoryImpl implements AuthRepository {
     final uri = BrowserSso.currentUri();
     final isCallbackPath =
         uri.path == '/auth/callback' || uri.path.endsWith('/auth/callback');
-    final hasCallbackParams = uri.queryParameters.containsKey('code') ||
+    final hasCallbackParams =
+        uri.queryParameters.containsKey('code') ||
         uri.queryParameters.containsKey('error');
     return isCallbackPath && hasCallbackParams;
   }
@@ -117,27 +119,27 @@ class AuthRepositoryImpl implements AuthRepository {
         .encode(utf8.encode(jsonEncode({'alg': 'none', 'typ': 'JWT'})))
         .replaceAll('=', '');
     final payload = base64Url
-        .encode(utf8.encode(jsonEncode({
-          'sub': sub,
-          'email': email,
-          'name': name,
-          'role': role,
-          'roles': [role],
-          'type': 'access',
-          'exp': (DateTime.now()
-                  .add(const Duration(days: 7))
-                  .millisecondsSinceEpoch ~/
-              1000),
-        })))
+        .encode(
+          utf8.encode(
+            jsonEncode({
+              'sub': sub,
+              'email': email,
+              'name': name,
+              'role': role,
+              'roles': [role],
+              'type': 'access',
+              'exp':
+                  (DateTime.now()
+                      .add(const Duration(days: 7))
+                      .millisecondsSinceEpoch ~/
+                  1000),
+            }),
+          ),
+        )
         .replaceAll('=', '');
     final token = '$header.$payload.';
 
-    final user = AuthUser(
-      sub: sub,
-      email: email,
-      name: name,
-      role: role,
-    );
+    final user = AuthUser(sub: sub, email: email, name: name, role: role);
 
     final ssoLauncher = launcher;
     if (ssoLauncher is SsoAuthLauncher) {
@@ -152,12 +154,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
       ssoLauncher.store.write(
         SsoSessionKeys.user,
-        jsonEncode({
-          'sub': sub,
-          'email': email,
-          'name': name,
-          'role': role,
-        }),
+        jsonEncode({'sub': sub, 'email': email, 'name': name, 'role': role}),
       );
     }
     return user;

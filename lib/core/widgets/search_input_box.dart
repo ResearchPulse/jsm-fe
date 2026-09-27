@@ -106,7 +106,10 @@ class _SearchInputBoxState extends State<SearchInputBox> {
               fontFamily: 'Manrope',
               fontWeight: FontWeight.w400,
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 0,
+            ),
             border: OutlineInputBorder(
               borderRadius: borderRadius,
               borderSide: const BorderSide(
@@ -134,13 +137,12 @@ class _SearchInputBoxState extends State<SearchInputBox> {
                 duration: duration,
                 curve: curve,
                 tween: ColorTween(
-                  end: _isFocused ? const Color(0xFF0071BC) : const Color(0xFF94A3B8),
+                  end: _isFocused
+                      ? const Color(0xFF0071BC)
+                      : const Color(0xFF94A3B8),
                 ),
-                builder: (context, color, _) => Icon(
-                  Icons.search_rounded,
-                  size: 17,
-                  color: color,
-                ),
+                builder: (context, color, _) =>
+                    Icon(Icons.search_rounded, size: 17, color: color),
               ),
             ),
             prefixIconConstraints: BoxConstraints(

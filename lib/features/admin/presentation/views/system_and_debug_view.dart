@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../users/presentation/views/users_view.dart';
@@ -51,7 +52,9 @@ class _SystemAndDebugViewState extends State<SystemAndDebugView> {
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           decoration: const BoxDecoration(
             color: AppColors.surface,
-            border: Border(bottom: BorderSide(color: AppColors.border, width: 1)),
+            border: Border(
+              bottom: BorderSide(color: AppColors.border, width: 1),
+            ),
           ),
           child: Row(
             children: [
@@ -145,8 +148,12 @@ class _SystemAndDebugViewState extends State<SystemAndDebugView> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                      color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                      fontWeight: isSelected
+                          ? FontWeight.w700
+                          : FontWeight.w600,
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textPrimary,
                       fontFamily: 'Manrope',
                     ),
                   ),

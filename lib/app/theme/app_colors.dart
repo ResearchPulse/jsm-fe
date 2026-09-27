@@ -73,7 +73,9 @@ class AppColors {
   static const Color sidebarBorder = Color(0xFFE8EEF2);
   static const Color sidebarSectionText = Color(0xFF8B9AA4);
   static const Color sidebarHover = Color(0xFFF7F9FA);
-  static const Color sidebarActive = Color(0xFFE1F0FA); // Soft blue selection pill
+  static const Color sidebarActive = Color(
+    0xFFE1F0FA,
+  ); // Soft blue selection pill
   static const Color sidebarActiveText = blue600; // #0071bc
   static const Color sidebarActiveIcon = blue600;
   static const Color sidebarTextActive = blue600;

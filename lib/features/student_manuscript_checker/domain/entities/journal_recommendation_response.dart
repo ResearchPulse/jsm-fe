@@ -23,9 +23,13 @@ class JournalRecommendationResponse extends Equatable {
       totalWords: (map['total_words'] as num?)?.toInt() ?? 0,
       totalSentences: (map['total_sentences'] as num?)?.toInt() ?? 0,
       candidateCount: (map['candidate_count'] as num?)?.toInt() ?? 0,
-      recommendations: (map['recommendations'] as List<dynamic>?)
-              ?.map((item) => JournalRecommendationItem.fromMap(
-                  item as Map<String, dynamic>))
+      recommendations:
+          (map['recommendations'] as List<dynamic>?)
+              ?.map(
+                (item) => JournalRecommendationItem.fromMap(
+                  item as Map<String, dynamic>,
+                ),
+              )
               .toList() ??
           const [],
     );
@@ -33,10 +37,10 @@ class JournalRecommendationResponse extends Equatable {
 
   @override
   List<Object?> get props => [
-        manuscriptName,
-        totalWords,
-        totalSentences,
-        candidateCount,
-        recommendations,
-      ];
+    manuscriptName,
+    totalWords,
+    totalSentences,
+    candidateCount,
+    recommendations,
+  ];
 }

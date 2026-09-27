@@ -61,8 +61,7 @@ class _AuthSwitch extends StatelessWidget {
           return Scaffold(
             body: ErrorView(
               message: state.message,
-              onRetry: () =>
-                  context.read<AuthCubit>().login(AuthProvider.web),
+              onRetry: () => context.read<AuthCubit>().login(AuthProvider.web),
             ),
           );
         }

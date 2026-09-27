@@ -51,13 +51,12 @@ void main() {
   });
 
   SsoAuthLauncher launcherWith(http.Client client) => SsoAuthLauncher(
-        store: store,
-        apiClient: OidcApiClient(client: client),
-      );
+    store: store,
+    apiClient: OidcApiClient(client: client),
+  );
 
   group('start (login redirect)', () {
-    test('generates PKCE + state, stores them, redirects to authorize URL',
-        () {
+    test('generates PKCE + state, stores them, redirects to authorize URL', () {
       final launcher = launcherWith(_neverCalledClient());
       launcher.start(AuthProvider.web);
 
@@ -75,17 +74,18 @@ void main() {
       expect(q['state'], isNot(equals('xyz')));
 
       // Stored pending request matches the URL.
-      final pending =
-          jsonDecode(store.read(SsoSessionKeys.pendingRequest)!)
-              as Map<String, dynamic>;
+      final pending = jsonDecode(
+        store.read(SsoSessionKeys.pendingRequest)!,
+      ) as Map<String, dynamic>;
       expect(pending['state'], q['state']);
       expect(pending['redirect_uri'], q['redirect_uri']);
       final verifier = pending['code_verifier'] as String;
       expect(verifier.length, 64);
       // challenge must equal BASE64URL(SHA256(verifier)).
       expect(
-          q['code_challenge'],
-          OidcAuthUrlBuilder.createCodeChallenge(verifier));
+        q['code_challenge'],
+        OidcAuthUrlBuilder.createCodeChallenge(verifier),
+      );
     });
 
     test('state and verifier are fresh per call', () {
@@ -93,74 +93,81 @@ void main() {
       launcher.start(AuthProvider.web);
       final first = store.read(SsoSessionKeys.pendingRequest);
       launcher.start(AuthProvider.web);
-      expect(store.read(SsoSessionKeys.pendingRequest),
-          isNot(equals(first)));
+      expect(store.read(SsoSessionKeys.pendingRequest), isNot(equals(first)));
     });
   });
 
   group('completeFromCallback', () {
     http.Client okClient({String userSub = 'u1'}) => MockClient((req) async {
-          if (req.url.path.endsWith('/oidc/token')) {
-            return http.Response(
-                jsonEncode({
-                  'access_token': 'at-1',
-                  'token_type': 'Bearer',
-                  'expires_in': 3600,
-                  'refresh_token': 'rt-1',
-                  'id_token': 'it-1',
-                }),
-                200);
-          }
-          if (req.url.path.endsWith('/oidc/userinfo')) {
-            expect(req.headers['Authorization'], 'Bearer at-1');
-            return http.Response(
-                jsonEncode({
-                  'sub': userSub,
-                  'email': 'user@example.com',
-                  'name': 'Example User',
-                  'picture': 'https://cdn.example.com/a.png',
-                }),
-                200);
-          }
-          fail('unexpected request to ${req.url}');
-        });
+      if (req.url.path.endsWith('/oidc/token')) {
+        return http.Response(
+          jsonEncode({
+            'access_token': 'at-1',
+            'token_type': 'Bearer',
+            'expires_in': 3600,
+            'refresh_token': 'rt-1',
+            'id_token': 'it-1',
+          }),
+          200,
+        );
+      }
+      if (req.url.path.endsWith('/oidc/userinfo')) {
+        expect(req.headers['Authorization'], 'Bearer at-1');
+        return http.Response(
+          jsonEncode({
+            'sub': userSub,
+            'email': 'user@example.com',
+            'name': 'Example User',
+            'picture': 'https://cdn.example.com/a.png',
+          }),
+          200,
+        );
+      }
+      fail('unexpected request to ${req.url}');
+    });
 
     Future<void> seedPending(SsoAuthLauncher launcher) async {
       await launcher.start(AuthProvider.web);
-      final pending =
-          jsonDecode(store.read(SsoSessionKeys.pendingRequest)!)
-              as Map<String, dynamic>;
+      final pending = jsonDecode(
+        store.read(SsoSessionKeys.pendingRequest)!,
+      ) as Map<String, dynamic>;
       pageUri = Uri.parse(
-          'http://localhost:3003/auth/callback?code=code-1&state=${pending['state']}');
+        'http://localhost:3003/auth/callback?code=code-1&state=${pending['state']}',
+      );
     }
 
-    test('valid code + state: exchanges, fetches userinfo, cleans history',
-        () async {
-      final launcher = launcherWith(okClient());
-      await seedPending(launcher);
+    test(
+      'valid code + state: exchanges, fetches userinfo, cleans history',
+      () async {
+        final launcher = launcherWith(okClient());
+        await seedPending(launcher);
 
-      final result = await launcher.completeFromCallback();
+        final result = await launcher.completeFromCallback();
 
-      expect(result.user.sub, 'u1');
-      expect(result.user.email, 'user@example.com');
-      expect(result.user.name, 'Example User');
-      expect(result.user.picture, 'https://cdn.example.com/a.png');
-      // Tokens persisted in the store (not in the UI result object).
-      final tokens = jsonDecode(store.read(SsoSessionKeys.tokens)!)
-          as Map<String, dynamic>;
-      expect(tokens['access_token'], 'at-1');
-      // Pending request consumed + history cleaned (no re-processing).
-      expect(store.read(SsoSessionKeys.pendingRequest), isNull);
-      expect(historyCleaned, isTrue);
-    });
+        expect(result.user.sub, 'u1');
+        expect(result.user.email, 'user@example.com');
+        expect(result.user.name, 'Example User');
+        expect(result.user.picture, 'https://cdn.example.com/a.png');
+        // Tokens persisted in the store (not in the UI result object).
+        final tokens = jsonDecode(
+          store.read(SsoSessionKeys.tokens)!,
+        ) as Map<String, dynamic>;
+        expect(tokens['access_token'], 'at-1');
+        // Pending request consumed + history cleaned (no re-processing).
+        expect(store.read(SsoSessionKeys.pendingRequest), isNull);
+        expect(historyCleaned, isTrue);
+      },
+    );
 
     test('callback cannot be processed twice', () async {
       final launcher = launcherWith(okClient());
       await seedPending(launcher);
       await launcher.completeFromCallback();
       // Second processing of the same URL: no stored state left.
-      await expectLater(launcher.completeFromCallback(),
-          throwsA(isA<ServerException>()));
+      await expectLater(
+        launcher.completeFromCallback(),
+        throwsA(isA<ServerException>()),
+      );
     });
 
     test('invalid state: safe failure, no token request', () async {
@@ -172,56 +179,70 @@ void main() {
       final launcher = launcherWith(client);
       await launcher.start(AuthProvider.web);
       pageUri = Uri.parse(
-          'http://localhost:3003/auth/callback?code=code-1&state=tampered');
+        'http://localhost:3003/auth/callback?code=code-1&state=tampered',
+      );
 
       await expectLater(
-          launcher.completeFromCallback(), throwsA(isA<ServerException>()));
+        launcher.completeFromCallback(),
+        throwsA(isA<ServerException>()),
+      );
       expect(tokenCalled, isFalse);
     });
 
     test('missing code: safe failure', () async {
       final launcher = launcherWith(_neverCalledClient());
       await launcher.start(AuthProvider.web);
-      final pending =
-          jsonDecode(store.read(SsoSessionKeys.pendingRequest)!)
-              as Map<String, dynamic>;
+      final pending = jsonDecode(
+        store.read(SsoSessionKeys.pendingRequest)!,
+      ) as Map<String, dynamic>;
       pageUri = Uri.parse(
-          'http://localhost:3003/auth/callback?state=${pending['state']}');
+        'http://localhost:3003/auth/callback?state=${pending['state']}',
+      );
 
       await expectLater(
-          launcher.completeFromCallback(), throwsA(isA<ServerException>()));
+        launcher.completeFromCallback(),
+        throwsA(isA<ServerException>()),
+      );
     });
 
     test('no stored pending request at all: safe failure', () async {
       final launcher = launcherWith(_neverCalledClient());
-      pageUri = Uri.parse(
-          'http://localhost:3003/auth/callback?code=c&state=s');
+      pageUri = Uri.parse('http://localhost:3003/auth/callback?code=c&state=s');
       await expectLater(
-          launcher.completeFromCallback(), throwsA(isA<ServerException>()));
+        launcher.completeFromCallback(),
+        throwsA(isA<ServerException>()),
+      );
     });
 
-    test('token exchange failure (non-200): safe failure, nothing stored',
-        () async {
-      final client = MockClient((req) async =>
-          http.Response(jsonEncode({'error': 'invalid_grant'}), 400));
-      final launcher = launcherWith(client);
-      await seedPending(launcher);
+    test(
+      'token exchange failure (non-200): safe failure, nothing stored',
+      () async {
+        final client = MockClient(
+          (req) async =>
+              http.Response(jsonEncode({'error': 'invalid_grant'}), 400),
+        );
+        final launcher = launcherWith(client);
+        await seedPending(launcher);
 
-      await expectLater(
-          launcher.completeFromCallback(), throwsA(isA<ServerException>()));
-      expect(store.read(SsoSessionKeys.tokens), isNull);
-    });
+        await expectLater(
+          launcher.completeFromCallback(),
+          throwsA(isA<ServerException>()),
+        );
+        expect(store.read(SsoSessionKeys.tokens), isNull);
+      },
+    );
 
     test('userinfo failure (non-200): safe failure', () async {
       final client = MockClient((req) async {
         if (req.url.path.endsWith('/oidc/token')) {
           return http.Response(
-              jsonEncode({
-                'access_token': 'at-1',
-                'token_type': 'Bearer',
-                'expires_in': 3600,
-              }),
-              200);
+            jsonEncode({
+              'access_token': 'at-1',
+              'token_type': 'Bearer',
+              'expires_in': 3600,
+            }),
+            200,
+          );
         }
         return http.Response('{}', 401);
       });
@@ -229,49 +250,62 @@ void main() {
       await seedPending(launcher);
 
       await expectLater(
-          launcher.completeFromCallback(), throwsA(isA<ServerException>()));
+        launcher.completeFromCallback(),
+        throwsA(isA<ServerException>()),
+      );
     });
 
-    test('Method 1: decodes profile from id_token directly when userinfo fails',
-        () async {
-      final payload = base64Url.encode(utf8.encode(jsonEncode({
-        'sub': 'fast-user',
-        'email': 'fast@example.com',
-        'name': 'Fast User',
-      }))).replaceAll('=', '');
-      final jwt = 'h.$payload.s';
+    test(
+      'Method 1: decodes profile from id_token directly when userinfo fails',
+      () async {
+        final payload = base64Url
+            .encode(
+              utf8.encode(
+                jsonEncode({
+                  'sub': 'fast-user',
+                  'email': 'fast@example.com',
+                  'name': 'Fast User',
+                }),
+              ),
+            )
+            .replaceAll('=', '');
+        final jwt = 'h.$payload.s';
 
-      final client = MockClient((req) async {
-        if (req.url.path.endsWith('/oidc/token')) {
-          return http.Response(
+        final client = MockClient((req) async {
+          if (req.url.path.endsWith('/oidc/token')) {
+            return http.Response(
               jsonEncode({
                 'access_token': 'at-fast',
                 'token_type': 'Bearer',
                 'expires_in': 3600,
                 'id_token': jwt,
               }),
-              200);
-        }
-        if (req.url.path.endsWith('/oidc/userinfo')) {
-          return http.Response('server error', 500);
-        }
-        fail('unexpected request');
-      });
+              200,
+            );
+          }
+          if (req.url.path.endsWith('/oidc/userinfo')) {
+            return http.Response('server error', 500);
+          }
+          fail('unexpected request');
+        });
 
-      final launcher = launcherWith(client);
-      await seedPending(launcher);
-      final result = await launcher.completeFromCallback();
+        final launcher = launcherWith(client);
+        await seedPending(launcher);
+        final result = await launcher.completeFromCallback();
 
-      expect(result.user.sub, 'fast-user');
-      expect(result.user.email, 'fast@example.com');
-      expect(result.user.name, 'Fast User');
-    });
+        expect(result.user.sub, 'fast-user');
+        expect(result.user.email, 'fast@example.com');
+        expect(result.user.name, 'Fast User');
+      },
+    );
 
     test('non-callback page: throws (nothing to complete)', () async {
       final launcher = launcherWith(_neverCalledClient());
       pageUri = Uri.parse('http://localhost:3003/');
       await expectLater(
-          launcher.completeFromCallback(), throwsA(isA<ServerException>()));
+        launcher.completeFromCallback(),
+        throwsA(isA<ServerException>()),
+      );
     });
   });
 
@@ -292,5 +326,5 @@ void main() {
   });
 }
 
-http.Client _neverCalledClient() => MockClient(
-    (req) async => fail('network must not be called in this test'));
+http.Client _neverCalledClient() =>
+    MockClient((req) async => fail('network must not be called in this test'));

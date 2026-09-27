@@ -52,15 +52,17 @@ class UserInfoPage extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       decoration: const BoxDecoration(
         color: AppColors.surface,
-        border: Border(
-          bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1),
-        ),
+        border: Border(bottom: BorderSide(color: Color(0xFFE2E8F0), width: 1)),
       ),
       child: Row(
         children: [
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.arrow_back_rounded, color: AppColors.textSecondary, size: 20),
+            icon: const Icon(
+              Icons.arrow_back_rounded,
+              color: AppColors.textSecondary,
+              size: 20,
+            ),
             tooltip: 'Quay lại',
           ),
           const SizedBox(width: 8),
@@ -172,12 +174,19 @@ class _ProfileIdentityCard extends StatelessWidget {
 
   String _cleanName(String rawName) {
     return rawName
-        .replaceAll(RegExp(r'\s*\((?:Admin|admin|ADMIN|User|USER|Editor|EDITOR)\)\s*'), '')
+        .replaceAll(
+          RegExp(r'\s*\((?:Admin|admin|ADMIN|User|USER|Editor|EDITOR)\)\s*'),
+          '',
+        )
         .trim();
   }
 
   String _initials(String name) {
-    final parts = name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
+    final parts = name
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((p) => p.isNotEmpty)
+        .toList();
     if (parts.isEmpty) return '?';
     return parts.take(2).map((p) => p[0].toUpperCase()).join();
   }
@@ -210,10 +219,7 @@ class _ProfileIdentityCard extends StatelessWidget {
             top: 0,
             left: 0,
             right: 0,
-            child: Container(
-              height: 3,
-              color: AppColors.primary,
-            ),
+            child: Container(height: 3, color: AppColors.primary),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
@@ -291,7 +297,7 @@ class _ProfileIdentityCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Account Context (Desktop only)
                 if (MediaQuery.of(context).size.width >= 768) ...[
                   Container(
@@ -372,7 +378,10 @@ class _ProfileDetailsCard extends StatelessWidget {
 
   String _cleanName(String rawName) {
     return rawName
-        .replaceAll(RegExp(r'\s*\((?:Admin|admin|ADMIN|User|USER|Editor|EDITOR)\)\s*'), '')
+        .replaceAll(
+          RegExp(r'\s*\((?:Admin|admin|ADMIN|User|USER|Editor|EDITOR)\)\s*'),
+          '',
+        )
         .trim();
   }
 
@@ -437,7 +446,11 @@ class _ProfileDetailsCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Divider(height: 1, thickness: 1, color: AppColors.borderSoft),
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.borderSoft,
+                ),
                 const SizedBox(height: 20),
                 _DetailRow(
                   icon: Icons.mail_outline_rounded,
@@ -453,7 +466,11 @@ class _ProfileDetailsCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Divider(height: 1, thickness: 1, color: AppColors.borderSoft),
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.borderSoft,
+                ),
                 const SizedBox(height: 20),
                 const _DetailRow(
                   icon: Icons.business_rounded,
@@ -546,7 +563,11 @@ class _AccountAccessCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Divider(height: 1, thickness: 1, color: AppColors.borderSoft),
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.borderSoft,
+                ),
                 const SizedBox(height: 20),
                 const _DetailRow(
                   icon: Icons.lock_outline_rounded,
@@ -562,7 +583,11 @@ class _AccountAccessCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                const Divider(height: 1, thickness: 1, color: AppColors.borderSoft),
+                const Divider(
+                  height: 1,
+                  thickness: 1,
+                  color: AppColors.borderSoft,
+                ),
                 const SizedBox(height: 20),
                 _DetailRow(
                   icon: Icons.fingerprint_rounded,
@@ -712,7 +737,11 @@ class _SsoManagedNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.verified_user_outlined, size: 18, color: AppColors.primary),
+          const Icon(
+            Icons.verified_user_outlined,
+            size: 18,
+            color: AppColors.primary,
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(

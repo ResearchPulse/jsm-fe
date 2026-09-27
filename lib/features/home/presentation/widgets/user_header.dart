@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/language_switcher.dart';
 import '../../../../core/localization/app_localizations.dart';
@@ -7,11 +8,7 @@ class UserHeader extends StatelessWidget {
   final int selectedIndex;
   final VoidCallback? onResetCheck;
 
-  const UserHeader({
-    super.key,
-    required this.selectedIndex,
-    this.onResetCheck,
-  });
+  const UserHeader({super.key, required this.selectedIndex, this.onResetCheck});
 
   String _getBreadcrumb(BuildContext context) {
     final l10n = AppLocalizations.of(context);

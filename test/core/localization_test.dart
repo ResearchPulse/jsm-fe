@@ -27,8 +27,14 @@ void main() {
       expect(l10nEn.titleJournalsMining, 'Journals & Mining Hub');
       expect(l10nEn.navJournalsCenter, 'Journals Center');
       expect(l10nEn.triggerMiningTitle, 'Trigger Journal Mining');
-      expect(l10nEn.ssoNote, 'Accounts are authenticated via HyperDataLab Central SSO portal.');
-      expect(l10nEn.securityStandard, 'Secured with OpenID Connect & OAuth 2.0 standards');
+      expect(
+        l10nEn.ssoNote,
+        'Accounts are authenticated via HyperDataLab Central SSO portal.',
+      );
+      expect(
+        l10nEn.securityStandard,
+        'Secured with OpenID Connect & OAuth 2.0 standards',
+      );
       expect(l10nEn.journalsCatalogTitle, 'Journal Catalog & Mining Center');
       expect(l10nEn.miningCenterTitle, 'Mining & Style Profile Center');
       expect(l10nEn.tabNlpProfilesTitle, 'NLP Style Profiles & CARS Moves');
@@ -44,9 +50,18 @@ void main() {
       expect(l10nVi.titleJournalsMining, 'Trung Tâm Tạp Chí & Khai Phá');
       expect(l10nVi.navJournalsCenter, 'Trung tâm Tạp chí');
       expect(l10nVi.triggerMiningTitle, 'Kích hoạt Khai phá Tạp chí');
-      expect(l10nVi.ssoNote, 'Tài khoản được xác thực qua cổng Central SSO chung của HyperDataLab.');
-      expect(l10nVi.securityStandard, 'Bảo mật tiêu chuẩn OpenID Connect & OAuth 2.0');
-      expect(l10nVi.journalsCatalogTitle, 'Danh Mục & Trung Tâm Khai Phá Tạp Chí');
+      expect(
+        l10nVi.ssoNote,
+        'Tài khoản được xác thực qua cổng Central SSO chung của HyperDataLab.',
+      );
+      expect(
+        l10nVi.securityStandard,
+        'Bảo mật tiêu chuẩn OpenID Connect & OAuth 2.0',
+      );
+      expect(
+        l10nVi.journalsCatalogTitle,
+        'Danh Mục & Trung Tâm Khai Phá Tạp Chí',
+      );
       expect(l10nVi.miningCenterTitle, 'Trung Tâm Khai Phá & Hồ Sơ Phong Cách');
       expect(l10nVi.tabNlpProfilesTitle, 'Hồ Sơ Phong Cách NLP & CARS Moves');
       expect(l10nVi.tabJobMonitorTitle, 'Nhật Ký Tác Vụ & Debug');

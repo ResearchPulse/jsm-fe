@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'manuscript_file_picker.dart';
 
 /// Native file picker for Windows and IO platforms without requiring native plugin symlinks.

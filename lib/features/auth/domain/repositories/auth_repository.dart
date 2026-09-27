@@ -54,9 +54,5 @@ class AuthSession {
   final String? accessToken;
   final String? refreshToken;
 
-  const AuthSession({
-    required this.user,
-    this.accessToken,
-    this.refreshToken,
-  });
+  const AuthSession({required this.user, this.accessToken, this.refreshToken});
 }

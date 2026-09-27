@@ -49,26 +49,28 @@ class _StubRepo implements AuthRepository {
 }
 
 Widget _wrap(AuthRepository repo) => BlocProvider(
-      create: (_) => AuthCubit(
-            loginUseCase: LoginUseCase(repo),
-            logoutUseCase: LogoutUseCase(repo),
-            restoreSessionUseCase: RestoreSessionUseCase(repo),
-            repository: repo,
-          )..checkSession(),
-      child: const MaterialApp(home: LoginPage()),
-    );
+  create: (_) => AuthCubit(
+    loginUseCase: LoginUseCase(repo),
+    logoutUseCase: LogoutUseCase(repo),
+    restoreSessionUseCase: RestoreSessionUseCase(repo),
+    repository: repo,
+  )..checkSession(),
+  child: const MaterialApp(home: LoginPage()),
+);
 
 void main() {
-  testWidgets('unauthenticated start renders Sign in button without Google button',
-      (tester) async {
-    final repo = _StubRepo();
-    await tester.pumpWidget(_wrap(repo));
-    await tester.pumpAndSettle(); // checkSession -> unauthenticated
-    expect(find.text('Sign in'), findsWidgets);
-    expect(find.text('Continue with Google'), findsNothing);
-    // No local credential form: the SSO page handles credentials.
-    expect(find.byType(TextFormField), findsNothing);
-  });
+  testWidgets(
+    'unauthenticated start renders Sign in button without Google button',
+    (tester) async {
+      final repo = _StubRepo();
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle(); // checkSession -> unauthenticated
+      expect(find.text('Sign in'), findsWidgets);
+      expect(find.text('Continue with Google'), findsNothing);
+      // No local credential form: the SSO page handles credentials.
+      expect(find.byType(TextFormField), findsNothing);
+    },
+  );
 
   testWidgets('tapping Sign in issues the web SSO redirect', (tester) async {
     final repo = _StubRepo();
@@ -88,15 +90,16 @@ void main() {
     expect(ctx.read<AuthCubit>().state, isA<AuthLoading>());
   });
 
-  testWidgets('auth failure surfaces a snackbar, stays on login',
-      (tester) async {
+  testWidgets('auth failure surfaces an error notification, stays on login', (
+    tester,
+  ) async {
     final repo = _StubRepo()..loginError = Exception('access_denied');
     await tester.pumpWidget(_wrap(repo));
     await tester.pumpAndSettle();
     await tester.tap(find.byType(ElevatedButton));
     await tester.pump(const Duration(milliseconds: 100));
     await tester.pump(const Duration(milliseconds: 100));
-    expect(find.byType(SnackBar), findsOneWidget);
+    expect(find.textContaining('access_denied'), findsOneWidget);
     final ctx = tester.element(find.byType(LoginView));
     expect(ctx.read<AuthCubit>().state, isA<AuthFailure>());
   });

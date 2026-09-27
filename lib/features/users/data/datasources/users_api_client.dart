@@ -13,10 +13,8 @@ class UsersApiClient {
   final http.Client _client;
   final Future<String?> Function() tokenProvider;
 
-  UsersApiClient({
-    required this.tokenProvider,
-    http.Client? client,
-  }) : _client = client ?? http.Client();
+  UsersApiClient({required this.tokenProvider, http.Client? client})
+    : _client = client ?? http.Client();
   Future<UserProfile> createAccount({
     required UserRole role,
     required String email,
@@ -25,8 +23,7 @@ class UsersApiClient {
   }) async {
     final token = await tokenProvider();
     if (token == null) {
-      throw const ServerException(
-          'You must be signed in to manage accounts.');
+      throw const ServerException('You must be signed in to manage accounts.');
     }
     http.Response response;
     try {
@@ -48,8 +45,9 @@ class UsersApiClient {
     }
     if (response.statusCode != 200 && response.statusCode != 201) {
       throw ServerException(
-          _errorMessage(response) ?? 'Account creation failed.',
-          response.statusCode);
+        _errorMessage(response) ?? 'Account creation failed.',
+        response.statusCode,
+      );
     }
     try {
       final body = jsonDecode(response.body) as Map<String, dynamic>;
@@ -92,11 +90,13 @@ class UsersApiClient {
         uri,
         headers: {
           'Content-Type': 'application/json',
-          if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
+          if (token != null && token.isNotEmpty)
+            'Authorization': 'Bearer $token',
         },
       );
       if (response.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is List) {
           return data.whereType<Map<String, dynamic>>().toList();
@@ -138,7 +138,8 @@ class UsersApiClient {
     }
 
     try {
-      final body = jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
+      final body =
+          jsonDecode(utf8.decode(response.bodyBytes)) as Map<String, dynamic>;
       return (body['data'] as Map<String, dynamic>?) ?? {};
     } catch (_) {
       return {};
@@ -163,4 +164,3 @@ class UsersApiClient {
     }
   }
 }
-

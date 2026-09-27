@@ -6,11 +6,7 @@ class ExemplarItem extends Equatable {
   final String? articleTitle;
   final String? doi;
 
-  const ExemplarItem({
-    required this.text,
-    this.articleTitle,
-    this.doi,
-  });
+  const ExemplarItem({required this.text, this.articleTitle, this.doi});
 
   factory ExemplarItem.fromMap(Map<String, dynamic> map) {
     return ExemplarItem(
@@ -21,11 +17,7 @@ class ExemplarItem extends Equatable {
   }
 
   Map<String, dynamic> toMap() {
-    return {
-      'text': text,
-      'article_title': articleTitle,
-      'doi': doi,
-    };
+    return {'text': text, 'article_title': articleTitle, 'doi': doi};
   }
 
   @override

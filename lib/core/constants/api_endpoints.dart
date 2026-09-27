@@ -52,19 +52,24 @@ class ApiEndpoints {
   static String get users => '$baseUrl/users';
 
   // Student Manuscript Checker
-  static String get studentManuscriptCheck => '$baseUrl/student/manuscript/check';
-  static String get studentManuscriptCheckStream => '$baseUrl/student/manuscript/check-stream';
-  static String get studentAvailableJournals => '$baseUrl/student/available-journals';
+  static String get studentManuscriptCheck =>
+      '$baseUrl/student/manuscript/check';
+  static String get studentManuscriptCheckStream =>
+      '$baseUrl/student/manuscript/check-stream';
+  static String get studentAvailableJournals =>
+      '$baseUrl/student/available-journals';
   static String get studentEvaluations => '$baseUrl/student/evaluations';
-  static String get studentEvaluationStats => '$baseUrl/student/evaluations/stats';
-  static String get studentRecommendations => '$baseUrl/student/recommendations';
-
+  static String get studentEvaluationStats =>
+      '$baseUrl/student/evaluations/stats';
+  static String get studentRecommendations =>
+      '$baseUrl/student/recommendations';
 
   // Admin Module Endpoints
   static String get adminJournals => '$baseUrl/admin/journals';
   static String get adminOpenAlexJournals => '$baseUrl/admin/journals/openalex';
   static String get adminImportJournal => '$baseUrl/admin/journals/import';
-  static String get adminConfigurations => '$baseUrl/admin/journal-configurations';
+  static String get adminConfigurations =>
+      '$baseUrl/admin/journal-configurations';
   static String get adminAnalysisJobs => '$baseUrl/admin/analysis-jobs';
   static String get adminSnapshots => '$baseUrl/admin/snapshots';
   static String get adminStyleProfiles => '$baseUrl/admin/style-profiles';
@@ -74,4 +79,3 @@ class ApiEndpoints {
     return '${uri.scheme}://${uri.host}:${uri.port}/health';
   }
 }
-

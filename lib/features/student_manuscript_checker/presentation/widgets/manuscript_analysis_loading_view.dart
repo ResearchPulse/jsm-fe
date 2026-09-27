@@ -625,7 +625,6 @@ class _ManuscriptAnalysisLoadingViewState
           color: AppColors.red700,
         );
       case PipelineStepStatus.pending:
-      default:
         return Container(
           width: 18,
           height: 18,
@@ -670,7 +669,6 @@ class _ManuscriptAnalysisLoadingViewState
         );
         break;
       case PipelineStepStatus.pending:
-      default:
         iconColor = AppColors.textSubtle;
         icon = Container(
           width: 7,

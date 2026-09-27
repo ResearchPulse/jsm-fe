@@ -23,18 +23,18 @@ class SsoTokens {
   });
 
   Map<String, dynamic> toJson() => {
-        'access_token': accessToken,
-        if (refreshToken != null) 'refresh_token': refreshToken,
-        if (idToken != null) 'id_token': idToken,
-        if (expiresAtMs != null) 'expires_at': expiresAtMs,
-      };
+    'access_token': accessToken,
+    if (refreshToken != null) 'refresh_token': refreshToken,
+    if (idToken != null) 'id_token': idToken,
+    if (expiresAtMs != null) 'expires_at': expiresAtMs,
+  };
 
   factory SsoTokens.fromJson(Map<String, dynamic> json) => SsoTokens(
-        accessToken: json['access_token'] as String,
-        refreshToken: json['refresh_token'] as String?,
-        idToken: json['id_token'] as String?,
-        expiresAtMs: json['expires_at'] as int?,
-      );
+    accessToken: json['access_token'] as String,
+    refreshToken: json['refresh_token'] as String?,
+    idToken: json['id_token'] as String?,
+    expiresAtMs: json['expires_at'] as int?,
+  );
 
   bool get isExpired =>
       expiresAtMs != null &&
@@ -58,12 +58,12 @@ class SsoUserInfo {
   });
 
   Map<String, dynamic> toJson() => {
-        'sub': sub,
-        if (email != null) 'email': email,
-        if (name != null) 'name': name,
-        if (picture != null) 'picture': picture,
-        if (role != null) 'role': role,
-      };
+    'sub': sub,
+    if (email != null) 'email': email,
+    if (name != null) 'name': name,
+    if (picture != null) 'picture': picture,
+    if (role != null) 'role': role,
+  };
 
   factory SsoUserInfo.fromJson(Map<String, dynamic> json) {
     String? resolvedRole;
@@ -76,8 +76,9 @@ class SsoUserInfo {
     return SsoUserInfo(
       sub: (json['sub'] ?? json['id'] ?? '').toString(),
       email: json['email'] as String?,
-      name: (json['name'] ?? json['preferred_username'] ?? json['username'])
-          as String?,
+      name:
+          (json['name'] ?? json['preferred_username'] ?? json['username'])
+              as String?,
       picture: (json['picture'] ?? json['avatar']) as String?,
       role: resolvedRole,
     );
@@ -89,8 +90,7 @@ class SsoUserInfo {
 class OidcApiClient {
   final http.Client _client;
 
-  OidcApiClient({http.Client? client})
-      : _client = client ?? http.Client();
+  OidcApiClient({http.Client? client}) : _client = client ?? http.Client();
 
   /// Decodes the OIDC id_token payload (JWT) to extract user profile
   /// claims without an extra network call (Method 1 in quickstart doc).
@@ -119,8 +119,7 @@ class OidcApiClient {
     required String redirectUri,
     required String codeVerifier,
   }) async {
-    final uri =
-        Uri.parse('${ApiEndpoints.ssoIssuer}/api/v1/oidc/token');
+    final uri = Uri.parse('${ApiEndpoints.ssoIssuer}/api/v1/oidc/token');
     http.Response response;
     try {
       response = await _client.post(
@@ -139,8 +138,9 @@ class OidcApiClient {
     }
     if (response.statusCode != 200) {
       throw ServerException(
-          _errorMessage(response) ?? 'Login was rejected by the login server.',
-          response.statusCode);
+        _errorMessage(response) ?? 'Login was rejected by the login server.',
+        response.statusCode,
+      );
     }
     final Map<String, dynamic> body;
     try {
@@ -158,16 +158,14 @@ class OidcApiClient {
       refreshToken: body['refresh_token'] as String?,
       idToken: body['id_token'] as String?,
       expiresAtMs: expiresIn is num
-          ? DateTime.now().millisecondsSinceEpoch +
-              (expiresIn * 1000).round()
+          ? DateTime.now().millisecondsSinceEpoch + (expiresIn * 1000).round()
           : null,
     );
   }
 
   /// Fetches the canonical user profile.
   Future<SsoUserInfo> fetchUserInfo(String accessToken) async {
-    final uri =
-        Uri.parse('${ApiEndpoints.ssoIssuer}/api/v1/oidc/userinfo');
+    final uri = Uri.parse('${ApiEndpoints.ssoIssuer}/api/v1/oidc/userinfo');
     http.Response response;
     try {
       response = await _client.get(
@@ -179,12 +177,14 @@ class OidcApiClient {
     }
     if (response.statusCode != 200) {
       throw ServerException(
-          _errorMessage(response) ?? 'Could not load the user profile.',
-          response.statusCode);
+        _errorMessage(response) ?? 'Could not load the user profile.',
+        response.statusCode,
+      );
     }
     try {
       return SsoUserInfo.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
+        jsonDecode(response.body) as Map<String, dynamic>,
+      );
     } catch (_) {
       throw const ServerException('Malformed user profile response.');
     }

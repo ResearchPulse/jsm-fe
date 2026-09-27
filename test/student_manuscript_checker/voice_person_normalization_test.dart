@@ -27,62 +27,67 @@ void main() {
       expect(comp.journalWeRate, isNot(equals(380.0)));
     });
 
-    testWidgets('VoicePersonCard displays clean percentage values, correct pp differences and shared scale', (tester) async {
-      const comp = VoicePersonComparison(
-        userPassiveRate: 20.0,
-        journalPassiveRate: 31.2,
-        userWeRate: 0.0,
-        journalWeRate: 3.8,
-      );
+    testWidgets(
+      'VoicePersonCard displays clean percentage values, correct pp differences and shared scale',
+      (tester) async {
+        const comp = VoicePersonComparison(
+          userPassiveRate: 20.0,
+          journalPassiveRate: 31.2,
+          userWeRate: 0.0,
+          journalWeRate: 3.8,
+        );
 
-      await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: VoicePersonCard(comparison: comp),
+        await tester.pumpWidget(
+          const MaterialApp(
+            home: Scaffold(body: VoicePersonCard(comparison: comp)),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
 
-      // Verify exact percentage display (NOT 2000.0% or 3120.0%)
-      expect(find.text('20.0%'), findsOneWidget);
-      expect(find.text('31.2%'), findsOneWidget);
-      expect(find.text('0.0%'), findsOneWidget);
-      expect(find.text('3.8%'), findsOneWidget);
+        // Verify exact percentage display (NOT 2000.0% or 3120.0%)
+        expect(find.text('20.0%'), findsOneWidget);
+        expect(find.text('31.2%'), findsOneWidget);
+        expect(find.text('0.0%'), findsOneWidget);
+        expect(find.text('3.8%'), findsOneWidget);
 
-      expect(find.text('3120.0%'), findsNothing);
-      expect(find.text('380.0%'), findsNothing);
-      expect(find.text('-3100.0 pp'), findsNothing);
-      expect(find.text('-380.0 pp'), findsNothing);
+        expect(find.text('3120.0%'), findsNothing);
+        expect(find.text('380.0%'), findsNothing);
+        expect(find.text('-3100.0 pp'), findsNothing);
+        expect(find.text('-380.0 pp'), findsNothing);
 
-      // Verify exact difference in percentage points
-      expect(find.text('-11.2 pp'), findsOneWidget);
-      expect(find.text('-3.8 pp'), findsOneWidget);
+        // Verify exact difference in percentage points
+        expect(find.text('-11.2 pp'), findsOneWidget);
+        expect(find.text('-3.8 pp'), findsOneWidget);
 
-      // Verify severity labels recalculated from real thresholds:
-      // Passive voice with 11.2 pp deviation is "Moderate deviation" (8.0 < diff <= 15.0)
-      expect(find.text('Moderate deviation'), findsOneWidget);
-      // Author voice with 3.8 pp deviation is "Major mismatch" (diff > 3.0)
-      expect(find.text('Major mismatch'), findsOneWidget);
+        // Verify severity labels recalculated from real thresholds:
+        // Passive voice with 11.2 pp deviation is "Moderate deviation" (8.0 < diff <= 15.0)
+        expect(find.text('Moderate deviation'), findsOneWidget);
+        // Author voice with 3.8 pp deviation is "Major mismatch" (diff > 3.0)
+        expect(find.text('Major mismatch'), findsOneWidget);
 
-      // Verify chart bars use shared scale (maxScale 50.0 for passive voice, 15.0 for author)
-      final fractionallySizedBoxes = tester.widgetList<FractionallySizedBox>(
-        find.byType(FractionallySizedBox),
-      ).toList();
+        // Verify chart bars use shared scale (maxScale 50.0 for passive voice, 15.0 for author)
+        final fractionallySizedBoxes = tester
+            .widgetList<FractionallySizedBox>(find.byType(FractionallySizedBox))
+            .toList();
 
-      // Passive voice manuscript: 20.0 / 50.0 = 0.40
-      expect(fractionallySizedBoxes[0].widthFactor, closeTo(0.40, 0.01));
-      // Passive voice journal: 31.2 / 50.0 = 0.624
-      expect(fractionallySizedBoxes[1].widthFactor, closeTo(0.624, 0.01));
+        // Passive voice manuscript: 20.0 / 50.0 = 0.40
+        expect(fractionallySizedBoxes[0].widthFactor, closeTo(0.40, 0.01));
+        // Passive voice journal: 31.2 / 50.0 = 0.624
+        expect(fractionallySizedBoxes[1].widthFactor, closeTo(0.624, 0.01));
 
-      // Manuscript 20.0% bar is visibly smaller than Journal 31.2% bar
-      expect(fractionallySizedBoxes[0].widthFactor! < fractionallySizedBoxes[1].widthFactor!, isTrue);
+        // Manuscript 20.0% bar is visibly smaller than Journal 31.2% bar
+        expect(
+          fractionallySizedBoxes[0].widthFactor! <
+              fractionallySizedBoxes[1].widthFactor!,
+          isTrue,
+        );
 
-      // Author voice manuscript: 0.0 / 15.0 = 0.0
-      expect(fractionallySizedBoxes[2].widthFactor, closeTo(0.0, 0.01));
-      // Author voice journal: 3.8 / 15.0 = 0.253
-      expect(fractionallySizedBoxes[3].widthFactor, closeTo(0.253, 0.01));
-    });
+        // Author voice manuscript: 0.0 / 15.0 = 0.0
+        expect(fractionallySizedBoxes[2].widthFactor, closeTo(0.0, 0.01));
+        // Author voice journal: 3.8 / 15.0 = 0.253
+        expect(fractionallySizedBoxes[3].widthFactor, closeTo(0.253, 0.01));
+      },
+    );
   });
 }

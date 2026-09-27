@@ -31,23 +31,29 @@ class _FakeUsersRepository implements UsersRepository {
   }
 }
 
-Widget _wrap(Widget child, {UsersRepository? repo}) =>
-    MultiRepositoryProvider(
-      providers: [
-        RepositoryProvider<UsersRepository>.value(value: repo ?? _FakeUsersRepository()),
-      ],
-      child: MaterialApp(home: BlocProvider(
-        create: (context) => CreateAccountCubit(
-          createAccount: CreateAccountUseCase(context.read<UsersRepository>()),
-        ),
-        child: child,
-      )),
-    );
+Widget _wrap(Widget child, {UsersRepository? repo}) => MultiRepositoryProvider(
+  providers: [
+    RepositoryProvider<UsersRepository>.value(
+      value: repo ?? _FakeUsersRepository(),
+    ),
+  ],
+  child: MaterialApp(
+    home: BlocProvider(
+      create: (context) => CreateAccountCubit(
+        createAccount: CreateAccountUseCase(context.read<UsersRepository>()),
+      ),
+      child: child,
+    ),
+  ),
+);
 
 void main() {
-  testWidgets('student form: title shown, validation blocks empty submit',
-      (tester) async {
-    await tester.pumpWidget(_wrap(const CreateAccountPage(role: UserRole.student)));
+  testWidgets('student form: title shown, validation blocks empty submit', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(const CreateAccountPage(role: UserRole.student)),
+    );
 
     expect(find.text('Create Student Account'), findsWidgets);
 
@@ -58,22 +64,28 @@ void main() {
     expect(find.text('Password is required.'), findsOneWidget);
   });
 
-  testWidgets('lecturer form: invalid email and short password rejected',
-      (tester) async {
+  testWidgets('lecturer form: invalid email and short password rejected', (
+    tester,
+  ) async {
     final repo = _FakeUsersRepository();
-    await tester.pumpWidget(_wrap(
-        const CreateAccountPage(role: UserRole.lecturer),
-        repo: repo));
+    await tester.pumpWidget(
+      _wrap(const CreateAccountPage(role: UserRole.lecturer), repo: repo),
+    );
 
     await tester.enterText(find.byKey(const Key('field_Full name')), 'G');
     await tester.enterText(
-        find.byKey(const Key('field_Email')), 'not-an-email');
+      find.byKey(const Key('field_Email')),
+      'not-an-email',
+    );
     await tester.enterText(find.byKey(const Key('field_Password')), 'short');
     await tester.tap(find.text('Create account'));
     await tester.pump();
 
     expect(find.text('Enter a valid email address.'), findsOneWidget);
-    expect(find.text('Password must be at least 8 characters.'), findsOneWidget);
+    expect(
+      find.text('Password must be at least 8 characters.'),
+      findsOneWidget,
+    );
     expect(find.text('Name is too short.'), findsOneWidget);
     expect(repo.calls, 0);
   });
@@ -81,15 +93,22 @@ void main() {
   testWidgets('valid student submission reaches the repository and shows '
       'success state', (tester) async {
     final repo = _FakeUsersRepository();
-    await tester.pumpWidget(_wrap(
-        const CreateAccountPage(role: UserRole.student),
-        repo: repo));
+    await tester.pumpWidget(
+      _wrap(const CreateAccountPage(role: UserRole.student), repo: repo),
+    );
 
     await tester.enterText(
-        find.byKey(const Key('field_Full name')), 'Sinh Vien');
+      find.byKey(const Key('field_Full name')),
+      'Sinh Vien',
+    );
     await tester.enterText(
-        find.byKey(const Key('field_Email')), 's@university.edu');
-    await tester.enterText(find.byKey(const Key('field_Password')), 'long-enough-1');
+      find.byKey(const Key('field_Email')),
+      's@university.edu',
+    );
+    await tester.enterText(
+      find.byKey(const Key('field_Password')),
+      'long-enough-1',
+    );
     await tester.tap(find.text('Create account'));
     await tester.pump();
     await tester.pump();
@@ -99,18 +118,27 @@ void main() {
     expect(find.text('Create another account'), findsOneWidget);
   });
 
-  testWidgets('backend failure shows a recoverable error, not a crash',
-      (tester) async {
-    final repo = _FakeUsersRepository()..error = Exception('Email already used.');
-    await tester.pumpWidget(_wrap(
-        const CreateAccountPage(role: UserRole.lecturer),
-        repo: repo));
+  testWidgets('backend failure shows a recoverable error, not a crash', (
+    tester,
+  ) async {
+    final repo = _FakeUsersRepository()
+      ..error = Exception('Email already used.');
+    await tester.pumpWidget(
+      _wrap(const CreateAccountPage(role: UserRole.lecturer), repo: repo),
+    );
 
     await tester.enterText(
-        find.byKey(const Key('field_Full name')), 'Giang Vien');
+      find.byKey(const Key('field_Full name')),
+      'Giang Vien',
+    );
     await tester.enterText(
-        find.byKey(const Key('field_Email')), 'dup@university.edu');
-    await tester.enterText(find.byKey(const Key('field_Password')), 'long-enough-1');
+      find.byKey(const Key('field_Email')),
+      'dup@university.edu',
+    );
+    await tester.enterText(
+      find.byKey(const Key('field_Password')),
+      'long-enough-1',
+    );
     await tester.tap(find.text('Create account'));
     await tester.pump();
     await tester.pump();
@@ -125,14 +153,17 @@ void main() {
       cubit,
       Stream<AuthState>.empty(),
       initialState: const AuthAuthenticated(
-          user: AuthUser(sub: 'sub-1', email: 'a@b.co', name: 'A B')),
-    );
-    await tester.pumpWidget(MaterialApp(
-      home: BlocProvider<AuthCubit>.value(
-        value: cubit,
-        child: const UserInfoPage(),
+        user: AuthUser(sub: 'sub-1', email: 'a@b.co', name: 'A B'),
       ),
-    ));
+    );
+    await tester.pumpWidget(
+      MaterialApp(
+        home: BlocProvider<AuthCubit>.value(
+          value: cubit,
+          child: const UserInfoPage(),
+        ),
+      ),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('Account Profile'), findsOneWidget);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
@@ -59,11 +60,20 @@ class _SettingsViewState extends State<SettingsView> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.shield_outlined, size: 20, color: AppColors.primary),
+                    const Icon(
+                      Icons.shield_outlined,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 10),
                     Text(
                       context.l10n.ssoTitle,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                   ],
                 ),
@@ -85,7 +95,11 @@ class _SettingsViewState extends State<SettingsView> {
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: AppColors.green100),
                         ),
-                        child: const Icon(Icons.check_rounded, color: AppColors.green700, size: 20),
+                        child: const Icon(
+                          Icons.check_rounded,
+                          color: AppColors.green700,
+                          size: 20,
+                        ),
                       ),
                       const SizedBox(width: 14),
                       Expanded(
@@ -94,25 +108,42 @@ class _SettingsViewState extends State<SettingsView> {
                           children: [
                             Text(
                               context.l10n.ssoConnected,
-                              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textPrimary,
+                                fontFamily: 'Manrope',
+                              ),
                             ),
                             const SizedBox(height: 2),
                             Text(
                               context.l10n.ssoProvider,
-                              style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.textMuted,
+                                fontFamily: 'Manrope',
+                              ),
                             ),
                           ],
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.green50,
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           context.l10n.ssoActive,
-                          style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.green700, fontFamily: 'Manrope'),
+                          style: const TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            color: AppColors.green700,
+                            fontFamily: 'Manrope',
+                          ),
                         ),
                       ),
                     ],
@@ -137,29 +168,50 @@ class _SettingsViewState extends State<SettingsView> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.privacy_tip_outlined, size: 20, color: AppColors.primary),
+                    const Icon(
+                      Icons.privacy_tip_outlined,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 10),
                     Text(
                       context.l10n.privacyTitle,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
                   context.l10n.privacyDesc,
-                  style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(
                     context.l10n.autoPurgeTitle,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                   subtitle: Text(
                     context.l10n.autoPurgeSubtitle(_retentionDays.toInt()),
-                    style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                   value: _autoPurge,
                   activeThumbColor: AppColors.primary,
@@ -171,7 +223,9 @@ class _SettingsViewState extends State<SettingsView> {
                   max: 30,
                   divisions: 29,
                   activeColor: AppColors.primary,
-                  onChanged: _autoPurge ? (val) => setState(() => _retentionDays = val) : null,
+                  onChanged: _autoPurge
+                      ? (val) => setState(() => _retentionDays = val)
+                      : null,
                 ),
               ],
             ),
@@ -192,29 +246,50 @@ class _SettingsViewState extends State<SettingsView> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.speed_rounded, size: 20, color: AppColors.primary),
+                    const Icon(
+                      Icons.speed_rounded,
+                      size: 20,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 10),
                     Text(
                       context.l10n.politePoolTitle,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 Text(
                   context.l10n.politePoolDesc,
-                  style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
                 const SizedBox(height: 16),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(
                     context.l10n.politePoolEnable,
-                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                   subtitle: Text(
                     context.l10n.politePoolSubtitle(_requestsPerSecond.toInt()),
-                    style: const TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textMuted,
+                      fontFamily: 'Manrope',
+                    ),
                   ),
                   value: _politePool,
                   activeThumbColor: AppColors.primary,
@@ -226,7 +301,9 @@ class _SettingsViewState extends State<SettingsView> {
                   max: 20,
                   divisions: 19,
                   activeColor: AppColors.primary,
-                  onChanged: _politePool ? (val) => setState(() => _requestsPerSecond = val) : null,
+                  onChanged: _politePool
+                      ? (val) => setState(() => _requestsPerSecond = val)
+                      : null,
                 ),
               ],
             ),
@@ -249,8 +326,13 @@ class _SettingsViewState extends State<SettingsView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
           ),

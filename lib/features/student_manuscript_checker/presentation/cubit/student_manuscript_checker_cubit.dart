@@ -185,14 +185,12 @@ class StudentManuscriptCheckerCubit
         }
       }
 
-      if (finalResult == null) {
-        finalResult = await checkManuscriptUseCase(
-          fileBytes: bytes,
-          filename: name,
-          targetJournalId: journalId.trim(),
-          includeExemplars: exemplars,
-        );
-      }
+      finalResult ??= await checkManuscriptUseCase(
+        fileBytes: bytes,
+        filename: name,
+        targetJournalId: journalId.trim(),
+        includeExemplars: exemplars,
+      );
 
       // Give user smooth visual transition after completion
       await Future<void>.delayed(const Duration(milliseconds: 600));

@@ -1,5 +1,7 @@
 import '../../../../core/localization/app_localizations.dart';
+
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_notification.dart';
 import '../../data/datasources/admin_api_client.dart';
@@ -24,7 +26,6 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
   List<Map<String, dynamic>> _journals = [];
   bool _isLoading = true;
   String? _error;
-
 
   @override
   void initState() {
@@ -70,7 +71,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
 
     // 2. Check if journal already has a configuration with a domain
     final cfg = _configs.firstWhere(
-      (c) => c['journal_id']?.toString() == journalId || c['journal']?['id']?.toString() == journalId,
+      (c) =>
+          c['journal_id']?.toString() == journalId ||
+          c['journal']?['id']?.toString() == journalId,
       orElse: () => {},
     );
     if (cfg.isNotEmpty && (cfg['domain'] ?? '').toString().trim().isNotEmpty) {
@@ -80,13 +83,17 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
     // 3. Fallback based on keywords in journal title
     if (j.isNotEmpty) {
       final title = (j['title'] ?? '').toString().toLowerCase();
-      if (title.contains('bioinformatics') || title.contains('computational biology')) {
+      if (title.contains('bioinformatics') ||
+          title.contains('computational biology')) {
         return 'Bioinformatics & Computational Biology';
       }
-      if (title.contains('software engineering') || title.contains('programming')) {
+      if (title.contains('software engineering') ||
+          title.contains('programming')) {
         return 'Software Engineering';
       }
-      if (title.contains('artificial intelligence') || title.contains('machine learning') || title.contains('ai')) {
+      if (title.contains('artificial intelligence') ||
+          title.contains('machine learning') ||
+          title.contains('ai')) {
         return 'Artificial Intelligence & Machine Learning';
       }
       if (title.contains('big data') || title.contains('data science')) {
@@ -95,7 +102,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
       if (title.contains('genetics') || title.contains('genomics')) {
         return 'Genetics & Genomics';
       }
-      if (title.contains('biomedical') || title.contains('medicine') || title.contains('life')) {
+      if (title.contains('biomedical') ||
+          title.contains('medicine') ||
+          title.contains('life')) {
         return 'Biomedical & Life Sciences';
       }
       if (title.contains('computer science')) {
@@ -131,7 +140,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
           builder: (context, setModalState) {
             return AlertDialog(
               backgroundColor: AppColors.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
               title: Text(
                 context.l10n.newMiningConfigTitle,
                 style: const TextStyle(
@@ -149,15 +160,32 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   children: [
                     Text(
                       context.l10n.newMiningConfigDesc,
-                      style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 20),
-                    Text(context.l10n.applicableJournalRequired, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
+                    Text(
+                      context.l10n.applicableJournalRequired,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     DropdownButtonFormField<String>(
                       initialValue: selectedJournalId,
                       isExpanded: true,
-                      decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
+                      decoration: const InputDecoration(
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                      ),
                       items: _journals.map((j) {
                         return DropdownMenuItem<String>(
                           value: j['id'].toString(),
@@ -165,7 +193,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                             '${j['title']} (${j['issn_l'] ?? 'No ISSN'})',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textPrimary,
+                              fontFamily: 'Manrope',
+                            ),
                           ),
                         );
                       }).toList(),
@@ -179,11 +211,23 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                       },
                     ),
                     const SizedBox(height: 16),
-                    Text(context.l10n.researchDomainRequired, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope')),
+                    Text(
+                      context.l10n.researchDomainRequired,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: domainController,
-                      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
                       decoration: InputDecoration(
                         hintText: context.l10n.domainPlaceholder,
                       ),
@@ -191,7 +235,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     const SizedBox(height: 4),
                     Text(
                       context.l10n.domainSyncNote,
-                      style: const TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -200,16 +248,40 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(context.l10n.fromYearLabel, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              Text(
+                                context.l10n.fromYearLabel,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearStart,
-                                decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
-                                items: [2018, 2019, 2020, 2021, 2022, 2023].map((y) {
-                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
-                                }).toList(),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                ),
+                                items: [2018, 2019, 2020, 2021, 2022, 2023].map(
+                                  (y) {
+                                    return DropdownMenuItem(
+                                      value: y,
+                                      child: Text(
+                                        '$y',
+                                        style: const TextStyle(
+                                          fontFamily: 'Manrope',
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ).toList(),
                                 onChanged: (val) {
-                                  if (val != null) setModalState(() => yearStart = val);
+                                  if (val != null) {
+                                    setModalState(() => yearStart = val);
+                                  }
                                 },
                               ),
                             ],
@@ -220,16 +292,38 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(context.l10n.toYearLabel, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              Text(
+                                context.l10n.toYearLabel,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearEnd,
-                                decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
+                                decoration: const InputDecoration(
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: 14,
+                                    vertical: 10,
+                                  ),
+                                ),
                                 items: [2022, 2023, 2024, 2025, 2026].map((y) {
-                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
+                                  return DropdownMenuItem(
+                                    value: y,
+                                    child: Text(
+                                      '$y',
+                                      style: const TextStyle(
+                                        fontFamily: 'Manrope',
+                                      ),
+                                    ),
+                                  );
                                 }).toList(),
                                 onChanged: (val) {
-                                  if (val != null) setModalState(() => yearEnd = val);
+                                  if (val != null) {
+                                    setModalState(() => yearEnd = val);
+                                  }
                                 },
                               ),
                             ],
@@ -241,10 +335,22 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(context.l10n.targetPapersLabel, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                        Text(
+                          context.l10n.targetPapersLabel,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Manrope',
+                          ),
+                        ),
                         Text(
                           context.l10n.papersCountLabel(targetPapers.toInt()),
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primary,
+                            fontFamily: 'Manrope',
+                          ),
                         ),
                       ],
                     ),
@@ -312,10 +418,19 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: isSaving
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text('Lưu cấu hình'),
                 ),
               ],
@@ -460,10 +575,16 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
           builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: AppColors.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: Row(
                 children: [
-                  const Icon(Icons.tune_rounded, color: AppColors.primary, size: 20),
+                  const Icon(
+                    Icons.tune_rounded,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                   SizedBox(width: 8),
                   Text(
                     context.l10n.targetPapersLabel,
@@ -484,22 +605,39 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   children: [
                     Text(
                       context.l10n.targetPapersHelp,
-                      style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 16),
                     TextField(
                       controller: controller,
                       keyboardType: TextInputType.number,
                       autofocus: true,
-                      style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700, fontFamily: 'Manrope', color: AppColors.textPrimary),
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Manrope',
+                        color: AppColors.textPrimary,
+                      ),
                       decoration: InputDecoration(
                         labelText: context.l10n.targetPapersCount,
                         suffixText: context.l10n.papersUnit,
-                        suffixStyle: const TextStyle(fontWeight: FontWeight.w600, color: AppColors.primary),
+                        suffixStyle: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
                       ),
                       onChanged: (val) {
                         final parsed = int.tryParse(val);
@@ -511,7 +649,12 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     const SizedBox(height: 14),
                     const Text(
                       'Chọn nhanh:',
-                      style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSubtle,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 6),
                     Wrap(
@@ -528,12 +671,19 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                           },
                           borderRadius: BorderRadius.circular(6),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.primary : AppColors.surfaceSoft,
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : AppColors.surfaceSoft,
                               borderRadius: BorderRadius.circular(6),
                               border: Border.all(
-                                color: isSelected ? AppColors.primary : AppColors.border,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.border,
                               ),
                             ),
                             child: Text(
@@ -541,7 +691,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: isSelected ? Colors.white : AppColors.textSecondary,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textSecondary,
                                 fontFamily: 'Manrope',
                               ),
                             ),
@@ -559,7 +711,8 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    final count = int.tryParse(controller.text.trim()) ?? selectedValue;
+                    final count =
+                        int.tryParse(controller.text.trim()) ?? selectedValue;
                     if (count < 5 || count > 5000) {
                       AppNotification.showWarning(
                         context,
@@ -576,7 +729,10 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     });
 
                     try {
-                      await _apiClient.updateConfiguration(configId, targetArticles: count);
+                      await _apiClient.updateConfiguration(
+                        configId,
+                        targetArticles: count,
+                      );
                       if (context.mounted) {
                         AppNotification.showSuccess(
                           context,
@@ -600,7 +756,9 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: const Text('Lưu thay đổi'),
                 ),
@@ -663,8 +821,13 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.onPrimary,
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 18,
+                        vertical: 12,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 ],
@@ -685,9 +848,19 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
               child: Center(
                 child: Column(
                   children: [
-                    const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
+                    const Icon(
+                      Icons.error_outline_rounded,
+                      color: AppColors.error,
+                      size: 36,
+                    ),
                     const SizedBox(height: 8),
-                    Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+                    Text(
+                      _error!,
+                      style: const TextStyle(
+                        color: AppColors.textSecondary,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: _loadData,
@@ -704,11 +877,19 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
               child: Center(
                 child: Column(
                   children: [
-                    const Icon(Icons.tune_rounded, size: 48, color: AppColors.slate300),
+                    const Icon(
+                      Icons.tune_rounded,
+                      size: 48,
+                      color: AppColors.slate300,
+                    ),
                     const SizedBox(height: 12),
                     const Text(
                       'Chưa có cấu hình khai phá nào được tạo.',
-                      style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope', fontSize: 14),
+                      style: TextStyle(
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                        fontSize: 14,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     ElevatedButton.icon(
@@ -777,7 +958,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                       color: AppColors.blue50,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.tune_rounded, color: AppColors.primary, size: 20),
+                    child: const Icon(
+                      Icons.tune_rounded,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 14),
                   Column(
@@ -797,7 +982,10 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                           if (isActive) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.blue50,
                                 borderRadius: BorderRadius.circular(4),
@@ -832,14 +1020,30 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                 children: [
                   OutlinedButton.icon(
                     onPressed: () => _deleteConfig(configId),
-                    icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.error),
-                    label: const Text('Xóa', style: TextStyle(color: AppColors.error, fontSize: 12, fontFamily: 'Manrope')),
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      size: 16,
+                      color: AppColors.error,
+                    ),
+                    label: const Text(
+                      'Xóa',
+                      style: TextStyle(
+                        color: AppColors.error,
+                        fontSize: 12,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
                     style: OutlinedButton.styleFrom(
                       side: const BorderSide(color: AppColors.border),
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -850,10 +1054,15 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: AppColors.onPrimary,
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                 ],
@@ -874,7 +1083,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.calendar_today_rounded, size: 12, color: AppColors.textSubtle),
+                        Icon(
+                          Icons.calendar_today_rounded,
+                          size: 12,
+                          color: AppColors.textSubtle,
+                        ),
                         SizedBox(width: 4),
                         Text(
                           'KHOẢNG NĂM KHẢO SÁT',
@@ -894,17 +1107,42 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                       children: [
                         _buildYearPickerButton(
                           currentYear: yearFrom,
-                          years: const [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+                          years: const [
+                            2016,
+                            2017,
+                            2018,
+                            2019,
+                            2020,
+                            2021,
+                            2022,
+                            2023,
+                            2024,
+                          ],
                           tooltip: 'Bấm chọn năm bắt đầu',
                           onSelected: (y) => _updateYearFrom(config, y),
                         ),
                         const Padding(
                           padding: EdgeInsets.symmetric(horizontal: 6),
-                          child: Text('–', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.textPrimary)),
+                          child: Text(
+                            '–',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textPrimary,
+                            ),
+                          ),
                         ),
                         _buildYearPickerButton(
                           currentYear: yearTo,
-                          years: const [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027],
+                          years: const [
+                            2020,
+                            2021,
+                            2022,
+                            2023,
+                            2024,
+                            2025,
+                            2026,
+                            2027,
+                          ],
                           tooltip: 'Bấm chọn năm kết thúc',
                           onSelected: (y) => _updateYearTo(config, y),
                         ),
@@ -921,7 +1159,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.description_outlined, size: 12, color: AppColors.textSubtle),
+                        Icon(
+                          Icons.description_outlined,
+                          size: 12,
+                          color: AppColors.textSubtle,
+                        ),
                         SizedBox(width: 4),
                         Text(
                           'MỤC TIÊU BÀI BÁO',
@@ -953,7 +1195,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            const Icon(Icons.edit_outlined, size: 14, color: AppColors.textPrimary),
+                            const Icon(
+                              Icons.edit_outlined,
+                              size: 14,
+                              color: AppColors.textPrimary,
+                            ),
                           ],
                         ),
                       ),
@@ -969,7 +1215,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   children: [
                     Row(
                       children: [
-                        Icon(Icons.code_rounded, size: 12, color: AppColors.textSubtle),
+                        Icon(
+                          Icons.code_rounded,
+                          size: 12,
+                          color: AppColors.textSubtle,
+                        ),
                         SizedBox(width: 4),
                         Text(
                           'CHẾ ĐỘ GROBID PARSER',
@@ -1030,12 +1280,18 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
-                    color: isCurrent ? AppColors.primary : AppColors.textPrimary,
+                    color: isCurrent
+                        ? AppColors.primary
+                        : AppColors.textPrimary,
                     fontFamily: 'Manrope',
                   ),
                 ),
                 if (isCurrent)
-                  const Icon(Icons.check_rounded, size: 14, color: AppColors.primary),
+                  const Icon(
+                    Icons.check_rounded,
+                    size: 14,
+                    color: AppColors.primary,
+                  ),
               ],
             ),
           );
@@ -1054,7 +1310,11 @@ class _ConfigurationsViewState extends State<ConfigurationsView> {
             ),
           ),
           const SizedBox(width: 2),
-          const Icon(Icons.arrow_drop_down_rounded, size: 18, color: AppColors.textPrimary),
+          const Icon(
+            Icons.arrow_drop_down_rounded,
+            size: 18,
+            color: AppColors.textPrimary,
+          ),
         ],
       ),
     );

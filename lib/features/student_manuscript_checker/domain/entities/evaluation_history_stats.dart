@@ -18,15 +18,16 @@ class EvaluationHistoryStats extends Equatable {
       totalEvaluations: (map['total_evaluations'] as num?)?.toInt() ?? 0,
       strongMatches: (map['strong_matches'] as num?)?.toInt() ?? 0,
       needRevision: (map['need_revision'] as num?)?.toInt() ?? 0,
-      averageCompatibility: (map['average_compatibility'] as num?)?.toDouble() ?? 0.0,
+      averageCompatibility:
+          (map['average_compatibility'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
   @override
   List<Object?> get props => [
-        totalEvaluations,
-        strongMatches,
-        needRevision,
-        averageCompatibility,
-      ];
+    totalEvaluations,
+    strongMatches,
+    needRevision,
+    averageCompatibility,
+  ];
 }

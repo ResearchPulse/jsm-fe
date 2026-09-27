@@ -1,5 +1,7 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/widgets/search_input_box.dart';
@@ -77,7 +79,9 @@ class _JournalsViewState extends State<JournalsView> {
         // Keep _selectedJournal synced with fresh data if already chosen
         if (_selectedJournal != null) {
           final sId = _selectedJournal!['id']?.toString();
-          final updated = _journals.where((j) => j['id']?.toString() == sId).toList();
+          final updated = _journals
+              .where((j) => j['id']?.toString() == sId)
+              .toList();
           if (updated.isNotEmpty) {
             _selectedJournal = updated.first;
           }
@@ -94,7 +98,8 @@ class _JournalsViewState extends State<JournalsView> {
 
   Map<String, dynamic>? _getConfigForJournal(String journalId) {
     for (final c in _configs) {
-      final jId = c['journal_id']?.toString() ?? c['journal']?['id']?.toString();
+      final jId =
+          c['journal_id']?.toString() ?? c['journal']?['id']?.toString();
       if (jId == journalId) {
         return c;
       }
@@ -114,13 +119,17 @@ class _JournalsViewState extends State<JournalsView> {
     }
 
     final title = (journal['title'] ?? '').toString().toLowerCase();
-    if (title.contains('bioinformatics') || title.contains('computational biology')) {
+    if (title.contains('bioinformatics') ||
+        title.contains('computational biology')) {
       return 'Bioinformatics & Computational Biology';
     }
-    if (title.contains('software engineering') || title.contains('programming')) {
+    if (title.contains('software engineering') ||
+        title.contains('programming')) {
       return 'Software Engineering';
     }
-    if (title.contains('artificial intelligence') || title.contains('machine learning') || title.contains('ai')) {
+    if (title.contains('artificial intelligence') ||
+        title.contains('machine learning') ||
+        title.contains('ai')) {
       return 'Artificial Intelligence & Machine Learning';
     }
     if (title.contains('big data') || title.contains('data science')) {
@@ -129,7 +138,9 @@ class _JournalsViewState extends State<JournalsView> {
     if (title.contains('genetics') || title.contains('genomics')) {
       return 'Genetics & Genomics';
     }
-    if (title.contains('biomedical') || title.contains('medicine') || title.contains('life')) {
+    if (title.contains('biomedical') ||
+        title.contains('medicine') ||
+        title.contains('life')) {
       return 'Biomedical & Life Sciences';
     }
     if (title.contains('computer science')) {
@@ -306,69 +317,126 @@ class _JournalsViewState extends State<JournalsView> {
                   children: [
                     Text(
                       context.l10n.fullJournalTitleRequired,
-                      style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: titleController,
                       decoration: InputDecoration(
                         hintText: context.l10n.journalTitlePlaceholder,
-                        hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle),
+                        hintStyle: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSubtle,
+                        ),
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.border)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     const Text(
                       'Mã chuẩn quốc tế ISSN / ISSN-L *',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: issnController,
                       decoration: InputDecoration(
                         hintText: 'Ví dụ: 0098-5589',
-                        hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle),
+                        hintStyle: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSubtle,
+                        ),
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.border)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     const Text(
                       'Nhà xuất bản (Publisher)',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: publisherController,
                       decoration: InputDecoration(
-                        hintText: 'Ví dụ: IEEE Computer Society / Springer / ACM',
-                        hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle),
+                        hintText:
+                            'Ví dụ: IEEE Computer Society / Springer / ACM',
+                        hintStyle: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSubtle,
+                        ),
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.border)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     const Text(
                       'OpenAlex Source URI (Tùy chọn)',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textSecondary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: openalexController,
                       decoration: InputDecoration(
                         hintText: 'Ví dụ: https://openalex.org/S8351582',
-                        hintStyle: const TextStyle(fontSize: 13, color: AppColors.textSubtle),
+                        hintStyle: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textSubtle,
+                        ),
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.border)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 12,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(10),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
                       ),
                     ),
                   ],
@@ -376,8 +444,13 @@ class _JournalsViewState extends State<JournalsView> {
               ),
               actions: [
                 TextButton(
-                  onPressed: isSubmitting ? null : () => Navigator.of(ctx).pop(),
-                  child: const Text('Hủy', style: TextStyle(color: AppColors.textMuted)),
+                  onPressed: isSubmitting
+                      ? null
+                      : () => Navigator.of(ctx).pop(),
+                  child: const Text(
+                    'Hủy',
+                    style: TextStyle(color: AppColors.textMuted),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: isSubmitting
@@ -395,7 +468,8 @@ class _JournalsViewState extends State<JournalsView> {
 
                           setModalState(() => isSubmitting = true);
                           try {
-                            final openalexId = openalexController.text.trim().isNotEmpty
+                            final openalexId =
+                                openalexController.text.trim().isNotEmpty
                                 ? openalexController.text.trim()
                                 : 'https://openalex.org/S_${issn.replaceAll('-', '')}';
 
@@ -404,7 +478,8 @@ class _JournalsViewState extends State<JournalsView> {
                               title: title,
                               issnL: issn,
                               issns: [issn],
-                              publisher: publisherController.text.trim().isNotEmpty
+                              publisher:
+                                  publisherController.text.trim().isNotEmpty
                                   ? publisherController.text.trim()
                                   : 'Academic Publisher',
                               worksCount: 0, // Fallback if manually typed
@@ -434,10 +509,19 @@ class _JournalsViewState extends State<JournalsView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                   child: isSubmitting
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Text('Lưu tạp chí'),
                 ),
               ],
@@ -448,21 +532,33 @@ class _JournalsViewState extends State<JournalsView> {
     );
   }
 
-  void _showQuickConfigDialog(BuildContext context, Map<String, dynamic> journal) {
+  void _showQuickConfigDialog(
+    BuildContext context,
+    Map<String, dynamic> journal,
+  ) {
     final journalId = journal['id'].toString();
     final journalTitle = journal['title']?.toString() ?? 'Tạp chí';
     final existingConfig = _getConfigForJournal(journalId);
 
     final domainController = TextEditingController(
       text: existingConfig != null
-          ? (existingConfig['domain']?.toString() ?? _getDomainForJournal(journal))
+          ? (existingConfig['domain']?.toString() ??
+                _getDomainForJournal(journal))
           : _getDomainForJournal(journal),
     );
 
-    int yearStart = existingConfig != null ? (existingConfig['year_from'] ?? 2021) : 2021;
-    int yearEnd = existingConfig != null ? (existingConfig['year_to'] ?? 2024) : 2024;
-    int targetPapers = existingConfig != null ? (existingConfig['target_articles'] ?? 200) : 200;
-    final targetController = TextEditingController(text: targetPapers.toString());
+    int yearStart = existingConfig != null
+        ? (existingConfig['year_from'] ?? 2021)
+        : 2021;
+    int yearEnd = existingConfig != null
+        ? (existingConfig['year_to'] ?? 2024)
+        : 2024;
+    int targetPapers = existingConfig != null
+        ? (existingConfig['target_articles'] ?? 200)
+        : 200;
+    final targetController = TextEditingController(
+      text: targetPapers.toString(),
+    );
 
     bool isSaving = false;
 
@@ -473,7 +569,9 @@ class _JournalsViewState extends State<JournalsView> {
           builder: (context, setModalState) {
             return AlertDialog(
               backgroundColor: AppColors.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: Row(
                 children: [
                   Container(
@@ -484,7 +582,11 @@ class _JournalsViewState extends State<JournalsView> {
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(color: AppColors.border),
                     ),
-                    child: const Icon(Icons.tune_rounded, size: 20, color: AppColors.textPrimary),
+                    child: const Icon(
+                      Icons.tune_rounded,
+                      size: 20,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -492,7 +594,9 @@ class _JournalsViewState extends State<JournalsView> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          existingConfig != null ? 'Cập nhật cấu hình khai phá' : 'Thiết lập cấu hình khai phá',
+                          existingConfig != null
+                              ? 'Cập nhật cấu hình khai phá'
+                              : 'Thiết lập cấu hình khai phá',
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -525,24 +629,44 @@ class _JournalsViewState extends State<JournalsView> {
                   children: [
                     const Text(
                       'Lĩnh vực nghiên cứu (Domain) *',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 6),
                     TextField(
                       controller: domainController,
-                      style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textPrimary,
+                        fontFamily: 'Manrope',
+                      ),
                       decoration: InputDecoration(
-                        hintText: 'Ví dụ: Bioinformatics & Computational Biology',
+                        hintText:
+                            'Ví dụ: Bioinformatics & Computational Biology',
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 4),
                     const Text(
                       'Tự động xác định từ dữ liệu học thuật. Bạn có thể chỉnh sửa nếu cần.',
-                      style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                      ),
                     ),
                     const SizedBox(height: 16),
 
@@ -552,21 +676,57 @@ class _JournalsViewState extends State<JournalsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Từ năm xuất bản', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              const Text(
+                                'Từ năm xuất bản',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearStart,
                                 decoration: InputDecoration(
                                   fillColor: AppColors.surfaceSoft,
                                   filled: true,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.border,
+                                    ),
+                                  ),
                                 ),
-                                items: [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023].map((y) {
-                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontSize: 13, fontFamily: 'Manrope')));
-                                }).toList(),
+                                items:
+                                    [
+                                      2016,
+                                      2017,
+                                      2018,
+                                      2019,
+                                      2020,
+                                      2021,
+                                      2022,
+                                      2023,
+                                    ].map((y) {
+                                      return DropdownMenuItem(
+                                        value: y,
+                                        child: Text(
+                                          '$y',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontFamily: 'Manrope',
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
                                 onChanged: (val) {
-                                  if (val != null) setModalState(() => yearStart = val);
+                                  if (val != null) {
+                                    setModalState(() => yearStart = val);
+                                  }
                                 },
                               ),
                             ],
@@ -577,21 +737,57 @@ class _JournalsViewState extends State<JournalsView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Đến năm xuất bản', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                              const Text(
+                                'Đến năm xuất bản',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
                               const SizedBox(height: 6),
                               DropdownButtonFormField<int>(
                                 initialValue: yearEnd,
                                 decoration: InputDecoration(
                                   fillColor: AppColors.surfaceSoft,
                                   filled: true,
-                                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                                  contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 8,
+                                  ),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: const BorderSide(
+                                      color: AppColors.border,
+                                    ),
+                                  ),
                                 ),
-                                items: [2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027].map((y) {
-                                  return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontSize: 13, fontFamily: 'Manrope')));
-                                }).toList(),
+                                items:
+                                    [
+                                      2020,
+                                      2021,
+                                      2022,
+                                      2023,
+                                      2024,
+                                      2025,
+                                      2026,
+                                      2027,
+                                    ].map((y) {
+                                      return DropdownMenuItem(
+                                        value: y,
+                                        child: Text(
+                                          '$y',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontFamily: 'Manrope',
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
                                 onChanged: (val) {
-                                  if (val != null) setModalState(() => yearEnd = val);
+                                  if (val != null) {
+                                    setModalState(() => yearEnd = val);
+                                  }
                                 },
                               ),
                             ],
@@ -604,10 +800,22 @@ class _JournalsViewState extends State<JournalsView> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(context.l10n.targetPapersLabel, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                        Text(
+                          context.l10n.targetPapersLabel,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            fontFamily: 'Manrope',
+                          ),
+                        ),
                         Text(
                           context.l10n.papersCountLabel(targetPapers.toInt()),
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textPrimary,
+                            fontFamily: 'Manrope',
+                          ),
                         ),
                       ],
                     ),
@@ -615,13 +823,23 @@ class _JournalsViewState extends State<JournalsView> {
                     TextField(
                       controller: targetController,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Manrope',
+                      ),
                       decoration: InputDecoration(
                         suffixText: context.l10n.papersUnit,
                         fillColor: AppColors.surfaceSoft,
                         filled: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: const BorderSide(color: AppColors.border)),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          borderSide: const BorderSide(color: AppColors.border),
+                        ),
                       ),
                       onChanged: (val) {
                         final parsed = int.tryParse(val);
@@ -645,18 +863,29 @@ class _JournalsViewState extends State<JournalsView> {
                           },
                           borderRadius: BorderRadius.circular(6),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.textPrimary : AppColors.surfaceSoft,
+                              color: isSelected
+                                  ? AppColors.textPrimary
+                                  : AppColors.surfaceSoft,
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: isSelected ? AppColors.textPrimary : AppColors.border),
+                              border: Border.all(
+                                color: isSelected
+                                    ? AppColors.textPrimary
+                                    : AppColors.border,
+                              ),
                             ),
                             child: Text(
                               context.l10n.papersCountLabel(preset),
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
-                                color: isSelected ? Colors.white : AppColors.textSecondary,
+                                color: isSelected
+                                    ? Colors.white
+                                    : AppColors.textSecondary,
                                 fontFamily: 'Manrope',
                               ),
                             ),
@@ -675,7 +904,11 @@ class _JournalsViewState extends State<JournalsView> {
                       ),
                       child: const Row(
                         children: [
-                          Icon(Icons.code_rounded, size: 16, color: AppColors.textPrimary),
+                          Icon(
+                            Icons.code_rounded,
+                            size: 16,
+                            color: AppColors.textPrimary,
+                          ),
                           SizedBox(width: 8),
                           Expanded(
                             child: Column(
@@ -683,12 +916,21 @@ class _JournalsViewState extends State<JournalsView> {
                               children: [
                                 Text(
                                   'Cấu trúc đầu ra: Toàn văn TEI XML',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textPrimary,
+                                    fontFamily: 'Manrope',
+                                  ),
                                 ),
                                 SizedBox(height: 2),
                                 Text(
                                   'Động cơ Grobid tự động bóc tách Abstract, Sections, References & Sentences.',
-                                  style: TextStyle(fontSize: 11, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    color: AppColors.textMuted,
+                                    fontFamily: 'Manrope',
+                                  ),
                                 ),
                               ],
                             ),
@@ -729,13 +971,30 @@ class _JournalsViewState extends State<JournalsView> {
                               }
                             }
                           },
-                    icon: const Icon(Icons.delete_outline_rounded, size: 16, color: AppColors.error),
-                    label: const Text('Xóa cấu hình', style: TextStyle(color: AppColors.error, fontSize: 12, fontFamily: 'Manrope')),
+                    icon: const Icon(
+                      Icons.delete_outline_rounded,
+                      size: 16,
+                      color: AppColors.error,
+                    ),
+                    label: const Text(
+                      'Xóa cấu hình',
+                      style: TextStyle(
+                        color: AppColors.error,
+                        fontSize: 12,
+                        fontFamily: 'Manrope',
+                      ),
+                    ),
                   ),
                 const Spacer(),
                 TextButton(
                   onPressed: isSaving ? null : () => Navigator.of(ctx).pop(),
-                  child: const Text('Đóng', style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope')),
+                  child: const Text(
+                    'Đóng',
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
                 ),
                 OutlinedButton(
                   onPressed: isSaving
@@ -802,9 +1061,18 @@ class _JournalsViewState extends State<JournalsView> {
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.textPrimary,
                     side: const BorderSide(color: AppColors.border),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  child: const Text('Lưu cấu hình', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                  child: const Text(
+                    'Lưu cấu hình',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
@@ -840,14 +1108,15 @@ class _JournalsViewState extends State<JournalsView> {
                                 targetArticles: targetPapers,
                               );
                             } else {
-                              final created = await _apiClient.createConfiguration(
-                                journalId: journalId,
-                                domain: domain,
-                                yearFrom: yearStart,
-                                yearTo: yearEnd,
-                                targetArticles: targetPapers,
-                                referenceCorpusName: 'Academic Core Corpus',
-                              );
+                              final created = await _apiClient
+                                  .createConfiguration(
+                                    journalId: journalId,
+                                    domain: domain,
+                                    yearFrom: yearStart,
+                                    yearTo: yearEnd,
+                                    targetArticles: targetPapers,
+                                    referenceCorpusName: 'Academic Core Corpus',
+                                  );
                               activeConfigId = created['id']?.toString() ?? '';
                             }
 
@@ -855,7 +1124,10 @@ class _JournalsViewState extends State<JournalsView> {
                             await _loadAllData();
 
                             if (activeConfigId.isNotEmpty) {
-                              await _triggerAnalysis(activeConfigId, journalTitle);
+                              await _triggerAnalysis(
+                                activeConfigId,
+                                journalTitle,
+                              );
                             }
                           } catch (err) {
                             setModalState(() => isSaving = false);
@@ -869,13 +1141,29 @@ class _JournalsViewState extends State<JournalsView> {
                           }
                         },
                   icon: isSaving
-                      ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Icon(Icons.bolt_rounded, size: 16),
-                  label: const Text('Lưu & Khởi chạy ngay', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, fontFamily: 'Manrope')),
+                  label: const Text(
+                    'Lưu & Khởi chạy ngay',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ],
@@ -888,15 +1176,18 @@ class _JournalsViewState extends State<JournalsView> {
 
   @override
   Widget build(BuildContext context) {
-    final configuredCount = _journals.where((j) => _getConfigForJournal(j['id'].toString()) != null).length;
+    final configuredCount = _journals
+        .where((j) => _getConfigForJournal(j['id'].toString()) != null)
+        .length;
     final unconfiguredCount = _journals.length - configuredCount;
 
-    final domains = _journals
-        .map((j) => _getDomainForJournal(j))
-        .where((d) => d.trim().isNotEmpty)
-        .toSet()
-        .toList()
-      ..sort();
+    final domains =
+        _journals
+            .map((j) => _getDomainForJournal(j))
+            .where((d) => d.trim().isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
 
     final filteredJournals = _journals.where((j) {
       final title = (j['title'] ?? '').toString().toLowerCase();
@@ -905,8 +1196,13 @@ class _JournalsViewState extends State<JournalsView> {
       final domain = _getDomainForJournal(j).toLowerCase();
       final q = _searchQuery.toLowerCase();
 
-      final matchesSearch = title.contains(q) || issn.contains(q) || publisher.contains(q) || domain.contains(q);
-      final matchesDomain = _selectedDomain == null || _getDomainForJournal(j) == _selectedDomain;
+      final matchesSearch =
+          title.contains(q) ||
+          issn.contains(q) ||
+          publisher.contains(q) ||
+          domain.contains(q);
+      final matchesDomain =
+          _selectedDomain == null || _getDomainForJournal(j) == _selectedDomain;
 
       final hasConfig = _getConfigForJournal(j['id'].toString()) != null;
       bool matchesStatus = true;
@@ -947,7 +1243,11 @@ class _JournalsViewState extends State<JournalsView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          _buildSearchAndFilterToolbar(domains, configuredCount, unconfiguredCount),
+                          _buildSearchAndFilterToolbar(
+                            domains,
+                            configuredCount,
+                            unconfiguredCount,
+                          ),
                           const SizedBox(height: 16),
                           _buildJournalCatalogList(filteredJournals),
                         ],
@@ -961,7 +1261,9 @@ class _JournalsViewState extends State<JournalsView> {
                           ? JournalCommandCenterPanel(
                               key: ValueKey(_selectedJournal!['id']),
                               journal: _selectedJournal!,
-                              initialConfig: _getConfigForJournal(_selectedJournal!['id'].toString()),
+                              initialConfig: _getConfigForJournal(
+                                _selectedJournal!['id'].toString(),
+                              ),
                               onNavigateToTab: widget.onNavigateToTab,
                               onRefreshParent: _loadAllData,
                             )
@@ -978,13 +1280,19 @@ class _JournalsViewState extends State<JournalsView> {
                       JournalCommandCenterPanel(
                         key: ValueKey(_selectedJournal!['id']),
                         journal: _selectedJournal!,
-                        initialConfig: _getConfigForJournal(_selectedJournal!['id'].toString()),
+                        initialConfig: _getConfigForJournal(
+                          _selectedJournal!['id'].toString(),
+                        ),
                         onNavigateToTab: widget.onNavigateToTab,
                         onRefreshParent: _loadAllData,
                       ),
                       const SizedBox(height: 24),
                     ],
-                    _buildSearchAndFilterToolbar(domains, configuredCount, unconfiguredCount),
+                    _buildSearchAndFilterToolbar(
+                      domains,
+                      configuredCount,
+                      unconfiguredCount,
+                    ),
                     const SizedBox(height: 16),
                     _buildJournalCatalogList(filteredJournals),
                   ],
@@ -1040,12 +1348,23 @@ class _JournalsViewState extends State<JournalsView> {
             OutlinedButton.icon(
               onPressed: () => _showAddJournalDialog(context),
               icon: const Icon(Icons.post_add_rounded, size: 18),
-              label: Text(context.l10n.addJournalManual, style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+              label: Text(
+                context.l10n.addJournalManual,
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Manrope',
+                ),
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textPrimary,
                 side: const BorderSide(color: AppColors.border),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
             ),
           ],
@@ -1054,7 +1373,11 @@ class _JournalsViewState extends State<JournalsView> {
     );
   }
 
-  Widget _buildSearchAndFilterToolbar(List<String> domains, int configuredCount, int unconfiguredCount) {
+  Widget _buildSearchAndFilterToolbar(
+    List<String> domains,
+    int configuredCount,
+    int unconfiguredCount,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -1084,17 +1407,33 @@ class _JournalsViewState extends State<JournalsView> {
                     ? null
                     : () => _searchOpenAlex(_searchQuery),
                 icon: _isSearchingOpenAlex
-                    ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? const SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
                     : const Icon(Icons.travel_explore_rounded, size: 16),
                 label: const Text(
                   'OpenAlex',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.textPrimary,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ],
@@ -1107,12 +1446,19 @@ class _JournalsViewState extends State<JournalsView> {
               runSpacing: 8,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                _buildStatusFilterChip('all', '${context.l10n.filterAll} (${_journals.length})'),
-                _buildStatusFilterChip('configured', '${context.l10n.filterConfigured} ($configuredCount)'),
-                _buildStatusFilterChip('unconfigured', '${context.l10n.filterUnconfigured} ($unconfiguredCount)'),
-                if (domains.isNotEmpty) ...[
-                  _buildDomainFilterMenu(domains),
-                ],
+                _buildStatusFilterChip(
+                  'all',
+                  '${context.l10n.filterAll} (${_journals.length})',
+                ),
+                _buildStatusFilterChip(
+                  'configured',
+                  '${context.l10n.filterConfigured} ($configuredCount)',
+                ),
+                _buildStatusFilterChip(
+                  'unconfigured',
+                  '${context.l10n.filterUnconfigured} ($unconfiguredCount)',
+                ),
+                if (domains.isNotEmpty) ...[_buildDomainFilterMenu(domains)],
               ],
             ),
           ),
@@ -1134,7 +1480,9 @@ class _JournalsViewState extends State<JournalsView> {
         decoration: BoxDecoration(
           color: isSelected ? AppColors.textPrimary : AppColors.surfaceSoft,
           borderRadius: BorderRadius.circular(8),
-          border: Border.all(color: isSelected ? AppColors.textPrimary : AppColors.border),
+          border: Border.all(
+            color: isSelected ? AppColors.textPrimary : AppColors.border,
+          ),
         ),
         child: Text(
           label,
@@ -1183,17 +1531,26 @@ class _JournalsViewState extends State<JournalsView> {
               height: 38,
               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
-                  color: _selectedDomain == null ? AppColors.sidebarActive : Colors.transparent,
+                  color: _selectedDomain == null
+                      ? AppColors.sidebarActive
+                      : Colors.transparent,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   children: [
                     Icon(
-                      _selectedDomain == null ? Icons.check_circle_rounded : Icons.circle_outlined,
+                      _selectedDomain == null
+                          ? Icons.check_circle_rounded
+                          : Icons.circle_outlined,
                       size: 15,
-                      color: _selectedDomain == null ? AppColors.primary : AppColors.textSubtle.withAlpha(102),
+                      color: _selectedDomain == null
+                          ? AppColors.primary
+                          : AppColors.textSubtle.withAlpha(102),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -1201,8 +1558,12 @@ class _JournalsViewState extends State<JournalsView> {
                         context.l10n.filterAll,
                         style: TextStyle(
                           fontSize: 12,
-                          fontWeight: _selectedDomain == null ? FontWeight.w700 : FontWeight.w500,
-                          color: _selectedDomain == null ? AppColors.primary : AppColors.textPrimary,
+                          fontWeight: _selectedDomain == null
+                              ? FontWeight.w700
+                              : FontWeight.w500,
+                          color: _selectedDomain == null
+                              ? AppColors.primary
+                              : AppColors.textPrimary,
                           fontFamily: 'Manrope',
                         ),
                         maxLines: 1,
@@ -1223,17 +1584,26 @@ class _JournalsViewState extends State<JournalsView> {
                 height: 38,
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
-                    color: isCurrent ? AppColors.sidebarActive : Colors.transparent,
+                    color: isCurrent
+                        ? AppColors.sidebarActive
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
                     children: [
                       Icon(
-                        isCurrent ? Icons.check_circle_rounded : Icons.circle_outlined,
+                        isCurrent
+                            ? Icons.check_circle_rounded
+                            : Icons.circle_outlined,
                         size: 15,
-                        color: isCurrent ? AppColors.primary : AppColors.textSubtle.withAlpha(102),
+                        color: isCurrent
+                            ? AppColors.primary
+                            : AppColors.textSubtle.withAlpha(102),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
@@ -1241,8 +1611,12 @@ class _JournalsViewState extends State<JournalsView> {
                           d,
                           style: TextStyle(
                             fontSize: 12,
-                            fontWeight: isCurrent ? FontWeight.w700 : FontWeight.w500,
-                            color: isCurrent ? AppColors.primary : AppColors.textPrimary,
+                            fontWeight: isCurrent
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                            color: isCurrent
+                                ? AppColors.primary
+                                : AppColors.textPrimary,
                             fontFamily: 'Manrope',
                           ),
                           maxLines: 1,
@@ -1280,7 +1654,9 @@ class _JournalsViewState extends State<JournalsView> {
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: isFiltered ? AppColors.primary : AppColors.textSecondary,
+                  color: isFiltered
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
                   fontFamily: 'Manrope',
                 ),
               ),
@@ -1321,9 +1697,19 @@ class _JournalsViewState extends State<JournalsView> {
         child: Center(
           child: Column(
             children: [
-              const Icon(Icons.error_outline_rounded, color: AppColors.error, size: 36),
+              const Icon(
+                Icons.error_outline_rounded,
+                color: AppColors.error,
+                size: 36,
+              ),
               const SizedBox(height: 8),
-              Text(_error!, style: const TextStyle(color: AppColors.textSecondary, fontFamily: 'Manrope')),
+              Text(
+                _error!,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontFamily: 'Manrope',
+                ),
+              ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: _loadAllData,
@@ -1354,12 +1740,14 @@ class _JournalsViewState extends State<JournalsView> {
       _currentPage = safeTotalPages;
     }
     final startIndex = (_currentPage - 1) * _pageSize;
-    final paginatedJournals = filteredJournals.skip(startIndex).take(_pageSize).toList();
+    final paginatedJournals = filteredJournals
+        .skip(startIndex)
+        .take(_pageSize)
+        .toList();
 
     return Column(
       children: [
-        for (final journal in paginatedJournals)
-          _buildJournalCard(journal),
+        for (final journal in paginatedJournals) _buildJournalCard(journal),
         if (totalCount > _pageSize) ...[
           const SizedBox(height: 12),
           _buildPaginationBar(totalCount, safeTotalPages),
@@ -1422,13 +1810,20 @@ class _JournalsViewState extends State<JournalsView> {
                 iconSize: 20,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                color: _currentPage > 1 ? AppColors.primary : AppColors.slate300,
-                onPressed: _currentPage > 1 ? () => setState(() => _currentPage--) : null,
+                color: _currentPage > 1
+                    ? AppColors.primary
+                    : AppColors.slate300,
+                onPressed: _currentPage > 1
+                    ? () => setState(() => _currentPage--)
+                    : null,
                 tooltip: context.l10n.prevPageTooltip,
               ),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 6),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(6),
@@ -1449,8 +1844,12 @@ class _JournalsViewState extends State<JournalsView> {
                 iconSize: 20,
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                color: _currentPage < totalPages ? AppColors.primary : AppColors.slate300,
-                onPressed: _currentPage < totalPages ? () => setState(() => _currentPage++) : null,
+                color: _currentPage < totalPages
+                    ? AppColors.primary
+                    : AppColors.slate300,
+                onPressed: _currentPage < totalPages
+                    ? () => setState(() => _currentPage++)
+                    : null,
                 tooltip: context.l10n.nextPageTooltip,
               ),
             ],
@@ -1464,7 +1863,8 @@ class _JournalsViewState extends State<JournalsView> {
     final journalId = journal['id'].toString();
     final title = journal['title'] ?? context.l10n.unknown;
     final publisher = journal['publisher'] ?? context.l10n.unknownPublisher;
-    final issn = journal['issn_l'] ??
+    final issn =
+        journal['issn_l'] ??
         ((journal['issns'] is List && (journal['issns'] as List).isNotEmpty)
             ? journal['issns'][0].toString()
             : 'N/A');
@@ -1473,7 +1873,9 @@ class _JournalsViewState extends State<JournalsView> {
 
     final config = _getConfigForJournal(journalId);
     final isConfigured = config != null;
-    final isSelected = _selectedJournal != null && _selectedJournal!['id'].toString() == journalId;
+    final isSelected =
+        _selectedJournal != null &&
+        _selectedJournal!['id'].toString() == journalId;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -1515,7 +1917,9 @@ class _JournalsViewState extends State<JournalsView> {
                   margin: const EdgeInsets.only(top: 2, right: 10),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isSelected ? AppColors.primary : AppColors.surfaceSoft,
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.surfaceSoft,
                     border: Border.all(
                       color: isSelected ? AppColors.primary : AppColors.border,
                     ),
@@ -1539,7 +1943,9 @@ class _JournalsViewState extends State<JournalsView> {
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
-                                color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                color: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.textPrimary,
                                 fontFamily: 'Manrope',
                               ),
                             ),
@@ -1547,7 +1953,10 @@ class _JournalsViewState extends State<JournalsView> {
                           const SizedBox(width: 8),
                           if (isConfigured)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.green100,
                                 borderRadius: BorderRadius.circular(4),
@@ -1564,7 +1973,10 @@ class _JournalsViewState extends State<JournalsView> {
                             )
                           else
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.surfaceSoft,
                                 borderRadius: BorderRadius.circular(4),
@@ -1597,7 +2009,10 @@ class _JournalsViewState extends State<JournalsView> {
                       Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 1,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.surfaceSoft,
                               borderRadius: BorderRadius.circular(4),
@@ -1618,16 +2033,26 @@ class _JournalsViewState extends State<JournalsView> {
                           const SizedBox(width: 6),
                           Text(
                             'ISSN: $issn',
-                            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                              fontFamily: 'Manrope',
+                            ),
                           ),
                           const Spacer(),
                           Text(
                             context.l10n.papersCountLabel(worksCount),
-                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textMuted,
+                              fontFamily: 'Manrope',
+                            ),
                           ),
                           const SizedBox(width: 6),
                           IconButton(
-                            onPressed: () => _showQuickConfigDialog(context, journal),
+                            onPressed: () =>
+                                _showQuickConfigDialog(context, journal),
                             icon: const Icon(Icons.tune_rounded, size: 14),
                             tooltip: context.l10n.configDetailsTooltip,
                             padding: EdgeInsets.zero,
@@ -1705,9 +2130,18 @@ class _JournalsViewState extends State<JournalsView> {
               runSpacing: 8,
               alignment: WrapAlignment.center,
               children: [
-                _buildFeatureBadge(Icons.bolt_rounded, context.l10n.badge1Touch),
-                _buildFeatureBadge(Icons.account_tree_rounded, context.l10n.badgeTeiXml),
-                _buildFeatureBadge(Icons.psychology_rounded, context.l10n.badgeNlpStyle),
+                _buildFeatureBadge(
+                  Icons.bolt_rounded,
+                  context.l10n.badge1Touch,
+                ),
+                _buildFeatureBadge(
+                  Icons.account_tree_rounded,
+                  context.l10n.badgeTeiXml,
+                ),
+                _buildFeatureBadge(
+                  Icons.psychology_rounded,
+                  context.l10n.badgeNlpStyle,
+                ),
               ],
             ),
           ],
@@ -1731,7 +2165,12 @@ class _JournalsViewState extends State<JournalsView> {
           const SizedBox(width: 5),
           Text(
             text,
-            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textSecondary,
+              fontFamily: 'Manrope',
+            ),
           ),
         ],
       ),
@@ -1763,7 +2202,11 @@ class _JournalsViewState extends State<JournalsView> {
               const SizedBox(height: 4),
               Text(
                 context.l10n.openAlexConnectingDesc,
-                style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
               ),
             ],
           ),
@@ -1777,12 +2220,20 @@ class _JournalsViewState extends State<JournalsView> {
         child: Center(
           child: Column(
             children: [
-              const Icon(Icons.cloud_off_rounded, size: 40, color: AppColors.error),
+              const Icon(
+                Icons.cloud_off_rounded,
+                size: 40,
+                color: AppColors.error,
+              ),
               const SizedBox(height: 12),
               Text(
                 'Lỗi kết nối OpenAlex: $_openAlexSearchError',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13, color: AppColors.error, fontFamily: 'Manrope'),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.error,
+                  fontFamily: 'Manrope',
+                ),
               ),
               const SizedBox(height: 12),
               OutlinedButton.icon(
@@ -1825,7 +2276,11 @@ class _JournalsViewState extends State<JournalsView> {
         child: Center(
           child: Column(
             children: [
-              const Icon(Icons.search_off_rounded, size: 40, color: AppColors.textSubtle),
+              const Icon(
+                Icons.search_off_rounded,
+                size: 40,
+                color: AppColors.textSubtle,
+              ),
               const SizedBox(height: 12),
               Text(
                 context.l10n.noJournalFoundOpenAlex,
@@ -1839,7 +2294,11 @@ class _JournalsViewState extends State<JournalsView> {
               const SizedBox(height: 6),
               Text(
                 context.l10n.tryAnotherKeywords,
-                style: TextStyle(fontSize: 12, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
               ),
             ],
           ),
@@ -1869,7 +2328,11 @@ class _JournalsViewState extends State<JournalsView> {
                     color: AppColors.textPrimary.withAlpha(20),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.travel_explore_rounded, color: AppColors.textPrimary, size: 26),
+                  child: const Icon(
+                    Icons.travel_explore_rounded,
+                    color: AppColors.textPrimary,
+                    size: 26,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 Text(
@@ -1901,8 +2364,13 @@ class _JournalsViewState extends State<JournalsView> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.textPrimary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ],
@@ -1918,11 +2386,18 @@ class _JournalsViewState extends State<JournalsView> {
         child: Center(
           child: Column(
             children: [
-              const Icon(Icons.filter_list_off_rounded, size: 40, color: AppColors.textSubtle),
+              const Icon(
+                Icons.filter_list_off_rounded,
+                size: 40,
+                color: AppColors.textSubtle,
+              ),
               const SizedBox(height: 8),
               Text(
                 context.l10n.noJournalsMatchedFilter,
-                style: const TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+                style: const TextStyle(
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
               ),
               const SizedBox(height: 14),
               OutlinedButton.icon(
@@ -1932,12 +2407,23 @@ class _JournalsViewState extends State<JournalsView> {
                   _currentPage = 1;
                 }),
                 icon: const Icon(Icons.clear_all_rounded, size: 16),
-                label: Text(context.l10n.clearFilter, style: const TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+                label: Text(
+                  context.l10n.clearFilter,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 10,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
               ),
             ],
@@ -1951,27 +2437,49 @@ class _JournalsViewState extends State<JournalsView> {
       child: Center(
         child: Column(
           children: [
-            const Icon(Icons.menu_book_outlined, size: 40, color: AppColors.textSubtle),
+            const Icon(
+              Icons.menu_book_outlined,
+              size: 40,
+              color: AppColors.textSubtle,
+            ),
             const SizedBox(height: 8),
             Text(
               context.l10n.noJournalsInDb,
-              style: TextStyle(color: AppColors.textMuted, fontFamily: 'Manrope'),
+              style: TextStyle(
+                color: AppColors.textMuted,
+                fontFamily: 'Manrope',
+              ),
             ),
             const SizedBox(height: 6),
             Text(
               context.l10n.searchOrManualHint,
-              style: TextStyle(fontSize: 12, color: AppColors.textSubtle, fontFamily: 'Manrope'),
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSubtle,
+                fontFamily: 'Manrope',
+              ),
             ),
             const SizedBox(height: 14),
             OutlinedButton.icon(
               onPressed: () => _showAddJournalDialog(context),
               icon: const Icon(Icons.post_add_rounded, size: 16),
-              label: Text(context.l10n.manualEntryBtn, style: TextStyle(fontWeight: FontWeight.w600, fontFamily: 'Manrope')),
+              label: Text(
+                context.l10n.manualEntryBtn,
+                style: TextStyle(
+                  fontWeight: FontWeight.w600,
+                  fontFamily: 'Manrope',
+                ),
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textPrimary,
                 side: const BorderSide(color: AppColors.border),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
             ),
           ],
@@ -1985,13 +2493,15 @@ class _JournalsViewState extends State<JournalsView> {
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
       decoration: const BoxDecoration(
         color: AppColors.surfaceSoft,
-        border: Border(
-          bottom: BorderSide(color: AppColors.borderSoft),
-        ),
+        border: Border(bottom: BorderSide(color: AppColors.borderSoft)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.travel_explore_rounded, size: 18, color: AppColors.textPrimary),
+          const Icon(
+            Icons.travel_explore_rounded,
+            size: 18,
+            color: AppColors.textPrimary,
+          ),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
@@ -2012,8 +2522,13 @@ class _JournalsViewState extends State<JournalsView> {
               });
             },
             icon: const Icon(Icons.close_rounded, size: 14),
-            label: Text(context.l10n.hideOpenAlexResults, style: TextStyle(fontSize: 11)),
-            style: TextButton.styleFrom(foregroundColor: AppColors.textSecondary),
+            label: Text(
+              context.l10n.hideOpenAlexResults,
+              style: TextStyle(fontSize: 11),
+            ),
+            style: TextButton.styleFrom(
+              foregroundColor: AppColors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -2023,7 +2538,8 @@ class _JournalsViewState extends State<JournalsView> {
   Widget _buildOpenAlexJournalRow(Map<String, dynamic> journal) {
     final title = journal['title'] ?? context.l10n.unknown;
     final publisher = journal['publisher'] ?? context.l10n.unknownPublisher;
-    final issn = journal['issn_l'] ??
+    final issn =
+        journal['issn_l'] ??
         ((journal['issns'] is List && (journal['issns'] as List).isNotEmpty)
             ? journal['issns'][0].toString()
             : 'N/A');
@@ -2065,7 +2581,10 @@ class _JournalsViewState extends State<JournalsView> {
                         ),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primary.withAlpha(20),
                             borderRadius: BorderRadius.circular(4),
@@ -2100,7 +2619,10 @@ class _JournalsViewState extends State<JournalsView> {
               // Action Button / Status
               if (isImported)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.green50,
                     borderRadius: BorderRadius.circular(8),
@@ -2109,7 +2631,11 @@ class _JournalsViewState extends State<JournalsView> {
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.check_circle_rounded, size: 16, color: AppColors.green700),
+                      const Icon(
+                        Icons.check_circle_rounded,
+                        size: 16,
+                        color: AppColors.green700,
+                      ),
                       const SizedBox(width: 6),
                       Text(
                         context.l10n.importedToDb,
@@ -2125,16 +2651,23 @@ class _JournalsViewState extends State<JournalsView> {
                 )
               else
                 ElevatedButton.icon(
-                  onPressed: isImporting ? null : () => _importOpenAlexJournal(journal),
+                  onPressed: isImporting
+                      ? null
+                      : () => _importOpenAlexJournal(journal),
                   icon: isImporting
                       ? const SizedBox(
                           width: 14,
                           height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : const Icon(Icons.add_rounded, size: 16),
                   label: Text(
-                    isImporting ? context.l10n.importingToDb : context.l10n.importToDbBtn,
+                    isImporting
+                        ? context.l10n.importingToDb
+                        : context.l10n.importToDbBtn,
                     style: const TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
@@ -2145,10 +2678,15 @@ class _JournalsViewState extends State<JournalsView> {
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     elevation: 0,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
             ],
@@ -2172,7 +2710,11 @@ class _JournalsViewState extends State<JournalsView> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.tag_rounded, size: 12, color: AppColors.textSubtle),
+                    const Icon(
+                      Icons.tag_rounded,
+                      size: 12,
+                      color: AppColors.textSubtle,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       'ISSN: $issn',
@@ -2198,7 +2740,11 @@ class _JournalsViewState extends State<JournalsView> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.menu_book_rounded, size: 12, color: AppColors.textSubtle),
+                    const Icon(
+                      Icons.menu_book_rounded,
+                      size: 12,
+                      color: AppColors.textSubtle,
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       context.l10n.worksAndCitations(worksCount, citedCount),
@@ -2216,15 +2762,21 @@ class _JournalsViewState extends State<JournalsView> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isImported ? AppColors.green100 : AppColors.surfaceSoft,
+                  color: isImported
+                      ? AppColors.green100
+                      : AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  isImported ? context.l10n.savedInSystem : context.l10n.notImportedToDb,
+                  isImported
+                      ? context.l10n.savedInSystem
+                      : context.l10n.notImportedToDb,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: isImported ? AppColors.green700 : AppColors.textMuted,
+                    color: isImported
+                        ? AppColors.green700
+                        : AppColors.textMuted,
                     fontFamily: 'Manrope',
                   ),
                 ),

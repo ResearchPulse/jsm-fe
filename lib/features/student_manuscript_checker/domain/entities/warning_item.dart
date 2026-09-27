@@ -31,8 +31,7 @@ class WarningItem extends Equatable {
       title.toLowerCase().contains('missing');
 
   bool get isSentenceLengthWarning =>
-      id == 'W-STYLE-01' ||
-      title.toLowerCase().contains('sentence length');
+      id == 'W-STYLE-01' || title.toLowerCase().contains('sentence length');
 
   bool get isVoicePersonWarning =>
       id == 'W-STYLE-02' ||
@@ -51,7 +50,8 @@ class WarningItem extends Equatable {
       section: map['section'] as String? ?? '',
       title: map['title'] as String? ?? '',
       message: map['message'] as String? ?? '',
-      exemplar: map['exemplar'] != null && map['exemplar'] is Map<String, dynamic>
+      exemplar:
+          map['exemplar'] != null && map['exemplar'] is Map<String, dynamic>
           ? ExemplarItem.fromMap(map['exemplar'] as Map<String, dynamic>)
           : null,
     );

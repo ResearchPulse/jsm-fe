@@ -192,10 +192,10 @@ class RecommendationsRankedList extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: (color ?? AppColors.textSecondary).withOpacity(0.08),
+        color: (color ?? AppColors.textSecondary).withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
-          color: (color ?? AppColors.textSecondary).withOpacity(0.2),
+          color: (color ?? AppColors.textSecondary).withValues(alpha: 0.2),
         ),
       ),
       child: Text(

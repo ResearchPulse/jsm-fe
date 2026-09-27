@@ -1,4 +1,5 @@
 import 'package:web/web.dart' as web;
+
 import 'locale_storage.dart';
 
 class WebLocaleStorage implements LocaleStorage {

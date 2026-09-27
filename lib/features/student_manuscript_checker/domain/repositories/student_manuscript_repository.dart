@@ -69,4 +69,3 @@ abstract class StudentManuscriptRepository {
     String? evaluationId,
   });
 }
-
