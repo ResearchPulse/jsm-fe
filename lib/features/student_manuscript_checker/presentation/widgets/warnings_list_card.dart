@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/warning_item.dart';
 
 class WarningsListCard extends StatefulWidget {
@@ -231,7 +232,7 @@ class _WarningsListCardState extends State<WarningsListCard> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                warning.title,
+                                context.l10n.localizeAnalysisString(warning.title),
                                 style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w700,
@@ -263,7 +264,7 @@ class _WarningsListCardState extends State<WarningsListCard> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              warning.message,
+                              context.l10n.localizeAnalysisString(warning.message),
                               style: const TextStyle(
                                 fontSize: 12,
                                 color: AppColors.textPrimary,

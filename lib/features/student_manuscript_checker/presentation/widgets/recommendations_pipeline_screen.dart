@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../cubit/journal_recommendations_state.dart';
 
 class RecommendationsPipelineScreen extends StatelessWidget {
@@ -12,29 +13,27 @@ class RecommendationsPipelineScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final availableCount = state.availableJournalsCount > 0
         ? '${state.availableJournalsCount}'
-        : 'available';
+        : (context.l10n.isVietnamese ? 'các' : 'available');
 
     final steps = [
       (
-        title: 'Extract manuscript style features',
-        subtitle:
-            'Parsing section structure, sentence length, and stance markers',
+        title: context.l10n.pipelineExtractFeaturesTitle,
+        subtitle: context.l10n.pipelineExtractFeaturesSub,
         threshold: 0.15,
       ),
       (
-        title: 'Retrieve eligible journal profiles',
-        subtitle:
-            'Loaded $availableCount ready journal profiles from internal dataset',
+        title: context.l10n.pipelineRetrieveProfilesTitle,
+        subtitle: context.l10n.pipelineRetrieveProfilesSub(availableCount),
         threshold: 0.45,
       ),
       (
-        title: 'Compare stylistic compatibility',
-        subtitle: 'Evaluating multi-dimensional metric alignment across all candidates',
+        title: context.l10n.pipelineCompareStyleTitle,
+        subtitle: context.l10n.pipelineCompareStyleSub,
         threshold: 0.75,
       ),
       (
-        title: 'Rank and synthesize recommendations',
-        subtitle: 'Ordering candidates by compatibility score and identifying distinctions',
+        title: context.l10n.pipelineRankSynthesizeTitle,
+        subtitle: context.l10n.pipelineRankSynthesizeSub,
         threshold: 0.95,
       ),
     ];
@@ -80,9 +79,9 @@ class RecommendationsPipelineScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Finding Suitable Journals',
-                            style: TextStyle(
+                          Text(
+                            context.l10n.findingSuitableJournalsTitle,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
                               fontFamily: 'Manrope',
@@ -92,8 +91,8 @@ class RecommendationsPipelineScreen extends StatelessWidget {
                           const SizedBox(height: 4),
                           Text(
                             state.fileName != null
-                                ? 'Evaluating: ${state.fileName}'
-                                : 'Analyzing manuscript against closed journal dataset',
+                                ? context.l10n.evaluatingFile(state.fileName!)
+                                : context.l10n.analyzingAgainstDataset,
                             style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textSecondary,

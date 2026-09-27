@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/journal_recommendation_item.dart';
 
 class RecommendationsTopMatchCard extends StatelessWidget {
@@ -14,29 +15,29 @@ class RecommendationsTopMatchCard extends StatelessWidget {
   });
 
   Color _getScoreColor(double score) {
-    if (score >= 80) return AppColors.success;
-    if (score >= 60) return AppColors.warning;
-    return AppColors.error;
+    if (score >= 80) return const Color(0xFF10B981);
+    if (score >= 60) return const Color(0xFFF59E0B);
+    return const Color(0xFFEF4444);
   }
 
-  String _formatDimensionName(String key) {
+  String _formatDimensionName(BuildContext context, String key) {
     switch (key.toLowerCase()) {
       case 'structure':
-        return 'Structure';
+        return context.l10n.dimStructureAlignment;
       case 'sentencestyle':
       case 'sentence_style':
-        return 'Sentence Style';
+        return context.l10n.dimSentenceStyle;
       case 'voiceperson':
       case 'voice_person':
       case 'voiceandperson':
       case 'voice_and_person':
-        return 'Voice & Person';
+        return context.l10n.dimVoicePerson;
       case 'epistemicstyle':
       case 'epistemic_style':
-        return 'Epistemic Style';
+        return context.l10n.dimEpistemicStyle;
       case 'rhetoricalmoves':
       case 'rhetorical_moves':
-        return 'Rhetorical Moves';
+        return context.l10n.dimRhetoricalMoves;
       default:
         return key.replaceAll('_', ' ');
     }
@@ -86,9 +87,9 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                     color: AppColors.primary,
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: const Text(
-                    '#1 BEST MATCH',
-                    style: TextStyle(
+                  child: Text(
+                    context.l10n.bestMatchBadge,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w800,
                       fontSize: 12,
@@ -99,7 +100,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  'Highest stylistic compatibility for your manuscript',
+                  context.l10n.highestStylisticCompatibility,
                   style: TextStyle(
                     color: AppColors.primary.withValues(alpha: 0.85),
                     fontSize: 13,
@@ -140,7 +141,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                               if (item.issn != null && item.issn!.isNotEmpty)
                                 _buildTag('ISSN: ${item.issn}'),
                               if (item.field != null && item.field!.isNotEmpty)
-                                _buildTag(item.field!),
+                                _buildTag(context.l10n.localizeField(item.field!)),
                               if (item.publisher != null &&
                                   item.publisher!.isNotEmpty)
                                 _buildTag(item.publisher!),
@@ -210,9 +211,9 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Dimension Breakdown
-                const Text(
-                  'Style Compatibility Breakdown',
-                  style: TextStyle(
+                Text(
+                  context.l10n.styleCompatibilityBreakdown,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'Manrope',
@@ -223,21 +224,24 @@ class RecommendationsTopMatchCard extends StatelessWidget {
 
                 Column(
                   children: [
-                    _buildDimensionRow('Structure', item.dimensions.structure),
                     _buildDimensionRow(
-                      'Sentence Style',
+                      context.l10n.dimStructureAlignment,
+                      item.dimensions.structure,
+                    ),
+                    _buildDimensionRow(
+                      context.l10n.dimSentenceStyle,
                       item.dimensions.sentenceStyle,
                     ),
                     _buildDimensionRow(
-                      'Voice & Person',
+                      context.l10n.dimVoicePerson,
                       item.dimensions.voiceAndPerson,
                     ),
                     _buildDimensionRow(
-                      'Epistemic Style',
+                      context.l10n.dimEpistemicStyle,
                       item.dimensions.epistemicStyle,
                     ),
                     _buildDimensionRow(
-                      'Rhetorical Moves',
+                      context.l10n.dimRhetoricalMoves,
                       item.dimensions.rhetoricalMoves,
                     ),
                   ],
@@ -272,9 +276,9 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Strongest Alignment',
-                                      style: TextStyle(
+                                    Text(
+                                      context.l10n.strongestAlignment,
+                                      style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.success,
@@ -282,6 +286,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                                     ),
                                     Text(
                                       _formatDimensionName(
+                                        context,
                                         item.strongestDimension,
                                       ),
                                       style: const TextStyle(
@@ -323,9 +328,9 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
-                                      'Key Distinction',
-                                      style: TextStyle(
+                                    Text(
+                                      context.l10n.keyDistinction,
+                                      style: const TextStyle(
                                         fontSize: 11,
                                         fontWeight: FontWeight.w700,
                                         color: AppColors.warning,
@@ -333,6 +338,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                                     ),
                                     Text(
                                       _formatDimensionName(
+                                        context,
                                         item.weakestDimension,
                                       ),
                                       style: const TextStyle(
@@ -378,7 +384,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    align,
+                                    context.l10n.localizeAnalysisString(align),
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textPrimary,
@@ -404,7 +410,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    diff,
+                                    context.l10n.localizeAnalysisString(diff),
                                     style: const TextStyle(
                                       fontSize: 12,
                                       color: AppColors.textSecondary,
@@ -429,7 +435,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                   child: ElevatedButton.icon(
                     onPressed: onViewComparison,
                     icon: const Icon(Icons.analytics_outlined, size: 18),
-                    label: const Text('View Full Style Comparison'),
+                    label: Text(context.l10n.viewFullStyleComparison),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 20,
@@ -465,23 +471,33 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
                 color: AppColors.textPrimary,
+                fontFamily: 'Manrope',
               ),
             ),
           ),
           Expanded(
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: (dimScore / 100).clamp(0.0, 1.0),
-                backgroundColor: AppColors.background,
-                valueColor: AlwaysStoppedAnimation<Color>(color),
-                minHeight: 8,
+              borderRadius: BorderRadius.circular(4.5),
+              child: Container(
+                height: 9,
+                color: const Color(0xFFF1F5F9),
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: (dimScore / 100).clamp(0.0, 1.0),
+                  child: Container(
+                    height: 9,
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(4.5),
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
           const SizedBox(width: 14),
           SizedBox(
-            width: 42,
+            width: 44,
             child: Text(
               '${dimScore.toStringAsFixed(0)}%',
               textAlign: TextAlign.end,
@@ -489,6 +505,7 @@ class RecommendationsTopMatchCard extends StatelessWidget {
                 fontSize: 13,
                 fontWeight: FontWeight.w700,
                 color: color,
+                fontFamily: 'Manrope',
               ),
             ),
           ),

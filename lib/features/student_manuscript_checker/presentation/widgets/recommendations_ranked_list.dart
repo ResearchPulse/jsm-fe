@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/journal_recommendation_item.dart';
 
 class RecommendationsRankedList extends StatelessWidget {
@@ -14,9 +15,9 @@ class RecommendationsRankedList extends StatelessWidget {
   });
 
   Color _getScoreColor(double score) {
-    if (score >= 80) return AppColors.success;
-    if (score >= 60) return AppColors.warning;
-    return AppColors.error;
+    if (score >= 80) return const Color(0xFF10B981);
+    if (score >= 60) return const Color(0xFFF59E0B);
+    return const Color(0xFFEF4444);
   }
 
   @override
@@ -26,9 +27,9 @@ class RecommendationsRankedList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
-          'Other Candidate Journals',
-          style: TextStyle(
+        Text(
+          context.l10n.otherCandidateJournals,
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
             fontFamily: 'Manrope',
@@ -94,7 +95,7 @@ class RecommendationsRankedList extends StatelessWidget {
                             if (item.issn != null && item.issn!.isNotEmpty)
                               _buildTag('ISSN: ${item.issn}'),
                             if (item.field != null && item.field!.isNotEmpty)
-                              _buildTag(item.field!),
+                              _buildTag(context.l10n.localizeField(item.field!)),
                             if (item.publisher != null &&
                                 item.publisher!.isNotEmpty)
                               _buildTag(
@@ -142,7 +143,7 @@ class RecommendationsRankedList extends StatelessWidget {
                       children: [
                         if (item.notableDifferences.isNotEmpty)
                           Text(
-                            item.notableDifferences.first,
+                            context.l10n.localizeAnalysisString(item.notableDifferences.first),
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -152,7 +153,9 @@ class RecommendationsRankedList extends StatelessWidget {
                           )
                         else if (item.weakestDimension.isNotEmpty)
                           Text(
-                            'Distinction: ${item.weakestDimension.replaceAll('_', ' ')}',
+                            context.l10n.distinctionLabel(
+                              item.weakestDimension.replaceAll('_', ' '),
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -166,7 +169,7 @@ class RecommendationsRankedList extends StatelessWidget {
                   OutlinedButton.icon(
                     onPressed: () => onViewComparison(item),
                     icon: const Icon(Icons.open_in_new_rounded, size: 14),
-                    label: const Text('View Comparison'),
+                    label: Text(context.l10n.viewComparisonBtn),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,

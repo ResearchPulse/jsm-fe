@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/journal_recommendation_item.dart';
 
 class RecommendationsDimensionTable extends StatelessWidget {
@@ -29,26 +30,35 @@ class RecommendationsDimensionTable extends StatelessWidget {
 
     final dimensions = [
       (
-        'Structure Alignment',
+        context.l10n.dimStructureAlignment,
         (JournalRecommendationItem r) => r.dimensions.structure,
+        false
       ),
       (
-        'Sentence Style',
+        context.l10n.dimSentenceStyle,
         (JournalRecommendationItem r) => r.dimensions.sentenceStyle,
+        false
       ),
       (
-        'Voice & Person',
+        context.l10n.dimVoicePerson,
         (JournalRecommendationItem r) => r.dimensions.voiceAndPerson,
+        false
       ),
       (
-        'Epistemic Style',
+        context.l10n.dimEpistemicStyle,
         (JournalRecommendationItem r) => r.dimensions.epistemicStyle,
+        false
       ),
       (
-        'Rhetorical Moves',
+        context.l10n.dimRhetoricalMoves,
         (JournalRecommendationItem r) => r.dimensions.rhetoricalMoves,
+        false
       ),
-      ('Overall Match', (JournalRecommendationItem r) => r.compatibilityScore),
+      (
+        context.l10n.dimOverallMatch,
+        (JournalRecommendationItem r) => r.compatibilityScore,
+        true
+      ),
     ];
 
     return Container(
@@ -61,13 +71,13 @@ class RecommendationsDimensionTable extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.grid_view_rounded, size: 20, color: AppColors.primary),
-              SizedBox(width: 8),
+              const Icon(Icons.grid_view_rounded, size: 20, color: AppColors.primary),
+              const SizedBox(width: 8),
               Text(
-                'Cross-Journal Dimension Comparison Heatmap',
-                style: TextStyle(
+                context.l10n.crossJournalHeatmapTitle,
+                style: const TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Manrope',
@@ -77,46 +87,47 @@ class RecommendationsDimensionTable extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Table(
-              defaultColumnWidth: const IntrinsicColumnWidth(),
-              border: TableBorder.all(
-                color: AppColors.border,
-                borderRadius: BorderRadius.circular(8),
-                width: 1,
-              ),
-              children: [
-                // Header row
-                TableRow(
-                  decoration: const BoxDecoration(color: AppColors.surfaceSoft),
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      child: Text(
-                        'Dimension',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
-                          fontFamily: 'Manrope',
-                        ),
-                      ),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final minTableWidth = recommendations.length * 130.0 + 160.0;
+              final effectiveWidth = constraints.maxWidth > minTableWidth
+                  ? constraints.maxWidth
+                  : minTableWidth;
+
+              final Map<int, TableColumnWidth> colWidths = {
+                0: const FlexColumnWidth(1.2), // Dimension column
+                for (int i = 0; i < recommendations.length; i++)
+                  i + 1: const FlexColumnWidth(1.0), // Equal journal columns
+              };
+
+              return SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minWidth: effectiveWidth,
+                  ),
+                  child: Table(
+                    columnWidths: colWidths,
+                    defaultVerticalAlignment:
+                        TableCellVerticalAlignment.middle,
+                    border: TableBorder.all(
+                      color: AppColors.border,
+                      borderRadius: BorderRadius.circular(8),
+                      width: 1,
                     ),
-                    ...recommendations.map(
-                      (rec) => Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Text(
-                              rec.journalName,
+                    children: [
+                      // Header row
+                      TableRow(
+                        decoration:
+                            const BoxDecoration(color: AppColors.surfaceSoft),
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 11,
+                            ),
+                            child: Text(
+                              context.l10n.dimensionCol,
                               style: const TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w700,
@@ -124,96 +135,128 @@ class RecommendationsDimensionTable extends StatelessWidget {
                                 fontFamily: 'Manrope',
                               ),
                             ),
-                            Text(
-                              '#${rec.rank}',
-                              style: const TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textSecondary,
+                          ),
+                          ...recommendations.map(
+                            (rec) => Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 11,
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    rec.journalName,
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.textPrimary,
+                                      fontFamily: 'Manrope',
+                                    ),
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    '#${rec.rank}',
+                                    style: const TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.textSecondary,
+                                      fontFamily: 'Manrope',
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                // Data rows
-                ...dimensions.map((dim) {
-                  final isOverall = dim.$1 == 'Overall Match';
-                  return TableRow(
-                    decoration: BoxDecoration(
-                      color: isOverall
-                          ? AppColors.primarySoft.withValues(alpha: 0.3)
-                          : Colors.transparent,
-                    ),
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
-                        child: Text(
-                          dim.$1,
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: isOverall
-                                ? FontWeight.w700
-                                : FontWeight.w500,
+                      // Data rows
+                      ...dimensions.map((dim) {
+                        final isOverall = dim.$3;
+                        return TableRow(
+                          decoration: BoxDecoration(
                             color: isOverall
-                                ? AppColors.primary
-                                : AppColors.textPrimary,
+                                ? AppColors.primarySoft.withValues(alpha: 0.35)
+                                : Colors.transparent,
                           ),
-                        ),
-                      ),
-                      ...recommendations.map((rec) {
-                        final score = dim.$2(rec);
-                        final bg = _getCellBgColor(score);
-                        final textClr = _getCellTextColor(score);
-                        return Container(
-                          color: isOverall ? null : bg,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 12,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            '${score.toStringAsFixed(1)}%',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: isOverall
-                                  ? FontWeight.w800
-                                  : FontWeight.w700,
-                              color: isOverall ? AppColors.primary : textClr,
-                              fontFamily: 'Manrope',
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 10,
+                              ),
+                              child: Text(
+                                dim.$1,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: isOverall
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: isOverall
+                                      ? AppColors.primary
+                                      : AppColors.textPrimary,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
                             ),
-                          ),
+                            ...recommendations.map((rec) {
+                              final score = dim.$2(rec);
+                              final bg = _getCellBgColor(score);
+                              final textClr = _getCellTextColor(score);
+                              return Container(
+                                color: isOverall ? null : bg,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 10,
+                                ),
+                                alignment: Alignment.center,
+                                child: Text(
+                                  '${score.toStringAsFixed(1)}%',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    fontWeight: isOverall
+                                        ? FontWeight.w800
+                                        : FontWeight.w700,
+                                    color:
+                                        isOverall ? AppColors.primary : textClr,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
+                              );
+                            }),
+                          ],
                         );
                       }),
                     ],
-                  );
-                }),
-              ],
-            ),
+                  ),
+                ),
+              );
+            },
           ),
-          const SizedBox(height: 12),
-          // Legend
+          const SizedBox(height: 16),
+          // Legend aligned to table boundary
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               _buildLegendItem(
-                '≥80% Strong',
+                context.l10n.legendStrong,
                 AppColors.success,
                 AppColors.successSurface,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               _buildLegendItem(
-                '60–79% Moderate',
+                context.l10n.legendModerate,
                 AppColors.warning,
                 AppColors.warningSurface,
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               _buildLegendItem(
-                '<60% Low',
+                context.l10n.legendLow,
                 AppColors.error,
                 AppColors.errorSurface,
               ),
@@ -244,6 +287,7 @@ class RecommendationsDimensionTable extends StatelessWidget {
             fontSize: 11,
             color: textColor,
             fontWeight: FontWeight.w600,
+            fontFamily: 'Manrope',
           ),
         ),
       ],

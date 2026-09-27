@@ -236,7 +236,7 @@ class _LoginViewState extends State<LoginView>
                       AppNotification.showError(
                         context,
                         state.message,
-                        title: 'Đăng nhập thất bại',
+                        title: context.l10n.loginFailedTitle,
                       );
                     }
                   },
@@ -314,9 +314,7 @@ class _LoginViewState extends State<LoginView>
 
                                   // Subtitle
                                   Text(
-                                    context.l10n.isVietnamese
-                                        ? 'Cổng xác thực tập trung cho nghiên cứu & xuất bản tạp chí khoa học'
-                                        : 'Central authentication portal for scientific research & journal publication',
+                                    context.l10n.authPortalSubtitle,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -460,8 +458,8 @@ class _LoginViewState extends State<LoginView>
                                             horizontal: 10,
                                           ),
                                           child: Text(
-                                            'HOẶC GIẢ LẬP SSO (TEST MODE)',
-                                            style: TextStyle(
+                                            context.l10n.orSimulateSso,
+                                            style: const TextStyle(
                                               fontSize: 10.5,
                                               fontWeight: FontWeight.w700,
                                               color: AppColors.textSubtle,
@@ -492,7 +490,7 @@ class _LoginViewState extends State<LoginView>
                                                   .mockLogin(
                                                     sub: 'mock-sso-admin-id',
                                                     email: 'admin@jsm.edu.vn',
-                                                    name: 'Quản trị viên Hệ thống (Admin)',
+                                                    name: context.l10n.ssoAdminRole,
                                                     role: 'ADMIN',
                                                   ),
                                         style: OutlinedButton.styleFrom(
@@ -520,12 +518,12 @@ class _LoginViewState extends State<LoginView>
                                               color: Color(0xFF7C3AED),
                                             ),
                                             const SizedBox(width: 8),
-                                            const Expanded(
+                                            Expanded(
                                               child: Text(
-                                                'Giả lập SSO: ADMIN',
+                                                context.l10n.ssoAdminBtn,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w700,
                                                   color: Color(0xFF7C3AED),
@@ -573,7 +571,7 @@ class _LoginViewState extends State<LoginView>
                                                   .mockLogin(
                                                     sub: 'mock-sso-user-id',
                                                     email: 'scholar.user@lab.edu.vn',
-                                                    name: 'TS. Nguyễn Văn Scholar (User)',
+                                                    name: context.l10n.ssoScholarRole,
                                                     role: 'USER',
                                                   ),
                                         style: OutlinedButton.styleFrom(
@@ -600,12 +598,12 @@ class _LoginViewState extends State<LoginView>
                                               color: Color(0xFF0D9488),
                                             ),
                                             const SizedBox(width: 8),
-                                            const Expanded(
+                                            Expanded(
                                               child: Text(
-                                                'Giả lập SSO: USER',
+                                                context.l10n.ssoUserBtn,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontSize: 13,
                                                   fontWeight: FontWeight.w700,
                                                   color: Color(0xFF0D9488),

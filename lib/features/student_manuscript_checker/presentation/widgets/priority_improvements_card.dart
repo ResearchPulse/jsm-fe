@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/manuscript_check_result.dart';
 import '../../domain/entities/warning_item.dart';
 
@@ -34,7 +35,7 @@ class PriorityImprovementsCard extends StatelessWidget {
     this.onSelectWarning,
   });
 
-  List<PriorityIssue> _extractPriorityIssues() {
+  List<PriorityIssue> _extractPriorityIssues(AppLocalizations l10n) {
     final issues = <PriorityIssue>[];
     final comp = result.featureComparison;
 
@@ -45,9 +46,9 @@ class PriorityImprovementsCard extends StatelessWidget {
           (vp.userWeRate == 0 && vp.journalWeRate > 2.0)) {
         issues.add(
           PriorityIssue(
-            title: 'Author Voice ("We")',
+            title: l10n.issueAuthorVoice,
             priority: 'HIGH',
-            description: 'Rarely uses author-person references compared to journal standard.',
+            description: l10n.issueAuthorVoiceDesc,
             manuscriptValue: '${vp.userWeRate.toStringAsFixed(1)}%',
             journalValue: '${vp.journalWeRate.toStringAsFixed(1)}%',
             deviation: '${vp.weRateDiff.toStringAsFixed(1)} pp',
@@ -63,9 +64,9 @@ class PriorityImprovementsCard extends StatelessWidget {
           (st.userBoosterRate == 0 && st.journalBoosterRate > 3.0)) {
         issues.add(
           PriorityIssue(
-            title: 'Epistemic Boosters',
+            title: l10n.issueBoosters,
             priority: 'HIGH',
-            description: 'Absence of confidence markers commonly expected in journal discourse.',
+            description: l10n.issueBoostersDesc,
             manuscriptValue: '${st.userBoosterRate.toStringAsFixed(1)} /1k',
             journalValue: '${st.journalBoosterRate.toStringAsFixed(1)} /1k',
             deviation: '${st.boosterRateDiff.toStringAsFixed(1)} /1k',
@@ -77,13 +78,13 @@ class PriorityImprovementsCard extends StatelessWidget {
     // 3. Missing Gap
     if (result.hasMissingGap) {
       issues.add(
-        const PriorityIssue(
-          title: 'Research Gap Statement',
+        PriorityIssue(
+          title: l10n.issueResearchGap,
           priority: 'HIGH',
-          description: 'Introduction lacks a clear, explicit research gap or limitation phrasing.',
-          manuscriptValue: 'Missing',
-          journalValue: 'Required',
-          deviation: 'Critical move',
+          description: l10n.issueResearchGapDesc,
+          manuscriptValue: l10n.valMissing,
+          journalValue: l10n.valRequired,
+          deviation: l10n.valCriticalMove,
           section: 'INTRO',
         ),
       );
@@ -94,9 +95,9 @@ class PriorityImprovementsCard extends StatelessWidget {
       if (score < 80.0) {
         issues.add(
           PriorityIssue(
-            title: '${sec.toUpperCase()} Style Alignment',
+            title: l10n.issueSectionStyle(sec.toUpperCase()),
             priority: score < 75 ? 'HIGH' : 'MEDIUM',
-            description: 'Section stylistic features diverge noticeably from journal benchmark.',
+            description: l10n.issueSectionStyleDesc,
             manuscriptValue: '${score.toStringAsFixed(0)}%',
             journalValue: '>= 85%',
             deviation: '${(score - 85).toStringAsFixed(0)} pp',
@@ -115,12 +116,12 @@ class PriorityImprovementsCard extends StatelessWidget {
         )) {
           issues.add(
             PriorityIssue(
-              title: w.title,
+              title: l10n.localizeAnalysisString(w.title),
               priority: w.severity,
-              description: w.message,
-              manuscriptValue: 'Divergent',
-              journalValue: 'Expected',
-              deviation: 'Review needed',
+              description: l10n.localizeAnalysisString(w.message),
+              manuscriptValue: l10n.valDivergent,
+              journalValue: l10n.valExpected,
+              deviation: l10n.valReviewNeeded,
               section: w.section,
             ),
           );
@@ -134,7 +135,8 @@ class PriorityImprovementsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final issues = _extractPriorityIssues();
+    final l10n = context.l10n;
+    final issues = _extractPriorityIssues(l10n);
 
     return Container(
       width: double.infinity,
@@ -153,14 +155,14 @@ class PriorityImprovementsCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              const Wrap(
+              Wrap(
                 spacing: 8,
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  Icon(Icons.flag_outlined, size: 18, color: AppColors.primary),
+                  const Icon(Icons.flag_outlined, size: 18, color: AppColors.primary),
                   Text(
-                    'Priority Improvements',
-                    style: TextStyle(
+                    l10n.priorityImprovementsTitle,
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textPrimary,
@@ -178,7 +180,7 @@ class PriorityImprovementsCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  issues.isEmpty ? 'None Required' : '${issues.length} Issues',
+                  issues.isEmpty ? l10n.priorityNoneRequired : l10n.priorityIssuesCount(issues.length),
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w700,
@@ -199,18 +201,18 @@ class PriorityImprovementsCard extends StatelessWidget {
                 color: AppColors.green50,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.check_circle_outline,
                     color: AppColors.green700,
                     size: 16,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'No high-priority stylistic mismatches detected. Manuscript matches key journal metrics.',
-                      style: TextStyle(
+                      l10n.priorityNoMismatch,
+                      style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                         color: AppColors.green700,
@@ -380,7 +382,7 @@ class PriorityImprovementsCard extends StatelessWidget {
                                                   BorderRadius.circular(4),
                                             ),
                                             child: Text(
-                                              '${issue.priority} PRIORITY',
+                                              l10n.priorityBadge(issue.priority),
                                               style: TextStyle(
                                                 fontSize: 9,
                                                 fontWeight: FontWeight.w800,
@@ -416,11 +418,11 @@ class PriorityImprovementsCard extends StatelessWidget {
                                       runSpacing: 4,
                                       children: [
                                         _buildMetricChip(
-                                          'Manuscript: ${issue.manuscriptValue}',
+                                          l10n.manuscriptMetricPrefix(issue.manuscriptValue),
                                           isJournal: false,
                                         ),
                                         _buildMetricChip(
-                                          'Journal: ${issue.journalValue}',
+                                          l10n.journalMetricPrefix(issue.journalValue),
                                           isJournal: true,
                                         ),
                                       ],

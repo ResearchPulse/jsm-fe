@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/users_api_client.dart';
 import 'account_form_field.dart';
 
@@ -119,9 +120,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                             ),
                           ),
                           const SizedBox(width: 12),
-                          const Text(
-                            'Chỉnh Sửa Tài Khoản',
-                            style: TextStyle(
+                          Text(
+                            context.l10n.editUserTitle,
+                            style: const TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
@@ -136,14 +137,14 @@ class _EditUserDialogState extends State<EditUserDialog> {
                             : () => Navigator.of(context).pop(),
                         icon: const Icon(Icons.close_rounded, size: 20),
                         color: AppColors.textSubtle,
-                        tooltip: 'Đóng',
+                        tooltip: context.l10n.close,
                       ),
                     ],
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Cập nhật thông tin chi tiết, vai trò hoặc mật khẩu cho người dùng.',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.editUserSubtitle,
+                    style: const TextStyle(
                       fontSize: 13,
                       color: AppColors.textMuted,
                       fontFamily: 'Manrope',
@@ -185,16 +186,16 @@ class _EditUserDialogState extends State<EditUserDialog> {
 
                   // Full Name Field
                   AccountFormField(
-                    label: 'Họ và tên *',
+                    label: context.l10n.fullNameRequired,
                     controller: _fullNameController,
-                    hintText: 'Nhập họ và tên người dùng',
+                    hintText: context.l10n.enterFullNameHint,
                     validator: AccountValidators.fullName,
                   ),
                   const SizedBox(height: 16),
 
                   // Email Field
                   AccountFormField(
-                    label: 'Email tài khoản *',
+                    label: context.l10n.accountEmailRequired,
                     controller: _emailController,
                     hintText: 'user@example.edu.vn',
                     keyboardType: TextInputType.emailAddress,
@@ -203,9 +204,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                   const SizedBox(height: 16),
 
                   // Role Dropdown
-                  const Text(
-                    'Vai trò hệ thống *',
-                    style: TextStyle(
+                  Text(
+                    context.l10n.systemRoleRequired,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 13,
                       fontFamily: 'Manrope',
@@ -235,26 +236,26 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         ),
                       ),
                     ),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         value: 'student',
                         child: Text(
-                          'Sinh viên (Student) - Kiểm tra bản thảo',
-                          style: TextStyle(fontFamily: 'Manrope', fontSize: 13),
+                          context.l10n.roleStudentDesc,
+                          style: const TextStyle(fontFamily: 'Manrope', fontSize: 13),
                         ),
                       ),
                       DropdownMenuItem(
                         value: 'lecturer',
                         child: Text(
-                          'Giảng viên (Lecturer) - Khảo sát tạp chí',
-                          style: TextStyle(fontFamily: 'Manrope', fontSize: 13),
+                          context.l10n.roleLecturerDesc,
+                          style: const TextStyle(fontFamily: 'Manrope', fontSize: 13),
                         ),
                       ),
                       DropdownMenuItem(
                         value: 'admin',
                         child: Text(
-                          'Quản trị viên (Admin) - Toàn quyền hệ thống',
-                          style: TextStyle(fontFamily: 'Manrope', fontSize: 13),
+                          context.l10n.roleAdminDesc,
+                          style: const TextStyle(fontFamily: 'Manrope', fontSize: 13),
                         ),
                       ),
                     ],
@@ -268,9 +269,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Mật khẩu mới (Tùy chọn)',
-                        style: TextStyle(
+                      Text(
+                        context.l10n.newPasswordOptional,
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13,
                           fontFamily: 'Manrope',
@@ -281,7 +282,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         controller: _passwordController,
                         obscureText: _obscurePassword,
                         decoration: InputDecoration(
-                          hintText: 'Để trống nếu không thay đổi mật khẩu',
+                          hintText: context.l10n.passwordKeepBlankHint,
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -301,7 +302,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                           if (value != null &&
                               value.isNotEmpty &&
                               value.length < 6) {
-                            return 'Mật khẩu mới phải từ 6 ký tự trở lên.';
+                            return context.l10n.passwordMinLengthError;
                           }
                           return null;
                         },
@@ -327,9 +328,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Trạng thái tài khoản',
-                              style: TextStyle(
+                            Text(
+                              context.l10n.accountStatusLabel,
+                              style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13,
                                 fontFamily: 'Manrope',
@@ -338,8 +339,8 @@ class _EditUserDialogState extends State<EditUserDialog> {
                             ),
                             Text(
                               _isActive
-                                  ? 'Đang hoạt động (cho phép đăng nhập)'
-                                  : 'Tạm khóa (chặn truy cập vào hệ thống)',
+                                  ? context.l10n.statusActiveDesc
+                                  : context.l10n.statusInactiveDesc,
                               style: TextStyle(
                                 fontSize: 12,
                                 color: _isActive
@@ -377,9 +378,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        child: const Text(
-                          'Hủy',
-                          style: TextStyle(fontFamily: 'Manrope'),
+                        child: Text(
+                          context.l10n.cancel,
+                          style: const TextStyle(fontFamily: 'Manrope'),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -405,9 +406,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
                                   color: Colors.white,
                                 ),
                               )
-                            : const Text(
-                                'Lưu thay đổi',
-                                style: TextStyle(
+                            : Text(
+                                context.l10n.saveChanges,
+                                style: const TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontFamily: 'Manrope',
                                 ),

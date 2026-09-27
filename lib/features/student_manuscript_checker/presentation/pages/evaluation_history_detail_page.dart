@@ -200,8 +200,8 @@ class _EvaluationHistoryDetailPageState
                       flex: 5,
                       child: ScoreRatingCard(
                         result: result,
-                        journalTitle: 'Target Journal Benchmark',
-                        filename: 'Archived Manuscript Draft',
+                        journalTitle: l10n.targetJournalBenchmark,
+                        filename: l10n.archivedManuscriptDraft,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -214,8 +214,8 @@ class _EvaluationHistoryDetailPageState
               ] else ...[
                 ScoreRatingCard(
                   result: result,
-                  journalTitle: 'Target Journal Benchmark',
-                  filename: 'Archived Manuscript Draft',
+                  journalTitle: l10n.targetJournalBenchmark,
+                  filename: l10n.archivedManuscriptDraft,
                 ),
                 const SizedBox(height: 16),
                 CompatibilityRadarChart(result: result),
@@ -393,9 +393,9 @@ class _EvaluationHistoryDetailPageState
                   color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(6),
                 ),
-                child: const Text(
-                  'Archived Snapshot · Audited',
-                  style: TextStyle(
+                child: Text(
+                  l10n.archivedSnapshotAudited,
+                  style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     color: AppColors.textSecondary,
@@ -427,7 +427,7 @@ class _EvaluationHistoryDetailPageState
             children: [
               _buildContextItem(
                 Icons.description_outlined,
-                'Manuscript ID / Ref',
+                l10n.manuscriptIdRef,
                 widget.evaluationId.substring(
                   0,
                   widget.evaluationId.length > 8
@@ -437,13 +437,13 @@ class _EvaluationHistoryDetailPageState
               ),
               _buildContextItem(
                 Icons.rule_folder_outlined,
-                'Journal Profile',
-                'Preserved V1 Benchmark Profile',
+                l10n.journalProfile,
+                l10n.preservedV1Profile,
               ),
               _buildContextItem(
                 Icons.verified_user_outlined,
-                'Snapshot Integrity',
-                'Exact Immutable Snapshot (Zero Recalculation)',
+                l10n.snapshotIntegrity,
+                l10n.immutableSnapshotNotice,
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/manuscript_check_result.dart';
 
 class CompatibilityAnalysis {
@@ -27,7 +28,10 @@ class CompatibilityAnalysis {
     required this.summaryText,
   });
 
-  factory CompatibilityAnalysis.fromResult(ManuscriptCheckResult result) {
+  factory CompatibilityAnalysis.fromResult(
+    ManuscriptCheckResult result,
+    AppLocalizations l10n,
+  ) {
     final score = result.suitabilityScore;
     final comp = result.featureComparison;
 
@@ -132,45 +136,44 @@ class CompatibilityAnalysis {
     Color bg;
 
     if (score >= 85 && major == 0 && moderate <= 1) {
-      matchLevel = 'STRONG MATCH';
-      recommendation = 'Ready for Submission';
+      matchLevel = l10n.matchStrong;
+      recommendation = l10n.recReadyForSubmission;
       color = AppColors.green700;
       bg = AppColors.green50;
     } else if (score >= 70 || (score >= 85 && (major > 0 || moderate > 1))) {
-      matchLevel = 'MODERATE MATCH';
+      matchLevel = l10n.matchModerate;
       if (major >= 2 || result.hasMissingGap) {
-        recommendation = 'Revision Recommended';
+        recommendation = l10n.recRevisionRecommended;
         color = const Color(0xFFD97706);
         bg = const Color(0xFFFFFBEB);
       } else if (major == 1 || moderate >= 2) {
-        recommendation = 'Minor Revision';
+        recommendation = l10n.recMinorRevision;
         color = const Color(0xFFD97706);
         bg = const Color(0xFFFFFBEB);
       } else {
-        recommendation = 'Ready for Polish';
+        recommendation = l10n.recReadyForPolish;
         color = AppColors.blue600;
         bg = AppColors.blue50;
       }
     } else if (score >= 50) {
-      matchLevel = 'WEAK MATCH';
-      recommendation = 'Major Revision Required';
+      matchLevel = l10n.matchWeak;
+      recommendation = l10n.recMajorRevisionRequired;
       color = const Color(0xFFEA580C);
       bg = const Color(0xFFFFF7ED);
     } else {
-      matchLevel = 'POOR MATCH';
-      recommendation = 'Substantial Rewrite Needed';
+      matchLevel = l10n.matchPoor;
+      recommendation = l10n.recSubstantialRewrite;
       color = AppColors.red700;
       bg = AppColors.red50;
     }
 
     String summaryText;
     if (major > 0) {
-      summaryText =
-          'Overall writing style is moderately aligned, but $major dimension${major > 1 ? "s show" : " shows"} critical deviations requiring revision.';
+      summaryText = l10n.summaryCriticalDeviations(major);
     } else if (moderate > 0) {
-      summaryText = 'Stylistic patterns closely match the journal target with minor adjustments recommended.';
+      summaryText = l10n.summaryMinorAdjustments;
     } else {
-      summaryText = 'Excellent harmony across rhetorical moves, sentence length, and academic voice.';
+      summaryText = l10n.summaryExcellentHarmony;
     }
 
     return CompatibilityAnalysis(
@@ -200,6 +203,7 @@ class ScoreRatingCard extends StatelessWidget {
   });
 
   void _showScoreExplainability(BuildContext context) {
+    final l10n = context.l10n;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -213,7 +217,7 @@ class ScoreRatingCard extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             Text(
-              'How is ${result.suitabilityScore.toStringAsFixed(1)} calculated?',
+              l10n.howIsScoreCalculated(result.suitabilityScore.toStringAsFixed(1)),
               style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -228,9 +232,9 @@ class ScoreRatingCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'The compatibility index uses weighted multi-factor scoring against target journal empirical corpora:',
-                style: TextStyle(
+              Text(
+                l10n.scoreExplainabilityDesc,
+                style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
                   fontFamily: 'Manrope',
@@ -238,29 +242,34 @@ class ScoreRatingCard extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               _buildWeightRow(
-                'Section Structure & Balance',
+                context,
+                l10n.weightSectionStructure,
                 '25%',
                 '92.0 / 100',
               ),
               _buildWeightRow(
-                'Rhetorical Moves (Gap, Method, etc.)',
+                context,
+                l10n.weightRhetoricalMoves,
                 '25%',
                 result.rhetoricalMoveWarnings.isEmpty
                     ? '100 / 100'
                     : '75.0 / 100',
               ),
               _buildWeightRow(
-                'Sentence Length & Distribution',
+                context,
+                l10n.weightSentenceLength,
                 '20%',
                 '88.0 / 100',
               ),
               _buildWeightRow(
-                'Voice & Person (Passive, We)',
+                context,
+                l10n.weightVoicePerson,
                 '15%',
                 '68.5 / 100',
               ),
               _buildWeightRow(
-                'Epistemic Markers (Hedges, Boosters)',
+                context,
+                l10n.weightEpistemicMarkers,
                 '15%',
                 '72.0 / 100',
               ),
@@ -271,9 +280,9 @@ class ScoreRatingCard extends StatelessWidget {
                   color: AppColors.surfaceSoft,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Text(
-                  'Note: A high numerical average does not guarantee acceptance. Critical stylistic deviations (e.g. missing research gap or zero author presence) flag a Revision recommendation.',
-                  style: TextStyle(
+                child: Text(
+                  l10n.scoreExplainabilityNote,
+                  style: const TextStyle(
                     fontSize: 11,
                     color: AppColors.textMuted,
                     fontFamily: 'Manrope',
@@ -287,9 +296,9 @@ class ScoreRatingCard extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'Close',
-              style: TextStyle(
+            child: Text(
+              l10n.close,
+              style: const TextStyle(
                 fontFamily: 'Manrope',
                 fontWeight: FontWeight.w700,
               ),
@@ -300,7 +309,12 @@ class ScoreRatingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildWeightRow(String title, String weight, String score) {
+  Widget _buildWeightRow(
+    BuildContext context,
+    String title,
+    String weight,
+    String score,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -323,7 +337,7 @@ class ScoreRatingCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              'Weight $weight',
+              context.l10n.weightLabel(weight),
               style: const TextStyle(
                 fontSize: 10,
                 color: AppColors.textSubtle,
@@ -348,7 +362,8 @@ class ScoreRatingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final analysis = CompatibilityAnalysis.fromResult(result);
+    final l10n = context.l10n;
+    final analysis = CompatibilityAnalysis.fromResult(result, l10n);
 
     return Container(
       constraints: const BoxConstraints(minHeight: 375),
@@ -386,7 +401,7 @@ class ScoreRatingCard extends StatelessWidget {
                         const SizedBox(width: 6),
                         Flexible(
                           child: Text(
-                            filename ?? 'Student Manuscript',
+                            filename ?? l10n.studentManuscriptFallback,
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
@@ -402,7 +417,7 @@ class ScoreRatingCard extends StatelessWidget {
                     if (journalTitle != null && journalTitle!.isNotEmpty) ...[
                       const SizedBox(height: 3),
                       Text(
-                        'Target Journal: $journalTitle',
+                        l10n.targetJournalLabel(journalTitle!),
                         style: const TextStyle(
                           fontSize: 11,
                           color: AppColors.textSecondary,
@@ -434,8 +449,8 @@ class ScoreRatingCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        'Score Breakdown',
-                        style: TextStyle(
+                        l10n.scoreBreakdown,
+                        style: const TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: AppColors.primary,
@@ -710,7 +725,7 @@ class ScoreRatingCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                totalW < 340 ? '0' : '0 Poor',
+                                totalW < 340 ? '0' : l10n.spectrumPoor,
                                 style: const TextStyle(
                                   fontSize: 9,
                                   color: AppColors.textSubtle,
@@ -718,7 +733,7 @@ class ScoreRatingCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                totalW < 340 ? '50' : '50 Weak',
+                                totalW < 340 ? '50' : l10n.spectrumWeak,
                                 style: const TextStyle(
                                   fontSize: 9,
                                   color: AppColors.textSubtle,
@@ -726,7 +741,7 @@ class ScoreRatingCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                totalW < 340 ? '70' : '70 Moderate',
+                                totalW < 340 ? '70' : l10n.spectrumModerate,
                                 style: const TextStyle(
                                   fontSize: 9,
                                   color: AppColors.textSubtle,
@@ -734,7 +749,7 @@ class ScoreRatingCard extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                totalW < 340 ? '85' : '85 Strong',
+                                totalW < 340 ? '85' : l10n.spectrumStrong,
                                 style: const TextStyle(
                                   fontSize: 9,
                                   color: AppColors.textSubtle,
@@ -796,9 +811,9 @@ class ScoreRatingCard extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 6,
                 children: [
-                  const Text(
-                    'STYLE MATCH DISTRIBUTION',
-                    style: TextStyle(
+                  Text(
+                    l10n.styleMatchDistribution,
+                    style: const TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.w700,
                       color: AppColors.textSubtle,
@@ -811,17 +826,17 @@ class ScoreRatingCard extends StatelessWidget {
                     runSpacing: 4,
                     children: [
                       _buildCountBadge(
-                        '${analysis.strongCount} Strong',
+                        l10n.countStrong(analysis.strongCount),
                         AppColors.green700,
                         AppColors.green50,
                       ),
                       _buildCountBadge(
-                        '${analysis.moderateCount} Moderate',
+                        l10n.countModerate(analysis.moderateCount),
                         const Color(0xFFB45309),
                         const Color(0xFFFFFBEB),
                       ),
                       _buildCountBadge(
-                        '${analysis.majorCount} Major Mismatch',
+                        l10n.countMajorMismatch(analysis.majorCount),
                         AppColors.red700,
                         AppColors.red50,
                       ),

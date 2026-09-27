@@ -171,7 +171,7 @@ class _UsersViewState extends State<UsersView> {
         AppNotification.showError(
           context,
           context.l10n.cannotDemoteLastAdmin,
-          title: 'Thao tác không được phép',
+          title: context.l10n.unauthorizedActionTitle,
         );
         return;
       }
@@ -208,8 +208,8 @@ class _UsersViewState extends State<UsersView> {
 
       AppNotification.showSuccess(
         context,
-        'Đã cập nhật thông tin tài khoản "$email" thành công.',
-        title: 'Cập nhật thành công',
+        context.l10n.userUpdateSuccess(email),
+        title: context.l10n.updateSuccessTitle,
       );
     } catch (e) {
       if (!mounted) return;
@@ -218,8 +218,8 @@ class _UsersViewState extends State<UsersView> {
       });
       AppNotification.showError(
         context,
-        'Lỗi cập nhật tài khoản: $e',
-        title: 'Cập nhật thất bại',
+        context.l10n.userUpdateError(e.toString().replaceFirst('Exception: ', '')),
+        title: context.l10n.updateFailedTitle,
       );
     }
   }
@@ -241,7 +241,7 @@ class _UsersViewState extends State<UsersView> {
       AppNotification.showError(
         context,
         context.l10n.cannotDeleteLastAdmin,
-        title: 'Thao tác không được phép',
+        title: context.l10n.unauthorizedActionTitle,
       );
       return;
     }
@@ -356,16 +356,16 @@ class _UsersViewState extends State<UsersView> {
                 });
                 AppNotification.showSuccess(
                   context,
-                  'Đã xóa vĩnh viễn tài khoản "$email".',
-                  title: 'Xóa tài khoản',
+                  context.l10n.userDeleteSuccess(email),
+                  title: context.l10n.deleteUserTitle,
                 );
               } catch (e) {
                 if (!mounted) return;
                 setState(() => _deletingUserIds.remove(userId));
                 AppNotification.showError(
                   context,
-                  'Lỗi khi xóa tài khoản: $e',
-                  title: 'Xóa thất bại',
+                  context.l10n.userDeleteError(e.toString().replaceFirst('Exception: ', '')),
+                  title: context.l10n.deleteFailedTitle,
                 );
               }
             },
@@ -658,7 +658,7 @@ class _UsersViewState extends State<UsersView> {
 
   Widget _buildUserRow(Map<String, dynamic> user) {
     final userId = user['id']?.toString() ?? '';
-    final fullName = user['full_name'] ?? user['name'] ?? 'Chưa rõ';
+    final fullName = user['full_name'] ?? user['name'] ?? context.l10n.unknownUser;
     final email = user['email'] ?? '';
     final origRole = (user['role'] ?? 'student').toString().toLowerCase();
     final origStatus = user['is_active'] != false;
@@ -940,7 +940,7 @@ class _UsersViewState extends State<UsersView> {
                               AppNotification.showError(
                                 context,
                                 context.l10n.cannotDeleteLastAdmin,
-                                title: 'Thao tác không được phép',
+                                title: context.l10n.unauthorizedActionTitle,
                               );
                             }
                           : () => _confirmDeleteUser(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/entities/journal_recommendation_item.dart';
 
 class RecommendationsComparisonChart extends StatelessWidget {
@@ -14,9 +15,9 @@ class RecommendationsComparisonChart extends StatelessWidget {
   });
 
   Color _getScoreColor(double score) {
-    if (score >= 80) return AppColors.success;
-    if (score >= 60) return AppColors.warning;
-    return AppColors.error;
+    if (score >= 80) return const Color(0xFF10B981);
+    if (score >= 60) return const Color(0xFFF59E0B);
+    return const Color(0xFFEF4444);
   }
 
   @override
@@ -36,17 +37,17 @@ class RecommendationsComparisonChart extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.bar_chart_rounded,
                     size: 20,
                     color: AppColors.primary,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
-                    'Overall Compatibility Ranking (0–100%)',
-                    style: TextStyle(
+                    context.l10n.overallCompatibilityRankingTitle,
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w700,
                       fontFamily: 'Manrope',
@@ -56,10 +57,11 @@ class RecommendationsComparisonChart extends StatelessWidget {
                 ],
               ),
               Text(
-                '${recommendations.length} journal${recommendations.length > 1 ? "s" : ""} evaluated',
+                context.l10n.journalsEvaluatedCount(recommendations.length),
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.textSecondary,
+                  fontFamily: 'Manrope',
                 ),
               ),
             ],
@@ -73,16 +75,17 @@ class RecommendationsComparisonChart extends StatelessWidget {
               final isTop = index == 0;
 
               return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6),
+                padding: const EdgeInsets.symmetric(vertical: 3),
                 child: InkWell(
                   onTap: () => onSelectJournal?.call(item),
                   borderRadius: BorderRadius.circular(8),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 6,
-                      vertical: 4,
+                      vertical: 5,
                     ),
                     child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Rank badge
                         Container(
@@ -100,6 +103,7 @@ class RecommendationsComparisonChart extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w700,
+                              fontFamily: 'Manrope',
                               color: isTop
                                   ? Colors.white
                                   : AppColors.textSecondary,
@@ -117,6 +121,7 @@ class RecommendationsComparisonChart extends StatelessWidget {
                               fontWeight: isTop
                                   ? FontWeight.w700
                                   : FontWeight.w500,
+                              fontFamily: 'Manrope',
                               color: AppColors.textPrimary,
                             ),
                             maxLines: 1,
@@ -124,40 +129,26 @@ class RecommendationsComparisonChart extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        // Horizontal Bar
+                        // Horizontal Bar (Subtle, clean, 9px height, pill-shaped)
                         Expanded(
-                          child: Stack(
-                            children: [
-                              Container(
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: AppColors.surfaceSoft,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              FractionallySizedBox(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4.5),
+                            child: Container(
+                              height: 9,
+                              color: const Color(0xFFF1F5F9),
+                              alignment: Alignment.centerLeft,
+                              child: FractionallySizedBox(
                                 widthFactor: (item.compatibilityScore / 100)
                                     .clamp(0.0, 1.0),
                                 child: Container(
-                                  height: 16,
+                                  height: 9,
                                   decoration: BoxDecoration(
                                     color: color,
-                                    borderRadius: BorderRadius.circular(4),
-                                    boxShadow: isTop
-                                        ? [
-                                            BoxShadow(
-                                              color: color.withValues(
-                                                alpha: 0.3,
-                                              ),
-                                              blurRadius: 4,
-                                              offset: const Offset(0, 1),
-                                            ),
-                                          ]
-                                        : null,
+                                    borderRadius: BorderRadius.circular(4.5),
                                   ),
                                 ),
                               ),
-                            ],
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16),

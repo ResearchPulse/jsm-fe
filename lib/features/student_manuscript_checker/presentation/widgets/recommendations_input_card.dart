@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/datasources/manuscript_file_picker.dart';
 import '../cubit/evaluation_history_cubit.dart';
 import '../cubit/evaluation_history_state.dart';
@@ -65,11 +66,11 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildAvailableJournalsInfo(state.availableJournalsCount),
+                _buildAvailableJournalsInfo(context, state.availableJournalsCount),
                 const SizedBox(height: 24),
-                const Text(
-                  'Choose Manuscript Source',
-                  style: TextStyle(
+                Text(
+                  context.l10n.chooseManuscriptSource,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'Manrope',
@@ -80,20 +81,20 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Expanded(flex: 1, child: _buildUploadOption(state)),
+                    Expanded(flex: 1, child: _buildUploadOption(context, state)),
                     const SizedBox(width: 24),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 60),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 60),
                       child: Text(
-                        'OR',
-                        style: TextStyle(
+                        context.l10n.orDivider,
+                        style: const TextStyle(
                           color: AppColors.textSecondary,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                     const SizedBox(width: 24),
-                    Expanded(flex: 1, child: _buildHistoryOption(state)),
+                    Expanded(flex: 1, child: _buildHistoryOption(context, state)),
                   ],
                 ),
                 if (state.errorMessage != null) ...[
@@ -154,9 +155,9 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                               ),
                             ),
                           )
-                        : const Text(
-                            'Find Suitable Journals',
-                            style: TextStyle(
+                        : Text(
+                            context.l10n.findSuitableJournals,
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'Manrope',
@@ -172,7 +173,7 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
     );
   }
 
-  Widget _buildAvailableJournalsInfo(int count) {
+  Widget _buildAvailableJournalsInfo(BuildContext context, int count) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -198,9 +199,9 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Available Journal Profiles',
-                  style: TextStyle(
+                Text(
+                  context.l10n.availableJournalProfiles,
+                  style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textPrimary,
@@ -210,8 +211,8 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                 const SizedBox(height: 4),
                 Text(
                   count > 0
-                      ? '$count journals currently available for comparison in our system.'
-                      : 'Loading available journal profiles...',
+                      ? context.l10n.availableJournalsComparisonCount(count)
+                      : context.l10n.loadingAvailableJournals,
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.textSecondary,
@@ -225,7 +226,10 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
     );
   }
 
-  Widget _buildUploadOption(JournalRecommendationsState state) {
+  Widget _buildUploadOption(
+    BuildContext context,
+    JournalRecommendationsState state,
+  ) {
     final isSelected =
         state.fileBytes != null && state.selectedEvaluationId == null;
 
@@ -242,13 +246,13 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Icons.upload_file_rounded, color: AppColors.textSecondary),
-              SizedBox(width: 8),
+              const Icon(Icons.upload_file_rounded, color: AppColors.textSecondary),
+              const SizedBox(width: 8),
               Text(
-                'Upload Manuscript',
-                style: TextStyle(
+                context.l10n.uploadManuscriptTab,
+                style: const TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 15,
                   color: AppColors.textPrimary,
@@ -290,7 +294,9 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      isSelected ? state.fileName! : 'Click to browse files',
+                      isSelected
+                          ? state.fileName!
+                          : context.l10n.clickToBrowseFiles,
                       style: TextStyle(
                         fontSize: 13,
                         color: isSelected
@@ -314,7 +320,10 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
     );
   }
 
-  Widget _buildHistoryOption(JournalRecommendationsState state) {
+  Widget _buildHistoryOption(
+    BuildContext context,
+    JournalRecommendationsState state,
+  ) {
     final isSelected = state.selectedEvaluationId != null;
 
     return BlocBuilder<EvaluationHistoryCubit, EvaluationHistoryState>(
@@ -332,13 +341,13 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.history_rounded, color: AppColors.textSecondary),
-                  SizedBox(width: 8),
+                  const Icon(Icons.history_rounded, color: AppColors.textSecondary),
+                  const SizedBox(width: 8),
                   Text(
-                    'Select Previous Evaluation',
-                    style: TextStyle(
+                    context.l10n.selectEvaluationHistoryTab,
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
                       color: AppColors.textPrimary,
@@ -358,11 +367,11 @@ class _RecommendationsInputCardState extends State<RecommendationsInputCard> {
                 child: historyState.status == EvaluationHistoryStatus.loading
                     ? const Center(child: CircularProgressIndicator())
                     : (historyState.items.isEmpty)
-                    ? const Center(
+                    ? Center(
                         child: Text(
-                          'No previous evaluations found.\nPlease upload a manuscript.',
+                          context.l10n.noPreviousEvaluationsHint,
                           textAlign: TextAlign.center,
-                          style: TextStyle(color: AppColors.textSecondary),
+                          style: const TextStyle(color: AppColors.textSecondary),
                         ),
                       )
                     : ListView.separated(

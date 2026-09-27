@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/localization/app_localizations.dart';
 import '../../domain/repositories/student_manuscript_repository.dart';
 import '../cubit/journal_recommendations_cubit.dart';
 import '../cubit/journal_recommendations_state.dart';
@@ -112,8 +113,8 @@ class _JournalRecommendationsView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildHeader(
-            title: 'Journal Recommendations',
-            subtitle: 'Find journals in our database whose academic writing profile best matches your manuscript.',
+            title: context.l10n.journalRecommendationsTitle,
+            subtitle: context.l10n.journalRecommendationsSubtitle,
           ),
           const SizedBox(height: 24),
           RecommendationsInputCard(
@@ -157,9 +158,9 @@ class _JournalRecommendationsView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'No Eligible Journal Profiles Available',
-                  style: TextStyle(
+                Text(
+                  context.l10n.noEligibleJournalsTitle,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'Manrope',
@@ -167,10 +168,10 @@ class _JournalRecommendationsView extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
-                  'Journal recommendations are generated only from journal profiles available in the system. Currently, no active profiles were found matching the required criteria.',
+                Text(
+                  context.l10n.noEligibleJournalsDesc,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 14,
                     color: AppColors.textSecondary,
                     height: 1.5,
@@ -182,7 +183,7 @@ class _JournalRecommendationsView extends StatelessWidget {
                     context.read<JournalRecommendationsCubit>().reset();
                   },
                   icon: const Icon(Icons.refresh_rounded, size: 16),
-                  label: const Text('Try Another Manuscript'),
+                  label: Text(context.l10n.tryAnotherManuscript),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 20,
@@ -214,9 +215,10 @@ class _JournalRecommendationsView extends StatelessWidget {
             children: [
               Expanded(
                 child: _buildHeader(
-                  title: 'Journal Recommendations',
-                  subtitle:
-                      'Based on your manuscript\'s academic writing profile. Evaluated against ${response.candidateCount} journal profile${response.candidateCount > 1 ? "s" : ""} in our database.',
+                  title: context.l10n.journalRecommendationsTitle,
+                  subtitle: context.l10n.evaluatedAgainstJournals(
+                    response.candidateCount,
+                  ),
                 ),
               ),
               OutlinedButton.icon(
@@ -224,7 +226,7 @@ class _JournalRecommendationsView extends StatelessWidget {
                   context.read<JournalRecommendationsCubit>().reset();
                 },
                 icon: const Icon(Icons.arrow_back_rounded, size: 16),
-                label: const Text('Evaluate Another'),
+                label: Text(context.l10n.evaluateAnother),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -315,7 +317,7 @@ class _JournalRecommendationsView extends StatelessWidget {
                       onPressed: () => context
                           .read<JournalRecommendationsCubit>()
                           .closeComparison(),
-                      tooltip: 'Back to Recommendations',
+                      tooltip: context.l10n.backToRecommendations,
                     ),
                     const SizedBox(width: 8),
                     Expanded(
@@ -325,7 +327,9 @@ class _JournalRecommendationsView extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                'Comparison Detail: ${selectedItem.journalName}',
+                                context.l10n.comparisonDetailFor(
+                                  selectedItem.journalName,
+                                ),
                                 style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w700,
@@ -344,7 +348,11 @@ class _JournalRecommendationsView extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(4),
                                 ),
                                 child: Text(
-                                  'Rank #${selectedItem.rank} • ${selectedItem.compatibilityScore.toStringAsFixed(1)}% Match',
+                                  context.l10n.rankMatchBadge(
+                                    selectedItem.rank,
+                                    selectedItem.compatibilityScore
+                                        .toStringAsFixed(1),
+                                  ),
                                   style: const TextStyle(
                                     fontSize: 11,
                                     fontWeight: FontWeight.w700,
@@ -356,7 +364,9 @@ class _JournalRecommendationsView extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            'Target Journal Benchmark: ${selectedItem.journalName}',
+                            context.l10n.targetJournalBenchmarkFor(
+                              selectedItem.journalName,
+                            ),
                             style: const TextStyle(
                               fontSize: 12,
                               color: AppColors.textSecondary,
@@ -373,7 +383,7 @@ class _JournalRecommendationsView extends StatelessWidget {
                         Icons.format_list_bulleted_rounded,
                         size: 16,
                       ),
-                      label: const Text('Back to Recommendations'),
+                      label: Text(context.l10n.backToRecommendations),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -395,7 +405,8 @@ class _JournalRecommendationsView extends StatelessWidget {
                       child: ScoreRatingCard(
                         result: checkResult,
                         journalTitle: selectedItem.journalName,
-                        filename: state.fileName ?? 'Analyzed Manuscript',
+                        filename: state.fileName ??
+                            context.l10n.studentManuscriptLabel,
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -409,7 +420,8 @@ class _JournalRecommendationsView extends StatelessWidget {
                 ScoreRatingCard(
                   result: checkResult,
                   journalTitle: selectedItem.journalName,
-                  filename: state.fileName ?? 'Analyzed Manuscript',
+                  filename: state.fileName ??
+                      context.l10n.studentManuscriptLabel,
                 ),
                 const SizedBox(height: 16),
                 CompatibilityRadarChart(result: checkResult),
