@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../app/theme/app_colors.dart';
+import '../../../student_manuscript_checker/presentation/pages/evaluation_history_page.dart';
+import '../../../student_manuscript_checker/presentation/pages/journal_recommendations_page.dart';
 import '../../../student_manuscript_checker/presentation/pages/student_manuscript_checker_page.dart';
 import '../widgets/user_header.dart';
 import '../widgets/user_sidebar.dart';
@@ -27,13 +29,16 @@ class _HomePageState extends State<HomePage> {
       case 0:
         return const StudentManuscriptCheckerPage(showAppBar: false);
       case 1:
-        return _buildJournalRecommendationsPlaceholder();
+        return const JournalRecommendationsPage();
       case 2:
-        return _buildHistoryPlaceholder();
+        return EvaluationHistoryPage(
+          onNewCheckRequested: () => _navigateToTab(0),
+        );
       default:
         return const StudentManuscriptCheckerPage(showAppBar: false);
     }
   }
+
 
   Widget _buildJournalRecommendationsPlaceholder() {
     final l10n = AppLocalizations.of(context);

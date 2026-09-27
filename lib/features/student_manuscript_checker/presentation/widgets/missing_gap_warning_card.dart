@@ -7,10 +7,7 @@ import '../../../../core/localization/app_localizations.dart';
 class MissingGapWarningCard extends StatelessWidget {
   final List<WarningItem> gapWarnings;
 
-  const MissingGapWarningCard({
-    super.key,
-    required this.gapWarnings,
-  });
+  const MissingGapWarningCard({super.key, required this.gapWarnings});
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +65,9 @@ class MissingGapWarningCard extends StatelessWidget {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.red700,
                             borderRadius: BorderRadius.circular(6),
@@ -148,7 +147,9 @@ class MissingGapWarningCard extends StatelessWidget {
                       if (exemplar.doi != null && exemplar.doi!.isNotEmpty)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primarySoft,
                             borderRadius: BorderRadius.circular(4),

@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 
+import '../../domain/entities/analysis_pipeline_models.dart';
 import '../../domain/entities/manuscript_check_result.dart';
 import '../../domain/entities/target_journal.dart';
 
@@ -45,8 +46,7 @@ class StudentManuscriptCheckerInitial extends StudentManuscriptCheckerState {
     return StudentManuscriptCheckerInitial(
       availableJournals: availableJournals ?? this.availableJournals,
       selectedJournalId: selectedJournalId ?? this.selectedJournalId,
-      selectedJournalTitle:
-          selectedJournalTitle ?? this.selectedJournalTitle,
+      selectedJournalTitle: selectedJournalTitle ?? this.selectedJournalTitle,
       draftText: draftText ?? this.draftText,
       fileName: fileName ?? this.fileName,
       fileBytes: fileBytes ?? this.fileBytes,
@@ -57,27 +57,58 @@ class StudentManuscriptCheckerInitial extends StudentManuscriptCheckerState {
 
   @override
   List<Object?> get props => [
-        availableJournals,
-        selectedJournalId,
-        selectedJournalTitle,
-        draftText,
-        fileName,
-        fileBytes,
-        includeExemplars,
-        isLoadingJournals,
-      ];
+    availableJournals,
+    selectedJournalId,
+    selectedJournalTitle,
+    draftText,
+    fileName,
+    fileBytes,
+    includeExemplars,
+    isLoadingJournals,
+  ];
 }
 
 /// Checker is analyzing the manuscript with the backend NLP engine.
 class StudentManuscriptCheckerLoading extends StudentManuscriptCheckerState {
   final String message;
+  final String? targetJournalTitle;
+  final String? manuscriptFileName;
+  final AnalysisPipelineProgress pipelineProgress;
 
   const StudentManuscriptCheckerLoading({
     this.message = 'Analyzing manuscript against journal style profile…',
+    this.targetJournalTitle,
+    this.manuscriptFileName,
+    this.pipelineProgress = const AnalysisPipelineProgress(
+      currentStepIndex: 1,
+      totalSteps: 7,
+      overallProgress: 0,
+      currentMessage: '',
+      steps: [],
+    ),
   });
 
+  StudentManuscriptCheckerLoading copyWith({
+    String? message,
+    String? targetJournalTitle,
+    String? manuscriptFileName,
+    AnalysisPipelineProgress? pipelineProgress,
+  }) {
+    return StudentManuscriptCheckerLoading(
+      message: message ?? this.message,
+      targetJournalTitle: targetJournalTitle ?? this.targetJournalTitle,
+      manuscriptFileName: manuscriptFileName ?? this.manuscriptFileName,
+      pipelineProgress: pipelineProgress ?? this.pipelineProgress,
+    );
+  }
+
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [
+    message,
+    targetJournalTitle,
+    manuscriptFileName,
+    pipelineProgress,
+  ];
 }
 
 /// Checker successfully returned evaluation results.
@@ -98,12 +129,12 @@ class StudentManuscriptCheckerSuccess extends StudentManuscriptCheckerState {
 
   @override
   List<Object?> get props => [
-        result,
-        targetJournalId,
-        targetJournalTitle,
-        manuscriptFileName,
-        includeExemplars,
-      ];
+    result,
+    targetJournalId,
+    targetJournalTitle,
+    manuscriptFileName,
+    includeExemplars,
+  ];
 }
 
 /// The analysis completed or returned empty section data.

@@ -102,6 +102,67 @@ class AppLocalizations {
       : 'You have no recent manuscript checks. Start by submitting your draft in the Manuscript Checker tab.';
   String get checkManuscriptNow =>
       isVietnamese ? 'Kiểm tra Bản thảo ngay' : 'Check Manuscript Now';
+  String get evalHistorySubtitle => isVietnamese
+      ? 'Xem lại các phân tích bản thảo và kết quả tương thích tạp chí trước đây.'
+      : 'Review previous manuscript analyses and journal compatibility results.';
+  String get checkNewManuscript =>
+      isVietnamese ? 'Đánh giá Bản thảo Mới' : 'Check New Manuscript';
+  String get totalEvaluations =>
+      isVietnamese ? 'Tổng số Đánh giá' : 'Total Evaluations';
+  String get strongMatches =>
+      isVietnamese ? 'Khớp Mạnh' : 'Strong Matches';
+  String get needRevision =>
+      isVietnamese ? 'Cần Chỉnh sửa' : 'Need Revision';
+  String get averageCompatibility =>
+      isVietnamese ? 'Tương thích Trung bình' : 'Average Compatibility';
+  String get searchManuscriptPlaceholder =>
+      isVietnamese ? 'Tìm kiếm bản thảo hoặc tạp chí...' : 'Search manuscript or journal...';
+  String get filterAllJournals =>
+      isVietnamese ? 'Tất cả Tạp chí' : 'All Journals';
+  String get filterAllCompatibilities =>
+      isVietnamese ? 'Tất cả Độ tương thích' : 'All Compatibilities';
+  String get sortNewest =>
+      isVietnamese ? 'Mới nhất trước' : 'Newest First';
+  String get sortOldest =>
+      isVietnamese ? 'Cũ nhất trước' : 'Oldest First';
+  String get sortScoreDesc =>
+      isVietnamese ? 'Điểm cao nhất' : 'Highest Score';
+  String get sortScoreAsc =>
+      isVietnamese ? 'Điểm thấp nhất' : 'Lowest Score';
+  String get colManuscript =>
+      isVietnamese ? 'Bản thảo' : 'Manuscript';
+  String get colTargetJournal =>
+      isVietnamese ? 'Tạp chí Mục tiêu' : 'Target Journal';
+  String get colCompatibility =>
+      isVietnamese ? 'Độ Tương thích' : 'Compatibility';
+  String get colScore =>
+      isVietnamese ? 'Điểm số' : 'Score';
+  String get colIssues =>
+      isVietnamese ? 'Vấn đề' : 'Issues';
+  String get colEvaluated =>
+      isVietnamese ? 'Thời gian' : 'Evaluated';
+  String get colAction =>
+      isVietnamese ? 'Thao tác' : 'Action';
+  String get historicalEvaluationTitle =>
+      isVietnamese ? 'Đánh giá Lịch sử' : 'Historical Evaluation';
+  String get runNewEvaluation =>
+      isVietnamese ? 'Chạy Đánh giá Mới' : 'Run New Evaluation';
+  String get deleteConfirmTitle =>
+      isVietnamese ? 'Xóa kết quả đánh giá này?' : 'Delete this evaluation?';
+  String get deleteConfirmMessage => isVietnamese
+      ? 'Thao tác này sẽ xóa kết quả đánh giá đã lưu khỏi lịch sử của bạn. Bạn có chắc chắn muốn xóa không?'
+      : 'This will remove the evaluation record from your history. Are you sure you want to proceed?';
+  String get noFilterResults => isVietnamese
+      ? 'Không có kết quả đánh giá nào phù hợp với bộ lọc.'
+      : 'No evaluations match your filters.';
+  String get clearFilters =>
+      isVietnamese ? 'Xóa bộ lọc' : 'Clear Filters';
+  String get errorLoadingHistory => isVietnamese
+      ? 'Không thể tải lịch sử đánh giá.'
+      : 'Unable to load evaluation history.';
+  String get tryAgain =>
+      isVietnamese ? 'Thử lại' : 'Try Again';
+
 
 
   // Admin Navigation Menu

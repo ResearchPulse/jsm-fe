@@ -108,28 +108,13 @@ class AdminSidebar extends StatelessWidget {
                     focusColor: Colors.transparent,
                     highlightColor: Colors.transparent,
                     splashColor: const Color(0xFF0071BC).withValues(alpha: 0.08),
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0xFF0071BC).withValues(alpha: 0.15),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          'assets/images/app_logo.png',
-                          width: 38,
-                          height: 38,
-                          fit: BoxFit.contain,
-                        ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        'assets/images/app_logo.png',
+                        width: 38,
+                        height: 38,
+                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
@@ -138,28 +123,13 @@ class AdminSidebar extends StatelessWidget {
             : Row(
                 key: const ValueKey('brand_expanded'),
                 children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF0071BC).withValues(alpha: 0.15),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: Image.asset(
-                        'assets/images/app_logo.png',
-                        width: 36,
-                        height: 36,
-                        fit: BoxFit.contain,
-                      ),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: Image.asset(
+                      'assets/images/app_logo.png',
+                      width: 36,
+                      height: 36,
+                      fit: BoxFit.contain,
                     ),
                   ),
                   const SizedBox(width: 12),

@@ -1,7 +1,10 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jsm_fe/core/errors/exceptions.dart';
+import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/evaluation_history_response.dart';
+import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/evaluation_history_stats.dart';
 import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/feature_comparison.dart';
+import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/journal_recommendation_response.dart';
 import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/manuscript_check_result.dart';
 import 'package:jsm_fe/features/student_manuscript_checker/domain/entities/target_journal.dart';
 import 'package:jsm_fe/features/student_manuscript_checker/domain/repositories/student_manuscript_repository.dart';
@@ -36,11 +39,90 @@ class _FakeStudentManuscriptRepository implements StudentManuscriptRepository {
   }
 
   @override
+  Stream<Map<String, dynamic>> checkManuscriptStream({
+    required List<int> fileBytes,
+    required String filename,
+    required String targetJournalId,
+    bool includeExemplars = false,
+  }) async* {
+    if (error != null) throw error!;
+    final res = result ??
+        const ManuscriptCheckResult(
+          suitabilityScore: 85.0,
+          ratingLevel: 'EXCELLENT_ALIGNMENT',
+          summary: 'High stylistic alignment.',
+          sectionScores: {'INTRO': 90.0},
+          featureComparison: FeatureComparison(),
+        );
+    yield {
+      'event': 'analysis.completed',
+      'stage': 'COMPLETED',
+      'progress': 100,
+      'message': 'Analysis complete',
+      'data': res.toMap(),
+    };
+  }
+
+  @override
   Future<List<TargetJournal>> getAvailableJournals() async {
     if (error != null) throw error!;
     return journals;
   }
+
+  @override
+  Future<EvaluationHistoryResponse> getEvaluationHistory({
+    int page = 1,
+    int limit = 10,
+    String sort = 'newest',
+    String? journal,
+    String? compatibility,
+    String? search,
+  }) async {
+    return const EvaluationHistoryResponse(
+      items: [],
+      page: 1,
+      limit: 10,
+      total: 0,
+      totalPages: 0,
+    );
+  }
+
+  @override
+  Future<EvaluationHistoryStats> getEvaluationStats() async {
+    return const EvaluationHistoryStats();
+  }
+
+  @override
+  Future<ManuscriptCheckResult> getEvaluationDetail(String id) async {
+    return result ??
+        const ManuscriptCheckResult(
+          suitabilityScore: 85.0,
+          ratingLevel: 'EXCELLENT_ALIGNMENT',
+          summary: 'High stylistic alignment.',
+          sectionScores: {'INTRO': 90.0},
+          featureComparison: FeatureComparison(),
+        );
+  }
+
+  @override
+  Future<void> deleteEvaluation(String id) async {}
+
+  @override
+  Future<JournalRecommendationResponse> getJournalRecommendations({
+    List<int>? fileBytes,
+    String? filename,
+    String? evaluationId,
+  }) async {
+    return const JournalRecommendationResponse(
+      manuscriptName: 'test.pdf',
+      totalWords: 1000,
+      totalSentences: 50,
+      candidateCount: 0,
+      recommendations: [],
+    );
+  }
 }
+
 
 void main() {
   group('StudentManuscriptCheckerCubit', () {
@@ -124,6 +206,7 @@ void main() {
         journalTitle: 'Target Journal',
       ),
       expect: () => [
+        isA<StudentManuscriptCheckerLoading>(),
         isA<StudentManuscriptCheckerLoading>(),
         isA<StudentManuscriptCheckerSuccess>()
             .having((s) => s.result.suitabilityScore, 'score', 85.0)
@@ -214,6 +297,7 @@ void main() {
         targetJournalId: 'j-1',
       ),
       expect: () => [
+        isA<StudentManuscriptCheckerLoading>(),
         isA<StudentManuscriptCheckerLoading>(),
         isA<StudentManuscriptCheckerEmpty>(),
       ],

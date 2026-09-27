@@ -2,9 +2,9 @@ name: Flutter CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, master, dev]
   pull_request:
-    branches: [main, master, develop]
+    branches: [main, master, dev]
 
 # Huỷ các workflow đang chạy nếu có commit mới được push vào cùng PR/nhánh
 concurrency:

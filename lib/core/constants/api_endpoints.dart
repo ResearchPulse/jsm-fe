@@ -53,7 +53,12 @@ class ApiEndpoints {
 
   // Student Manuscript Checker
   static String get studentManuscriptCheck => '$baseUrl/student/manuscript/check';
+  static String get studentManuscriptCheckStream => '$baseUrl/student/manuscript/check-stream';
   static String get studentAvailableJournals => '$baseUrl/student/available-journals';
+  static String get studentEvaluations => '$baseUrl/student/evaluations';
+  static String get studentEvaluationStats => '$baseUrl/student/evaluations/stats';
+  static String get studentRecommendations => '$baseUrl/student/recommendations';
+
 
   // Admin Module Endpoints
   static String get adminJournals => '$baseUrl/admin/journals';

@@ -26,10 +26,10 @@ void main() {
           'status': 'WITHIN_RANGE',
         },
         'voice_and_person': {
-          'user_passive_rate': 0.25,
-          'journal_passive_rate': 0.22,
-          'user_we_rate': 0.05,
-          'journal_we_rate': 0.08,
+          'user_passive_rate': 25.0,
+          'journal_passive_rate': 22.0,
+          'user_we_rate': 5.0,
+          'journal_we_rate': 8.0,
         },
         'additional': {
           'stance': {
@@ -108,7 +108,7 @@ void main() {
       expect(result.summary, contains('excellent alignment'));
       expect(result.sectionScores['INTRO'], 92.0);
       expect(result.featureComparison.sentenceLength?.userMedian, 18.5);
-      expect(result.featureComparison.voiceAndPerson?.userPassiveRate, 0.25);
+      expect(result.featureComparison.voiceAndPerson?.userPassiveRate, 25.0);
       expect(result.featureComparison.stance?.userHedgeRate, 12.0);
       expect(result.warnings.length, 1);
       expect(result.hasMissingGap, isTrue);

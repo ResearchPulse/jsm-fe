@@ -72,6 +72,9 @@ class AdminApiClient {
     List<String>? issns,
     String? publisher,
     String? homepageUrl,
+    int? worksCount,
+    int? citedByCount,
+    String? field,
   }) async {
     try {
       final uri = Uri.parse(ApiEndpoints.adminImportJournal);
@@ -85,6 +88,9 @@ class AdminApiClient {
           'issns': issns ?? (issnL != null ? [issnL] : []),
           'publisher': publisher,
           'homepage_url': homepageUrl,
+          if (worksCount != null) 'works_count': worksCount,
+          if (citedByCount != null) 'cited_by_count': citedByCount,
+          if (field != null) 'field': field,
         }),
       );
       if (res.statusCode == 200 || res.statusCode == 201) {

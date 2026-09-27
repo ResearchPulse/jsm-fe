@@ -14,10 +14,7 @@ import '../../../../core/localization/app_localizations.dart';
 class ManuscriptInputCard extends StatefulWidget {
   final StudentManuscriptCheckerInitial initialState;
 
-  const ManuscriptInputCard({
-    super.key,
-    required this.initialState,
-  });
+  const ManuscriptInputCard({super.key, required this.initialState});
 
   @override
   State<ManuscriptInputCard> createState() => _ManuscriptInputCardState();
@@ -52,10 +49,12 @@ These findings highlight the necessity of providing immediate linguistic feedbac
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    _textController =
-        TextEditingController(text: widget.initialState.draftText ?? '');
+    _textController = TextEditingController(
+      text: widget.initialState.draftText ?? '',
+    );
     _journalIdController = TextEditingController(
-        text: widget.initialState.selectedJournalId ?? '');
+      text: widget.initialState.selectedJournalId ?? '',
+    );
     _selectedJournalId = widget.initialState.selectedJournalId;
     _selectedJournalTitle = widget.initialState.selectedJournalTitle;
     _includeExemplars = widget.initialState.includeExemplars;
@@ -100,9 +99,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
       });
       if (mounted) {
         context.read<StudentManuscriptCheckerCubit>().setPickedFile(
-              file.name,
-              file.bytes,
-            );
+          file.name,
+          file.bytes,
+        );
       }
     }
   }
@@ -111,9 +110,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
     setState(() {
       _textController.text = _sampleManuscript;
     });
-    context
-        .read<StudentManuscriptCheckerCubit>()
-        .updateDraftText(_sampleManuscript);
+    context.read<StudentManuscriptCheckerCubit>().updateDraftText(
+      _sampleManuscript,
+    );
   }
 
   void _handleSubmit() {
@@ -138,35 +137,35 @@ These findings highlight the necessity of providing immediate linguistic feedbac
         return;
       }
       context.read<StudentManuscriptCheckerCubit>().submit(
-            fileBytes: utf8.encode(text),
-            filename: 'manuscript.txt',
-            targetJournalId: journalId,
-            includeExemplars: _includeExemplars,
-            journalTitle: _selectedJournalTitle,
-          );
+        fileBytes: utf8.encode(text),
+        filename: 'manuscript.txt',
+        targetJournalId: journalId,
+        includeExemplars: _includeExemplars,
+        journalTitle: _selectedJournalTitle,
+      );
     } else {
       // File mode
       if (_pickedFileBytes == null || _pickedFileBytes!.isEmpty) {
-        AppNotification.showWarning(
-          context,
-          context.l10n.pleaseChooseFile,
-        );
+        AppNotification.showWarning(context, context.l10n.pleaseChooseFile);
         return;
       }
       context.read<StudentManuscriptCheckerCubit>().submit(
-            fileBytes: _pickedFileBytes!,
-            filename: _pickedFileName ?? 'manuscript.pdf',
-            targetJournalId: journalId,
-            includeExemplars: _includeExemplars,
-            journalTitle: _selectedJournalTitle,
-          );
+        fileBytes: _pickedFileBytes!,
+        filename: _pickedFileName ?? 'manuscript.pdf',
+        targetJournalId: journalId,
+        includeExemplars: _includeExemplars,
+        journalTitle: _selectedJournalTitle,
+      );
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final journals = widget.initialState.availableJournals;
-    final int wordCount = _textController.text.split(RegExp(r'\s+')).where((s) => s.isNotEmpty).length;
+    final int wordCount = _textController.text
+        .split(RegExp(r'\s+'))
+        .where((s) => s.isNotEmpty)
+        .length;
 
     return Container(
       decoration: BoxDecoration(
@@ -196,7 +195,11 @@ These findings highlight the necessity of providing immediate linguistic feedbac
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.auto_stories_rounded, size: 14, color: AppColors.primary),
+                const Icon(
+                  Icons.auto_stories_rounded,
+                  size: 14,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   context.l10n.studentCheckerSubtitle,
@@ -281,12 +284,17 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                 },
                 borderRadius: BorderRadius.circular(8),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        _isManualJournal ? Icons.list_alt_rounded : Icons.edit_outlined,
+                        _isManualJournal
+                            ? Icons.list_alt_rounded
+                            : Icons.edit_outlined,
                         size: 14,
                         color: AppColors.primary,
                       ),
@@ -322,9 +330,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                   _journalIdController.text = found.id;
                 });
                 context.read<StudentManuscriptCheckerCubit>().selectJournal(
-                      found.id,
-                      found.title,
-                    );
+                  found.id,
+                  found.title,
+                );
               },
             ),
           ] else ...[
@@ -339,10 +347,17 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                       color: AppColors.blue50,
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.vpn_key_outlined, size: 16, color: AppColors.primary),
+                    child: const Icon(
+                      Icons.vpn_key_outlined,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
-                prefixIconConstraints: const BoxConstraints(minWidth: 44, minHeight: 32),
+                prefixIconConstraints: const BoxConstraints(
+                  minWidth: 44,
+                  minHeight: 32,
+                ),
                 hintText: context.l10n.targetJournalIdHint,
                 hintStyle: const TextStyle(
                   fontSize: 13.5,
@@ -363,7 +378,10 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                   borderRadius: BorderRadius.circular(12),
                   borderSide: const BorderSide(color: AppColors.primary),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 14,
+                ),
               ),
               style: const TextStyle(
                 fontSize: 13.5,
@@ -374,9 +392,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
               onChanged: (val) {
                 _selectedJournalId = val;
                 context.read<StudentManuscriptCheckerCubit>().selectJournal(
-                      val,
-                      'Target Journal',
-                    );
+                  val,
+                  'Target Journal',
+                );
               },
             ),
           ],
@@ -397,17 +415,17 @@ These findings highlight the necessity of providing immediate linguistic feedbac
               indicatorSize: TabBarIndicatorSize.tab,
               dividerColor: Colors.transparent,
               splashBorderRadius: BorderRadius.circular(8),
-              overlayColor: WidgetStateProperty.resolveWith<Color?>(
-                (Set<WidgetState> states) {
-                  if (states.contains(WidgetState.hovered)) {
-                    return AppColors.primary.withValues(alpha: 0.04);
-                  }
-                  if (states.contains(WidgetState.pressed)) {
-                    return AppColors.primary.withValues(alpha: 0.08);
-                  }
-                  return null;
-                },
-              ),
+              overlayColor: WidgetStateProperty.resolveWith<Color?>((
+                Set<WidgetState> states,
+              ) {
+                if (states.contains(WidgetState.hovered)) {
+                  return AppColors.primary.withValues(alpha: 0.04);
+                }
+                if (states.contains(WidgetState.pressed)) {
+                  return AppColors.primary.withValues(alpha: 0.08);
+                }
+                return null;
+              }),
               indicator: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(8),
@@ -522,75 +540,108 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                       ),
                       // Editor Bottom Toolbar
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
                         decoration: const BoxDecoration(
                           color: AppColors.paper50,
-                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(13)),
+                          borderRadius: BorderRadius.vertical(
+                            bottom: Radius.circular(13),
+                          ),
                           border: Border(
                             top: BorderSide(color: AppColors.borderSoft),
                           ),
                         ),
-                        child: Row(
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
-                            InkWell(
-                              onTap: _loadSampleText,
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: AppColors.blue50,
+                            Wrap(
+                              spacing: 12,
+                              crossAxisAlignment: WrapCrossAlignment.center,
+                              children: [
+                                InkWell(
+                                  onTap: _loadSampleText,
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: AppColors.blue100),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.auto_stories_outlined, size: 14, color: AppColors.primary),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      context.l10n.loadSample,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: AppColors.primary,
-                                        fontFamily: 'Manrope',
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 6,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.blue50,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: AppColors.blue100,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            if (_textController.text.isNotEmpty) ...[
-                              const SizedBox(width: 12),
-                              InkWell(
-                                onTap: () {
-                                  _textController.clear();
-                                  setState(() {});
-                                  context.read<StudentManuscriptCheckerCubit>().updateDraftText('');
-                                },
-                                borderRadius: BorderRadius.circular(8),
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                                  child: Text(
-                                    context.l10n.clear,
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: AppColors.textMuted,
-                                      fontWeight: FontWeight.w600,
-                                      fontFamily: 'Manrope',
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        const Icon(
+                                          Icons.auto_stories_outlined,
+                                          size: 14,
+                                          color: AppColors.primary,
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          context.l10n.loadSample,
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primary,
+                                            fontFamily: 'Manrope',
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                            const Spacer(),
+                                if (_textController.text.isNotEmpty)
+                                  InkWell(
+                                    onTap: () {
+                                      _textController.clear();
+                                      setState(() {});
+                                      context
+                                          .read<StudentManuscriptCheckerCubit>()
+                                          .updateDraftText('');
+                                    },
+                                    borderRadius: BorderRadius.circular(8),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 6,
+                                      ),
+                                      child: Text(
+                                        context.l10n.clear,
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: AppColors.textMuted,
+                                          fontWeight: FontWeight.w600,
+                                          fontFamily: 'Manrope',
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: wordCount > 0 ? AppColors.green50 : AppColors.surfaceSoft,
+                                color: wordCount > 0
+                                    ? AppColors.green50
+                                    : AppColors.surfaceSoft,
                                 borderRadius: BorderRadius.circular(6),
                                 border: Border.all(
-                                  color: wordCount > 0 ? AppColors.green100 : AppColors.borderSoft,
+                                  color: wordCount > 0
+                                      ? AppColors.green100
+                                      : AppColors.borderSoft,
                                 ),
                               ),
                               child: Row(
@@ -600,7 +651,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                                     width: 6,
                                     height: 6,
                                     decoration: BoxDecoration(
-                                      color: wordCount > 0 ? AppColors.green700 : AppColors.textSubtle,
+                                      color: wordCount > 0
+                                          ? AppColors.green700
+                                          : AppColors.textSubtle,
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -608,9 +661,11 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                                   Text(
                                     '$wordCount ${context.l10n.words}',
                                     style: TextStyle(
-                                      fontSize: 11.5,
+                                      fontSize: 11,
                                       fontWeight: FontWeight.w700,
-                                      color: wordCount > 0 ? AppColors.green700 : AppColors.textSubtle,
+                                      color: wordCount > 0
+                                          ? AppColors.green700
+                                          : AppColors.textSubtle,
                                       fontFamily: 'Manrope',
                                     ),
                                   ),
@@ -627,10 +682,14 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                 // Tab 2: File Upload
                 Container(
                   decoration: BoxDecoration(
-                    color: _pickedFileName != null ? AppColors.blue50.withValues(alpha: 0.3) : AppColors.surfaceSoft.withValues(alpha: 0.5),
+                    color: _pickedFileName != null
+                        ? AppColors.blue50.withValues(alpha: 0.3)
+                        : AppColors.surfaceSoft.withValues(alpha: 0.5),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: _pickedFileName != null ? AppColors.primary : const Color(0xFFCBD5E1),
+                      color: _pickedFileName != null
+                          ? AppColors.primary
+                          : const Color(0xFFCBD5E1),
                       width: _pickedFileName != null ? 1.5 : 1,
                     ),
                   ),
@@ -643,10 +702,14 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                           width: 56,
                           height: 56,
                           decoration: BoxDecoration(
-                            color: _pickedFileName != null ? AppColors.blue50 : Colors.white,
+                            color: _pickedFileName != null
+                                ? AppColors.blue50
+                                : Colors.white,
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: _pickedFileName != null ? AppColors.blue100 : AppColors.border,
+                              color: _pickedFileName != null
+                                  ? AppColors.blue100
+                                  : AppColors.border,
                             ),
                             boxShadow: [
                               BoxShadow(
@@ -681,7 +744,10 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                           ),
                           const SizedBox(height: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.green50,
                               borderRadius: BorderRadius.circular(6),
@@ -721,7 +787,9 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                         ElevatedButton.icon(
                           onPressed: _pickFile,
                           icon: Icon(
-                            _pickedFileName != null ? Icons.sync_rounded : Icons.folder_open_rounded,
+                            _pickedFileName != null
+                                ? Icons.sync_rounded
+                                : Icons.folder_open_rounded,
                             size: 16,
                           ),
                           label: Text(
@@ -734,7 +802,10 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                             foregroundColor: AppColors.primary,
                             side: const BorderSide(color: AppColors.primary),
                             elevation: 0,
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -769,10 +840,14 @@ These findings highlight the necessity of providing immediate linguistic feedbac
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               decoration: BoxDecoration(
-                color: _includeExemplars ? const Color(0xFFF0F7FC) : AppColors.surfaceSoft,
+                color: _includeExemplars
+                    ? const Color(0xFFF0F7FC)
+                    : AppColors.surfaceSoft,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: _includeExemplars ? AppColors.blue100 : AppColors.border,
+                  color: _includeExemplars
+                      ? AppColors.blue100
+                      : AppColors.border,
                 ),
               ),
               child: Row(
@@ -781,17 +856,25 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                     width: 36,
                     height: 36,
                     decoration: BoxDecoration(
-                      color: _includeExemplars ? Colors.white : AppColors.borderSoft,
+                      color: _includeExemplars
+                          ? Colors.white
+                          : AppColors.borderSoft,
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                        color: _includeExemplars ? AppColors.blue100 : Colors.transparent,
+                        color: _includeExemplars
+                            ? AppColors.blue100
+                            : Colors.transparent,
                       ),
                     ),
                     child: Center(
                       child: Icon(
-                        _includeExemplars ? Icons.verified_rounded : Icons.verified_outlined,
+                        _includeExemplars
+                            ? Icons.verified_rounded
+                            : Icons.verified_outlined,
                         size: 18,
-                        color: _includeExemplars ? AppColors.primary : AppColors.textMuted,
+                        color: _includeExemplars
+                            ? AppColors.primary
+                            : AppColors.textMuted,
                       ),
                     ),
                   ),
@@ -868,11 +951,12 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                 ),
                 child: Container(
                   alignment: Alignment.center,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 10,
                     children: [
                       const Icon(Icons.spellcheck_rounded, size: 20),
-                      const SizedBox(width: 10),
                       Text(
                         context.l10n.checkAlignmentBtn,
                         style: const TextStyle(
@@ -881,6 +965,7 @@ These findings highlight the necessity of providing immediate linguistic feedbac
                           fontFamily: 'Manrope',
                           letterSpacing: 0.2,
                         ),
+                        textAlign: TextAlign.center,
                       ),
                     ],
                   ),
@@ -909,7 +994,8 @@ class SearchableJournalDropdown extends StatefulWidget {
   });
 
   @override
-  State<SearchableJournalDropdown> createState() => _SearchableJournalDropdownState();
+  State<SearchableJournalDropdown> createState() =>
+      _SearchableJournalDropdownState();
 }
 
 class _SearchableJournalDropdownState extends State<SearchableJournalDropdown> {
@@ -984,11 +1070,17 @@ class _SearchableJournalDropdownState extends State<SearchableJournalDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    final currentTitle = (widget.selectedJournalTitle != null && widget.selectedJournalTitle!.isNotEmpty)
+    final currentTitle =
+        (widget.selectedJournalTitle != null &&
+            widget.selectedJournalTitle!.isNotEmpty)
         ? widget.selectedJournalTitle!
         : (widget.journals.any((j) => j.id == widget.selectedJournalId)
-            ? widget.journals.firstWhere((j) => j.id == widget.selectedJournalId).title
-            : (widget.journals.isNotEmpty ? widget.journals.first.title : context.l10n.selectTargetJournal));
+              ? widget.journals
+                    .firstWhere((j) => j.id == widget.selectedJournalId)
+                    .title
+              : (widget.journals.isNotEmpty
+                    ? widget.journals.first.title
+                    : context.l10n.selectTargetJournal));
 
     return CompositedTransformTarget(
       link: _layerLink,
@@ -1015,7 +1107,11 @@ class _SearchableJournalDropdownState extends State<SearchableJournalDropdown> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: AppColors.blue100),
                 ),
-                child: const Icon(Icons.menu_book_rounded, size: 16, color: AppColors.primary),
+                child: const Icon(
+                  Icons.menu_book_rounded,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -1145,24 +1241,41 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
                     ),
                     prefixIcon: const Padding(
                       padding: EdgeInsets.only(left: 10, right: 8),
-                      child: Icon(Icons.search_rounded, size: 17, color: AppColors.primary),
+                      child: Icon(
+                        Icons.search_rounded,
+                        size: 17,
+                        color: AppColors.primary,
+                      ),
                     ),
-                    prefixIconConstraints: const BoxConstraints(minWidth: 35, minHeight: 38),
+                    prefixIconConstraints: const BoxConstraints(
+                      minWidth: 35,
+                      minHeight: 38,
+                    ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
-                            icon: const Icon(Icons.clear_rounded, size: 15, color: Color(0xFF94A3B8)),
+                            icon: const Icon(
+                              Icons.clear_rounded,
+                              size: 15,
+                              color: Color(0xFF94A3B8),
+                            ),
                             onPressed: () {
                               _searchController.clear();
                               setState(() => _searchQuery = '');
                             },
                             padding: EdgeInsets.zero,
-                            constraints: const BoxConstraints(minWidth: 30, minHeight: 38),
+                            constraints: const BoxConstraints(
+                              minWidth: 30,
+                              minHeight: 38,
+                            ),
                           )
                         : null,
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     focusedBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 0),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 0,
+                    ),
                   ),
                 ),
               ),
@@ -1172,7 +1285,10 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
             Flexible(
               child: filtered.isEmpty
                   ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 24,
+                        horizontal: 16,
+                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1196,7 +1312,10 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
                     )
                   : ListView.separated(
                       shrinkWrap: true,
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 6,
+                      ),
                       itemCount: filtered.length,
                       separatorBuilder: (_, _) => const SizedBox(height: 2),
                       itemBuilder: (context, index) {
@@ -1207,9 +1326,14 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
                           borderRadius: BorderRadius.circular(8),
                           hoverColor: AppColors.primarySoft,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 8,
+                            ),
                             decoration: BoxDecoration(
-                              color: isSelected ? AppColors.blue50 : Colors.transparent,
+                              color: isSelected
+                                  ? AppColors.blue50
+                                  : Colors.transparent,
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Row(
@@ -1217,22 +1341,29 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
                                 Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
-                                    color: isSelected ? AppColors.blue50 : AppColors.surfaceSoft,
+                                    color: isSelected
+                                        ? AppColors.blue50
+                                        : AppColors.surfaceSoft,
                                     borderRadius: BorderRadius.circular(6),
                                     border: Border.all(
-                                      color: isSelected ? AppColors.blue100 : AppColors.borderSoft,
+                                      color: isSelected
+                                          ? AppColors.blue100
+                                          : AppColors.borderSoft,
                                     ),
                                   ),
                                   child: Icon(
                                     Icons.menu_book_rounded,
                                     size: 14,
-                                    color: isSelected ? AppColors.primary : AppColors.textSubtle,
+                                    color: isSelected
+                                        ? AppColors.primary
+                                        : AppColors.textSubtle,
                                   ),
                                 ),
                                 const SizedBox(width: 10),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -1241,12 +1372,17 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
                                         overflow: TextOverflow.ellipsis,
                                         style: TextStyle(
                                           fontSize: 13,
-                                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                                          color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w600,
+                                          color: isSelected
+                                              ? AppColors.primary
+                                              : AppColors.textPrimary,
                                           fontFamily: 'Manrope',
                                         ),
                                       ),
-                                      if (j.domain != null && j.domain!.isNotEmpty) ...[
+                                      if (j.domain != null &&
+                                          j.domain!.isNotEmpty) ...[
                                         const SizedBox(height: 2),
                                         Text(
                                           j.domain!,
@@ -1283,4 +1419,3 @@ class _JournalDropdownMenuState extends State<_JournalDropdownMenu> {
     );
   }
 }
-

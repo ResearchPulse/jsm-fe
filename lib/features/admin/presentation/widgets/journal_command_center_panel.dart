@@ -1,6 +1,9 @@
 import '../../../../core/localization/app_localizations.dart';
+
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
 import '../../../../core/widgets/app_notification.dart';
 import '../../data/datasources/admin_api_client.dart';
@@ -23,7 +26,8 @@ class JournalCommandCenterPanel extends StatefulWidget {
   });
 
   @override
-  State<JournalCommandCenterPanel> createState() => _JournalCommandCenterPanelState();
+  State<JournalCommandCenterPanel> createState() =>
+      _JournalCommandCenterPanelState();
 }
 
 class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
@@ -48,8 +52,17 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
   @override
   void initState() {
     super.initState();
-    _initSettings();
+    _domainController = TextEditingController();
+    _initSettings(isInit: true);
     _loadJournalData();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_domainController.text.isEmpty) {
+      _domainController.text = context.l10n.defaultDomainCs;
+    }
   }
 
   @override
@@ -57,7 +70,7 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.journal['id'] != widget.journal['id']) {
       _stopPolling();
-      _initSettings();
+      _initSettings(isInit: false);
       _loadJournalData();
     }
   }
@@ -69,21 +82,25 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     super.dispose();
   }
 
-  void _initSettings() {
+  void _initSettings({bool isInit = false}) {
     _config = widget.initialConfig;
-    _targetArticles = _config != null ? (_config!['target_articles'] ?? 300) : 300;
+    _targetArticles = _config != null
+        ? (_config!['target_articles'] ?? 300)
+        : 300;
     _yearFrom = _config != null ? (_config!['year_from'] ?? 2022) : 2022;
     _yearTo = _config != null ? (_config!['year_to'] ?? 2024) : 2024;
-    _domainController = TextEditingController(
-      text: _config?['domain']?.toString() ??
-          widget.journal['field']?.toString() ??
-          context.l10n.defaultDomainCs,
-    );
+    _domainController.text =
+        _config?['domain']?.toString() ??
+        widget.journal['field']?.toString() ??
+        (isInit ? '' : context.l10n.defaultDomainCs);
   }
 
   void _startPolling() {
     _stopPolling();
-    _pollingTimer = Timer.periodic(const Duration(seconds: 2), (_) => _pollJobStatus());
+    _pollingTimer = Timer.periodic(
+      const Duration(seconds: 2),
+      (_) => _pollJobStatus(),
+    );
   }
 
   void _stopPolling() {
@@ -104,7 +121,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       if (_config == null) {
         final configs = await _apiClient.getConfigurations();
         for (final c in configs) {
-          final jId = c['journal_id']?.toString() ?? c['journal']?['id']?.toString();
+          final jId =
+              c['journal_id']?.toString() ?? c['journal']?['id']?.toString();
           if (jId == journalId) {
             _config = c;
             _targetArticles = c['target_articles'] ?? 300;
@@ -126,7 +144,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
         if (jobId.isNotEmpty) {
           _jobMetrics = await _apiClient.getJobMetrics(jobId);
           try {
-            final articles = await _apiClient.getJobArticles(jobId, page: 1, perPage: 2);
+            final articles = await _apiClient.getJobArticles(
+              jobId,
+              page: 1,
+              perPage: 2,
+            );
             if (articles.isNotEmpty) {
               _currentArticleTitle = articles.first['title']?.toString();
             }
@@ -176,7 +198,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       if (jobId.isNotEmpty) {
         metrics = await _apiClient.getJobMetrics(jobId);
         try {
-          final articles = await _apiClient.getJobArticles(jobId, page: 1, perPage: 1);
+          final articles = await _apiClient.getJobArticles(
+            jobId,
+            page: 1,
+            perPage: 1,
+          );
           if (articles.isNotEmpty) {
             _currentArticleTitle = articles.first['title']?.toString();
           }
@@ -184,10 +210,14 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       }
 
       // Check if job completed
-      if (status == 'COMPLETED' || status == 'FAILED' || status == 'CANCELLED') {
+      if (status == 'COMPLETED' ||
+          status == 'FAILED' ||
+          status == 'CANCELLED') {
         _stopPolling();
         // Refresh style profile when job completes
-        final profiles = await _apiClient.getStyleProfiles(journalId: journalId);
+        final profiles = await _apiClient.getStyleProfiles(
+          journalId: journalId,
+        );
         if (mounted) {
           setState(() {
             _activeJob = latest;
@@ -214,7 +244,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
   /// 1-Touch Smart Preset Trigger
   Future<void> _handleOneTouchExecute() async {
     final journalId = widget.journal['id']?.toString() ?? '';
-    final journalTitle = widget.journal['title']?.toString() ?? context.l10n.journal;
+    final journalTitle =
+        widget.journal['title']?.toString() ?? context.l10n.journal;
     if (journalId.isEmpty) return;
 
     setState(() => _isTriggering = true);
@@ -239,7 +270,8 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           journalId: journalId,
           domain: _domainController.text.trim().isNotEmpty
               ? _domainController.text.trim()
-              : (widget.journal['field']?.toString() ?? context.l10n.defaultDomainCs),
+              : (widget.journal['field']?.toString() ??
+                    context.l10n.defaultDomainCs),
           yearFrom: _yearFrom,
           yearTo: _yearTo,
           targetArticles: _targetArticles,
@@ -299,7 +331,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
               const SizedBox(height: 16),
               Text(
                 context.l10n.syncCommandCenterDesc,
-                style: TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
               ),
             ],
           ),
@@ -308,9 +344,12 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     }
 
     final title = widget.journal['title'] ?? context.l10n.unknownJournalTitle;
-    final publisher = widget.journal['publisher'] ?? context.l10n.unknownPublisher;
-    final issn = widget.journal['issn_l'] ??
-        ((widget.journal['issns'] is List && (widget.journal['issns'] as List).isNotEmpty)
+    final publisher =
+        widget.journal['publisher'] ?? context.l10n.unknownPublisher;
+    final issn =
+        widget.journal['issn_l'] ??
+        ((widget.journal['issns'] is List &&
+                (widget.journal['issns'] as List).isNotEmpty)
             ? widget.journal['issns'][0].toString()
             : 'N/A');
     final worksCount = widget.journal['works_count'] ?? 0;
@@ -330,7 +369,14 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // 1. HERO HEADER
-          _buildHeroHeader(title, publisher, issn, worksCount, citedCount, jobStatus),
+          _buildHeroHeader(
+            title,
+            publisher,
+            issn,
+            worksCount,
+            citedCount,
+            jobStatus,
+          ),
 
           const Divider(height: 1, color: AppColors.borderSoft),
 
@@ -408,7 +454,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   borderRadius: BorderRadius.circular(10),
                   border: Border.all(color: AppColors.border),
                 ),
-                child: const Icon(Icons.school_rounded, color: AppColors.textPrimary, size: 24),
+                child: const Icon(
+                  Icons.school_rounded,
+                  color: AppColors.textPrimary,
+                  size: 24,
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -439,7 +489,10 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
               ),
               const SizedBox(width: 12),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: badgeBg,
                   borderRadius: BorderRadius.circular(20),
@@ -470,8 +523,14 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
             children: [
               _buildMetaTag(Icons.fingerprint_rounded, 'ISSN: $issn'),
               _buildMetaTag(Icons.category_rounded, _domainController.text),
-              _buildMetaTag(Icons.library_books_rounded, '${context.l10n.papersCountLabel(worksCount)} ${context.l10n.worksOnOpenAlexLabel}'),
-              _buildMetaTag(Icons.format_quote_rounded, '${context.l10n.papersCountLabel(citedCount)} ${context.l10n.citationsLabel}'),
+              _buildMetaTag(
+                Icons.library_books_rounded,
+                '${context.l10n.papersCountLabel(worksCount)} ${context.l10n.worksOnOpenAlexLabel}',
+              ),
+              _buildMetaTag(
+                Icons.format_quote_rounded,
+                '${context.l10n.papersCountLabel(citedCount)} ${context.l10n.citationsLabel}',
+              ),
             ],
           ),
         ],
@@ -517,25 +576,36 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
             children: [
               Expanded(
                 child: ElevatedButton.icon(
-                  onPressed: (_isTriggering || isRunning) ? null : _handleOneTouchExecute,
+                  onPressed: (_isTriggering || isRunning)
+                      ? null
+                      : _handleOneTouchExecute,
                   icon: _isTriggering
                       ? const SizedBox(
                           width: 16,
                           height: 16,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
                         )
                       : Icon(
-                          isCompleted ? Icons.replay_rounded : Icons.play_arrow_rounded,
+                          isCompleted
+                              ? Icons.replay_rounded
+                              : Icons.play_arrow_rounded,
                           size: 18,
                         ),
                   label: Text(
                     _isTriggering
                         ? 'Đang khởi chạy...'
                         : (isRunning
-                            ? 'Đang khai phá theo chu trình...'
-                            : (isCompleted
-                                ? context.l10n.reMineActionCount(_targetArticles)
-                                : context.l10n.startMiningActionCount(_targetArticles))),
+                              ? 'Đang khai phá theo chu trình...'
+                              : (isCompleted
+                                    ? context.l10n.reMineActionCount(
+                                        _targetArticles,
+                                      )
+                                    : context.l10n.startMiningActionCount(
+                                        _targetArticles,
+                                      ))),
                     style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
@@ -547,7 +617,9 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     elevation: 0,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),
@@ -559,15 +631,23 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 },
                 tooltip: context.l10n.customMiningParams,
                 icon: Icon(
-                  _isAdvancedExpanded ? Icons.tune_rounded : Icons.tune_outlined,
-                  color: _isAdvancedExpanded ? AppColors.primary : AppColors.textMuted,
+                  _isAdvancedExpanded
+                      ? Icons.tune_rounded
+                      : Icons.tune_outlined,
+                  color: _isAdvancedExpanded
+                      ? AppColors.primary
+                      : AppColors.textMuted,
                 ),
                 style: IconButton.styleFrom(
-                  backgroundColor: _isAdvancedExpanded ? AppColors.blue100 : AppColors.surfaceSoft,
+                  backgroundColor: _isAdvancedExpanded
+                      ? AppColors.blue100
+                      : AppColors.surfaceSoft,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                     side: BorderSide(
-                      color: _isAdvancedExpanded ? AppColors.primary : AppColors.border,
+                      color: _isAdvancedExpanded
+                          ? AppColors.primary
+                          : AppColors.border,
                     ),
                   ),
                 ),
@@ -579,11 +659,19 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.flash_on_rounded, size: 13, color: AppColors.primary),
+              const Icon(
+                Icons.flash_on_rounded,
+                size: 13,
+                color: AppColors.primary,
+              ),
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  context.l10n.defaultOptimizedConfigDetails(_targetArticles, _yearFrom, _yearTo),
+                  context.l10n.defaultOptimizedConfigDetails(
+                    _targetArticles,
+                    _yearFrom,
+                    _yearTo,
+                  ),
                   style: const TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
@@ -624,7 +712,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     children: [
                       Text(
                         context.l10n.targetPapersColon,
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Manrope',
+                        ),
                       ),
                       const SizedBox(height: 6),
                       Wrap(
@@ -633,21 +725,33 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                         children: [50, 100, 200, 300, 500].map((preset) {
                           final isSel = _targetArticles == preset;
                           return InkWell(
-                            onTap: () => setState(() => _targetArticles = preset),
+                            onTap: () =>
+                                setState(() => _targetArticles = preset),
                             borderRadius: BorderRadius.circular(6),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
-                                color: isSel ? AppColors.textPrimary : Colors.white,
+                                color: isSel
+                                    ? AppColors.textPrimary
+                                    : Colors.white,
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: isSel ? AppColors.textPrimary : AppColors.border),
+                                border: Border.all(
+                                  color: isSel
+                                      ? AppColors.textPrimary
+                                      : AppColors.border,
+                                ),
                               ),
                               child: Text(
                                 context.l10n.papersCountLabel(preset),
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: isSel ? Colors.white : AppColors.textSecondary,
+                                  color: isSel
+                                      ? Colors.white
+                                      : AppColors.textSecondary,
                                   fontFamily: 'Manrope',
                                 ),
                               ),
@@ -663,7 +767,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                     children: [
                       const Text(
                         'Khoảng năm xuất bản:',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Manrope',
+                        ),
                       ),
                       const SizedBox(width: 12),
                       DropdownButton<int>(
@@ -673,7 +781,12 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                         borderRadius: BorderRadius.circular(10),
                         focusColor: Colors.transparent,
                         elevation: 4,
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Manrope',
+                        ),
                         items: [2018, 2019, 2020, 2021, 2022, 2023].map((y) {
                           return DropdownMenuItem(value: y, child: Text('$y'));
                         }).toList(),
@@ -683,7 +796,10 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                       ),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Text('➔', style: TextStyle(color: AppColors.textMuted)),
+                        child: Text(
+                          '➔',
+                          style: TextStyle(color: AppColors.textMuted),
+                        ),
                       ),
                       DropdownButton<int>(
                         value: _yearTo,
@@ -692,7 +808,12 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                         borderRadius: BorderRadius.circular(10),
                         focusColor: Colors.transparent,
                         elevation: 4,
-                        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textPrimary, fontFamily: 'Manrope'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                          fontFamily: 'Manrope',
+                        ),
                         items: [2022, 2023, 2024, 2025, 2026].map((y) {
                           return DropdownMenuItem(value: y, child: Text('$y'));
                         }).toList(),
@@ -711,7 +832,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     );
   }
 
-  Widget _buildActiveAnalysisSection(String jobStatus, bool isRunning, bool isCompleted) {
+  Widget _buildActiveAnalysisSection(
+    String jobStatus,
+    bool isRunning,
+    bool isCompleted,
+  ) {
     double progressPercent = 0.0;
     final progressVal = (_activeJob?['progress'] as num?)?.toDouble() ?? 0.0;
     progressPercent = progressVal / 100.0;
@@ -720,8 +845,10 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
       progressPercent = 1.0;
     }
 
-    final totalArticles = (_activeJob?['total_articles'] as num?)?.toInt() ?? _targetArticles;
-    final processedArticles = (_activeJob?['processed_articles'] as num?)?.toInt() ??
+    final totalArticles =
+        (_activeJob?['total_articles'] as num?)?.toInt() ?? _targetArticles;
+    final processedArticles =
+        (_activeJob?['processed_articles'] as num?)?.toInt() ??
         (_jobMetrics?['normalized'] as num?)?.toInt() ??
         0;
     final failedCount = (_jobMetrics?['failed'] as num?)?.toInt() ?? 0;
@@ -748,7 +875,9 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   Icon(
                     isRunning
                         ? Icons.autorenew_rounded
-                        : (isCompleted ? Icons.check_circle_rounded : Icons.pending_actions_rounded),
+                        : (isCompleted
+                              ? Icons.check_circle_rounded
+                              : Icons.pending_actions_rounded),
                     size: 18,
                     color: isCompleted
                         ? AppColors.green700
@@ -788,7 +917,10 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 )
               else if (isCompleted)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.green50,
                     borderRadius: BorderRadius.circular(6),
@@ -812,7 +944,9 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: isCompleted ? 1.0 : (isRunning ? progressPercent.clamp(0.05, 1.0) : 0.0),
+              value: isCompleted
+                  ? 1.0
+                  : (isRunning ? progressPercent.clamp(0.05, 1.0) : 0.0),
               minHeight: 7,
               backgroundColor: AppColors.surfaceSoft,
               valueColor: AlwaysStoppedAnimation<Color>(
@@ -827,10 +961,14 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             decoration: BoxDecoration(
-              color: isRunning ? AppColors.blue50.withAlpha(80) : AppColors.surfaceSoft,
+              color: isRunning
+                  ? AppColors.blue50.withAlpha(80)
+                  : AppColors.surfaceSoft,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isRunning ? AppColors.primary.withAlpha(60) : AppColors.border,
+                color: isRunning
+                    ? AppColors.primary.withAlpha(60)
+                    : AppColors.border,
               ),
             ),
             child: Row(
@@ -847,7 +985,9 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   child: Icon(
                     isRunning
                         ? Icons.article_rounded
-                        : (isCompleted ? Icons.task_alt_rounded : Icons.menu_book_rounded),
+                        : (isCompleted
+                              ? Icons.task_alt_rounded
+                              : Icons.menu_book_rounded),
                     size: 20,
                     color: isCompleted
                         ? AppColors.green700
@@ -863,21 +1003,31 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                         children: [
                           Text(
                             isRunning
-                                ? context.l10n.parsingPaperProgress(processedArticles < totalArticles ? processedArticles + 1 : totalArticles, totalArticles)
+                                ? context.l10n.parsingPaperProgress(
+                                    processedArticles < totalArticles
+                                        ? processedArticles + 1
+                                        : totalArticles,
+                                    totalArticles,
+                                  )
                                 : (isCompleted
-                                    ? 'Đã bóc tách & phân tích hoàn tất'
-                                    : 'Chưa có tác vụ phân tích'),
+                                      ? 'Đã bóc tách & phân tích hoàn tất'
+                                      : 'Chưa có tác vụ phân tích'),
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w700,
-                              color: isRunning ? AppColors.primary : AppColors.textPrimary,
+                              color: isRunning
+                                  ? AppColors.primary
+                                  : AppColors.textPrimary,
                               fontFamily: 'Manrope',
                             ),
                           ),
                           if (isRunning) ...[
                             const SizedBox(width: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.primary,
                                 borderRadius: BorderRadius.circular(4),
@@ -898,20 +1048,31 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                       const SizedBox(height: 4),
                       Text(
                         isRunning
-                            ? (_currentArticleTitle != null && _currentArticleTitle!.isNotEmpty
-                                ? _currentArticleTitle!
-                                : 'Bài nghiên cứu ${processedArticles < totalArticles ? processedArticles + 1 : totalArticles}: Trích xuất cấu trúc câu IMRAD & CARS Moves...')
+                            ? (_currentArticleTitle != null &&
+                                      _currentArticleTitle!.isNotEmpty
+                                  ? _currentArticleTitle!
+                                  : 'Bài nghiên cứu ${processedArticles < totalArticles ? processedArticles + 1 : totalArticles}: Trích xuất cấu trúc câu IMRAD & CARS Moves...')
                             : (isCompleted
-                                ? context.l10n.miningCompleteStatus(processedArticles)
-                                : context.l10n.clickMineAbovePrompt(_targetArticles)),
+                                  ? context.l10n.miningCompleteStatus(
+                                      processedArticles,
+                                    )
+                                  : context.l10n.clickMineAbovePrompt(
+                                      _targetArticles,
+                                    )),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontSize: 13,
-                          fontWeight: isRunning ? FontWeight.w600 : FontWeight.w500,
-                          color: isRunning ? AppColors.textPrimary : AppColors.textSecondary,
+                          fontWeight: isRunning
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          color: isRunning
+                              ? AppColors.textPrimary
+                              : AppColors.textSecondary,
                           fontFamily: 'Manrope',
-                          fontStyle: isRunning && _currentArticleTitle == null ? FontStyle.italic : FontStyle.normal,
+                          fontStyle: isRunning && _currentArticleTitle == null
+                              ? FontStyle.italic
+                              : FontStyle.normal,
                         ),
                       ),
                     ],
@@ -940,10 +1101,17 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.check_circle_outline_rounded, size: 15, color: AppColors.green700),
+                    const Icon(
+                      Icons.check_circle_outline_rounded,
+                      size: 15,
+                      color: AppColors.green700,
+                    ),
                     const SizedBox(width: 6),
                     Text(
-                      context.l10n.completedPapersFraction(processedArticles, totalArticles),
+                      context.l10n.completedPapersFraction(
+                        processedArticles,
+                        totalArticles,
+                      ),
                       style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
@@ -957,16 +1125,27 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.warning_amber_rounded, size: 15, color: AppColors.error),
+                      const Icon(
+                        Icons.warning_amber_rounded,
+                        size: 15,
+                        color: AppColors.error,
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         context.l10n.failedPapersCount(failedCount),
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.error, fontFamily: 'Manrope'),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.error,
+                          fontFamily: 'Manrope',
+                        ),
                       ),
                     ],
                   ),
                 InkWell(
-                  onTap: () => widget.onNavigateToTab(2), // Navigate to Tab 2 (Hệ thống & Giám sát logs)
+                  onTap: () => widget.onNavigateToTab(
+                    2,
+                  ), // Navigate to Tab 2 (Hệ thống & Giám sát logs)
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -980,7 +1159,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                         ),
                       ),
                       SizedBox(width: 4),
-                      Icon(Icons.arrow_forward_rounded, size: 13, color: AppColors.primary),
+                      Icon(
+                        Icons.arrow_forward_rounded,
+                        size: 13,
+                        color: AppColors.primary,
+                      ),
                     ],
                   ),
                 ),
@@ -993,20 +1176,25 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
   }
 
   Widget _buildStyleProfileSection() {
-    final metrics = (_styleProfile?['sentence_metrics'] as Map<String, dynamic>?) ?? {};
+    final metrics =
+        (_styleProfile?['sentence_metrics'] as Map<String, dynamic>?) ?? {};
     final stance = (_styleProfile?['stance'] as Map<String, dynamic>?) ?? {};
-    final carsMoves = (_styleProfile?['cars_moves'] as Map<String, dynamic>?) ?? {};
+    final carsMoves =
+        (_styleProfile?['cars_moves'] as Map<String, dynamic>?) ?? {};
 
     final meanLen = metrics['mean_length'] ?? 21.0;
     final p50Len = metrics['p50'] ?? 20.0;
     final hedges1k = metrics['hedges_per_1k'] ?? 14.5;
     final boosters1k = metrics['boosters_per_1k'] ?? 6.2;
 
-    final territoryMove = ((carsMoves['territory'] as num?)?.toDouble() ?? 0.85) * 100;
+    final territoryMove =
+        ((carsMoves['territory'] as num?)?.toDouble() ?? 0.85) * 100;
     final nicheMove = ((carsMoves['niche'] as num?)?.toDouble() ?? 0.72) * 100;
 
-    final supportStance = ((stance['support'] as num?)?.toDouble() ?? 0.35) * 100;
-    final neutralStance = ((stance['neutral'] as num?)?.toDouble() ?? 0.58) * 100;
+    final supportStance =
+        ((stance['support'] as num?)?.toDouble() ?? 0.35) * 100;
+    final neutralStance =
+        ((stance['neutral'] as num?)?.toDouble() ?? 0.58) * 100;
 
     return Padding(
       padding: const EdgeInsets.all(22),
@@ -1022,7 +1210,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.auto_awesome_rounded, size: 16, color: AppColors.primary),
+                  const Icon(
+                    Icons.auto_awesome_rounded,
+                    size: 16,
+                    color: AppColors.primary,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     context.l10n.nlpStyleProfileSectionTitle,
@@ -1036,18 +1228,28 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                 ],
               ),
               OutlinedButton.icon(
-                onPressed: () => widget.onNavigateToTab(1), // Tab 1: Hồ sơ & Đối chuẩn NLP
+                onPressed: () =>
+                    widget.onNavigateToTab(1), // Tab 1: Hồ sơ & Đối chuẩn NLP
                 icon: const Icon(Icons.analytics_outlined, size: 15),
                 label: Text(
                   context.l10n.viewComprehensiveCorpusBenchmark,
-                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, fontFamily: 'Manrope'),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppColors.primary,
                   side: const BorderSide(color: AppColors.primary, width: 1.2),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 9,
+                  ),
                   minimumSize: const Size(0, 36),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
                 ),
               ),
             ],
@@ -1122,7 +1324,12 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
     );
   }
 
-  Widget _buildMetricTile(String title, String mainValue, String subText, IconData icon) {
+  Widget _buildMetricTile(
+    String title,
+    String mainValue,
+    String subText,
+    IconData icon,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -1142,7 +1349,12 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                  style: const TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                  ),
                 ),
               ),
             ],
@@ -1162,7 +1374,11 @@ class _JournalCommandCenterPanelState extends State<JournalCommandCenterPanel> {
             subText,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary, fontFamily: 'Manrope'),
+            style: const TextStyle(
+              fontSize: 10,
+              color: AppColors.textSecondary,
+              fontFamily: 'Manrope',
+            ),
           ),
         ],
       ),

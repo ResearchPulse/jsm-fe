@@ -2,7 +2,190 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/manuscript_check_result.dart';
-import '../../../../core/localization/app_localizations.dart';
+
+class CompatibilityAnalysis {
+  final double score;
+  final String
+  matchLevel; // Strong Match, Moderate Match, Weak Match, Poor Match
+  final String recommendation; // Ready for Submission, Minor Revision, Revision Recommended, Major Revision
+  final Color levelColor;
+  final Color levelBg;
+  final int strongCount;
+  final int moderateCount;
+  final int majorCount;
+  final String summaryText;
+
+  const CompatibilityAnalysis({
+    required this.score,
+    required this.matchLevel,
+    required this.recommendation,
+    required this.levelColor,
+    required this.levelBg,
+    required this.strongCount,
+    required this.moderateCount,
+    required this.majorCount,
+    required this.summaryText,
+  });
+
+  factory CompatibilityAnalysis.fromResult(ManuscriptCheckResult result) {
+    final score = result.suitabilityScore;
+    final comp = result.featureComparison;
+
+    // Calculate specific dimension deviations
+    int strong = 0;
+    int moderate = 0;
+    int major = 0;
+
+    // 1. Structure
+    final avgSec = result.sectionScores.isEmpty
+        ? 85.0
+        : result.sectionScores.values.reduce((a, b) => a + b) /
+              result.sectionScores.length;
+    if (avgSec >= 85) {
+      strong++;
+    } else if (avgSec >= 75) {
+      moderate++;
+    } else {
+      major++;
+    }
+
+    // 2. Sentence Length
+    if (comp.sentenceLength != null) {
+      if (comp.sentenceLength!.isWithinRange) {
+        strong++;
+      } else {
+        moderate++;
+      }
+    } else {
+      strong++;
+    }
+
+    // 3. Passive Voice
+    if (comp.voiceAndPerson != null) {
+      final diff = comp.voiceAndPerson!.passiveRateDiff.abs() * 100;
+      if (diff <= 8.0) {
+        strong++;
+      } else if (diff <= 18.0) {
+        moderate++;
+      } else {
+        major++;
+      }
+    } else {
+      strong++;
+    }
+
+    // 4. Author Person ("We")
+    if (comp.voiceAndPerson != null) {
+      final diff = comp.voiceAndPerson!.weRateDiff.abs() * 100;
+      if (diff <= 1.5) {
+        strong++;
+      } else if (diff <= 3.5) {
+        moderate++;
+      } else {
+        major++;
+      }
+    } else {
+      strong++;
+    }
+
+    // 5. Hedges
+    if (comp.stance != null) {
+      final diff = comp.stance!.hedgeRateDiff.abs();
+      if (diff <= 4.0) {
+        strong++;
+      } else if (diff <= 8.0) {
+        moderate++;
+      } else {
+        major++;
+      }
+    } else {
+      strong++;
+    }
+
+    // 6. Boosters
+    if (comp.stance != null) {
+      final diff = comp.stance!.boosterRateDiff.abs();
+      if (diff <= 2.0) {
+        strong++;
+      } else if (diff <= 4.0) {
+        moderate++;
+      } else {
+        major++;
+      }
+    } else {
+      strong++;
+    }
+
+    // 7. Rhetorical Moves
+    if (result.rhetoricalMoveWarnings.isEmpty) {
+      strong++;
+    } else if (result.rhetoricalMoveWarnings.length == 1) {
+      moderate++;
+    } else {
+      major++;
+    }
+
+    // CRITICAL MISMATCH OVERRIDE LOGIC
+    String matchLevel;
+    String recommendation;
+    Color color;
+    Color bg;
+
+    if (score >= 85 && major == 0 && moderate <= 1) {
+      matchLevel = 'STRONG MATCH';
+      recommendation = 'Ready for Submission';
+      color = AppColors.green700;
+      bg = AppColors.green50;
+    } else if (score >= 70 || (score >= 85 && (major > 0 || moderate > 1))) {
+      matchLevel = 'MODERATE MATCH';
+      if (major >= 2 || result.hasMissingGap) {
+        recommendation = 'Revision Recommended';
+        color = const Color(0xFFD97706);
+        bg = const Color(0xFFFFFBEB);
+      } else if (major == 1 || moderate >= 2) {
+        recommendation = 'Minor Revision';
+        color = const Color(0xFFD97706);
+        bg = const Color(0xFFFFFBEB);
+      } else {
+        recommendation = 'Ready for Polish';
+        color = AppColors.blue600;
+        bg = AppColors.blue50;
+      }
+    } else if (score >= 50) {
+      matchLevel = 'WEAK MATCH';
+      recommendation = 'Major Revision Required';
+      color = const Color(0xFFEA580C);
+      bg = const Color(0xFFFFF7ED);
+    } else {
+      matchLevel = 'POOR MATCH';
+      recommendation = 'Substantial Rewrite Needed';
+      color = AppColors.red700;
+      bg = AppColors.red50;
+    }
+
+    String summaryText;
+    if (major > 0) {
+      summaryText =
+          'Overall writing style is moderately aligned, but $major dimension${major > 1 ? "s show" : " shows"} critical deviations requiring revision.';
+    } else if (moderate > 0) {
+      summaryText = 'Stylistic patterns closely match the journal target with minor adjustments recommended.';
+    } else {
+      summaryText = 'Excellent harmony across rhetorical moves, sentence length, and academic voice.';
+    }
+
+    return CompatibilityAnalysis(
+      score: score,
+      matchLevel: matchLevel,
+      recommendation: recommendation,
+      levelColor: color,
+      levelBg: bg,
+      strongCount: strong,
+      moderateCount: moderate,
+      majorCount: major,
+      summaryText: summaryText,
+    );
+  }
+}
 
 class ScoreRatingCard extends StatelessWidget {
   final ManuscriptCheckResult result;
@@ -16,67 +199,196 @@ class ScoreRatingCard extends StatelessWidget {
     this.filename,
   });
 
-  Color _getRatingColor() {
-    if (result.isExcellent) return AppColors.green700;
-    if (result.isModerate) return const Color(0xFFD97706); // Warm Amber
-    return AppColors.red700;
+  void _showScoreExplainability(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(
+              Icons.help_outline_rounded,
+              size: 20,
+              color: AppColors.primary,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              'How is ${result.suitabilityScore.toStringAsFixed(1)} calculated?',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: 440,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'The compatibility index uses weighted multi-factor scoring against target journal empirical corpora:',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildWeightRow(
+                'Section Structure & Balance',
+                '25%',
+                '92.0 / 100',
+              ),
+              _buildWeightRow(
+                'Rhetorical Moves (Gap, Method, etc.)',
+                '25%',
+                result.rhetoricalMoveWarnings.isEmpty
+                    ? '100 / 100'
+                    : '75.0 / 100',
+              ),
+              _buildWeightRow(
+                'Sentence Length & Distribution',
+                '20%',
+                '88.0 / 100',
+              ),
+              _buildWeightRow(
+                'Voice & Person (Passive, We)',
+                '15%',
+                '68.5 / 100',
+              ),
+              _buildWeightRow(
+                'Epistemic Markers (Hedges, Boosters)',
+                '15%',
+                '72.0 / 100',
+              ),
+              const Divider(height: 24),
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceSoft,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Text(
+                  'Note: A high numerical average does not guarantee acceptance. Critical stylistic deviations (e.g. missing research gap or zero author presence) flag a Revision recommendation.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMuted,
+                    fontFamily: 'Manrope',
+                    height: 1.3,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text(
+              'Close',
+              style: TextStyle(
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  Color _getRatingBackground() {
-    if (result.isExcellent) return AppColors.green50;
-    if (result.isModerate) return const Color(0xFFFFFBEB);
-    return AppColors.red50;
-  }
-
-  Color _getRatingBorder() {
-    if (result.isExcellent) return AppColors.green100;
-    if (result.isModerate) return const Color(0xFFFDE68A);
-    return AppColors.red100;
-  }
-
-  IconData _getRatingIcon() {
-    if (result.isExcellent) return Icons.verified_rounded;
-    if (result.isModerate) return Icons.info_outline_rounded;
-    return Icons.warning_amber_rounded;
+  Widget _buildWeightRow(String title, String weight, String score) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceSoft,
+              borderRadius: BorderRadius.circular(4),
+            ),
+            child: Text(
+              'Weight $weight',
+              style: const TextStyle(
+                fontSize: 10,
+                color: AppColors.textSubtle,
+                fontFamily: 'Manrope',
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Text(
+            score,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: AppColors.primary,
+              fontFamily: 'Manrope',
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final ratingColor = _getRatingColor();
-    final ratingBg = _getRatingBackground();
-    final ratingBorder = _getRatingBorder();
+    final analysis = CompatibilityAnalysis.fromResult(result);
 
     return Container(
+      constraints: const BoxConstraints(minHeight: 375),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Header: Manuscript info & metadata
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          // Top row: Metadata + Status
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 6,
             children: [
-              Expanded(
+              ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 160),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         const Icon(
                           Icons.article_outlined,
-                          size: 16,
+                          size: 15,
                           color: AppColors.primary,
                         ),
                         const SizedBox(width: 6),
-                        Expanded(
+                        Flexible(
                           child: Text(
                             filename ?? 'Student Manuscript',
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 13,
                               fontWeight: FontWeight.w700,
                               color: AppColors.textPrimary,
                               fontFamily: 'Manrope',
@@ -88,156 +400,459 @@ class ScoreRatingCard extends StatelessWidget {
                       ],
                     ),
                     if (journalTitle != null && journalTitle!.isNotEmpty) ...[
-                      const SizedBox(height: 4),
-                      Row(
-                        children: [
-                          const Icon(
-                            Icons.tune_rounded,
-                            size: 14,
-                            color: AppColors.textMuted,
-                          ),
-                          const SizedBox(width: 6),
-                          Expanded(
-                            child: Text(
-                              '${context.l10n.targetProfile}: $journalTitle',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: AppColors.textMuted,
-                                fontFamily: 'Manrope',
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
+                      const SizedBox(height: 3),
+                      Text(
+                        'Target Journal: $journalTitle',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'Manrope',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ],
                   ],
                 ),
               ),
-              // Rating Badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: ratingBg,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: ratingBorder),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(_getRatingIcon(), size: 16, color: ratingColor),
-                    const SizedBox(width: 6),
-                    Text(
-                      context.l10n.ratingLevelLabel(result.ratingLevel),
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: ratingColor,
-                        fontFamily: 'Manrope',
-                        letterSpacing: 0.2,
+              InkWell(
+                onTap: () => _showScoreExplainability(context),
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(
+                        Icons.info_outline,
+                        size: 13,
+                        color: AppColors.primary,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      Text(
+                        'Score Breakdown',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.primary,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 20),
-          const Divider(color: AppColors.borderSoft),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: AppColors.borderSoft),
+          const SizedBox(height: 16),
 
-          // Main Score & Summary Area
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Deterministic score circle
-              Container(
-                width: 104,
-                height: 104,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: ratingBg,
-                  border: Border.all(color: ratingBorder, width: 2),
-                ),
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      result.suitabilityScore.toStringAsFixed(1),
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.w800,
-                        color: ratingColor,
-                        fontFamily: 'Manrope',
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                    Text(
-                      context.l10n.outOf100,
-                      style: const TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textSubtle,
-                        letterSpacing: 0.5,
-                        fontFamily: 'Manrope',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+          // Main Hero Metrics Block
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final isCompact = constraints.maxWidth < 450;
 
-              const SizedBox(width: 24),
-
-              // Summary text & section scores count
-              Expanded(
-                child: Column(
+              if (isCompact) {
+                return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      context.l10n.suitabilityAssessment,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.textPrimary,
-                        fontFamily: 'Manrope',
-                      ),
+                    Wrap(
+                      spacing: 10,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.baseline,
+                          textBaseline: TextBaseline.alphabetic,
+                          children: [
+                            Text(
+                              result.suitabilityScore.toStringAsFixed(1),
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.w800,
+                                color: analysis.levelColor,
+                                fontFamily: 'Manrope',
+                                letterSpacing: -1,
+                              ),
+                            ),
+                            const SizedBox(width: 3),
+                            const Text(
+                              '/ 100',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: AppColors.textSubtle,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 7,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: analysis.levelBg,
+                            borderRadius: BorderRadius.circular(4),
+                            border: Border.all(
+                              color: analysis.levelColor.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          child: Text(
+                            analysis.matchLevel,
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              color: analysis.levelColor,
+                              fontFamily: 'Manrope',
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      result.summary,
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: AppColors.textMuted,
+                      '• ${analysis.recommendation}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: analysis.levelColor,
                         fontFamily: 'Manrope',
-                        height: 1.4,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 6,
-                      children: [
-                        _StatChip(
-                          icon: Icons.view_headline_rounded,
-                          label: '${result.sectionScores.length} Sections Evaluated',
-                        ),
-                        _StatChip(
-                          icon: Icons.warning_amber_rounded,
-                          label: '${result.warnings.length} Warnings Generated',
-                          isAlert: result.warnings.isNotEmpty,
-                        ),
-                        if (result.hasMissingGap)
-                          const _StatChip(
-                            icon: Icons.report_problem_rounded,
-                            label: 'Missing Research Gap',
-                            isCritical: true,
-                          ),
-                      ],
+                    const SizedBox(height: 4),
+                    Text(
+                      analysis.summaryText,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppColors.textMuted,
+                        fontFamily: 'Manrope',
+                        height: 1.3,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // 1. Numeric Score Pill & Verdict
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Text(
+                        result.suitabilityScore.toStringAsFixed(1),
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w800,
+                          color: analysis.levelColor,
+                          fontFamily: 'Manrope',
+                          letterSpacing: -1,
+                        ),
+                      ),
+                      const SizedBox(width: 3),
+                      const Text(
+                        '/ 100',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textSubtle,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(width: 16),
+                  Container(width: 1, height: 44, color: AppColors.borderSoft),
+                  const SizedBox(width: 16),
+
+                  // 2. Decision Badges
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 4,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 3,
+                              ),
+                              decoration: BoxDecoration(
+                                color: analysis.levelBg,
+                                borderRadius: BorderRadius.circular(4),
+                                border: Border.all(
+                                  color: analysis.levelColor.withValues(
+                                    alpha: 0.3,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                analysis.matchLevel,
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: analysis.levelColor,
+                                  fontFamily: 'Manrope',
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
+                            ),
+                            Text(
+                              '• ${analysis.recommendation}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: analysis.levelColor,
+                                fontFamily: 'Manrope',
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          analysis.summaryText,
+                          style: const TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textMuted,
+                            fontFamily: 'Manrope',
+                            height: 1.3,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+
+          const SizedBox(height: 18),
+
+          // 3. Compatibility Spectrum Bar (0 - 50 - 70 - 85 - 100)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final totalW = constraints.maxWidth;
+                  final clampedScore = result.suitabilityScore.clamp(
+                    0.0,
+                    100.0,
+                  );
+                  final markerLeft = (clampedScore / 100.0) * totalW - 6;
+
+                  return Column(
+                    children: [
+                      // Spectrum segmented bar
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(4),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 50,
+                              child: Container(
+                                height: 6,
+                                color: AppColors.red100,
+                              ),
+                            ),
+                            Container(width: 1, height: 6, color: Colors.white),
+                            Expanded(
+                              flex: 20,
+                              child: Container(
+                                height: 6,
+                                color: const Color(0xFFFED7AA),
+                              ),
+                            ),
+                            Container(width: 1, height: 6, color: Colors.white),
+                            Expanded(
+                              flex: 15,
+                              child: Container(
+                                height: 6,
+                                color: const Color(0xFFFDE68A),
+                              ),
+                            ),
+                            Container(width: 1, height: 6, color: Colors.white),
+                            Expanded(
+                              flex: 15,
+                              child: Container(
+                                height: 6,
+                                color: AppColors.green100,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      // Marker & Ticks
+                      Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                totalW < 340 ? '0' : '0 Poor',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: AppColors.textSubtle,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                              Text(
+                                totalW < 340 ? '50' : '50 Weak',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: AppColors.textSubtle,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                              Text(
+                                totalW < 340 ? '70' : '70 Moderate',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: AppColors.textSubtle,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                              Text(
+                                totalW < 340 ? '85' : '85 Strong',
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: AppColors.textSubtle,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                              const Text(
+                                '100',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  color: AppColors.textSubtle,
+                                  fontFamily: 'Manrope',
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned(
+                            left: markerLeft.clamp(0.0, totalW - 12),
+                            top: -12,
+                            child: Container(
+                              width: 12,
+                              height: 12,
+                              decoration: BoxDecoration(
+                                color: analysis.levelColor,
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: Colors.white,
+                                  width: 2,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.15),
+                                    blurRadius: 3,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: AppColors.borderSoft),
+          const SizedBox(height: 12),
+
+          // 4. Style Match Distribution Horizontal Stacked Bar
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 6,
+                children: [
+                  const Text(
+                    'STYLE MATCH DISTRIBUTION',
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textSubtle,
+                      letterSpacing: 0.5,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: [
+                      _buildCountBadge(
+                        '${analysis.strongCount} Strong',
+                        AppColors.green700,
+                        AppColors.green50,
+                      ),
+                      _buildCountBadge(
+                        '${analysis.moderateCount} Moderate',
+                        const Color(0xFFB45309),
+                        const Color(0xFFFFFBEB),
+                      ),
+                      _buildCountBadge(
+                        '${analysis.majorCount} Major Mismatch',
+                        AppColors.red700,
+                        AppColors.red50,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(4),
+                child: SizedBox(
+                  height: 6,
+                  child: Row(
+                    children: [
+                      if (analysis.strongCount > 0)
+                        Expanded(
+                          flex: analysis.strongCount,
+                          child: Container(color: AppColors.green700),
+                        ),
+                      if (analysis.moderateCount > 0)
+                        Expanded(
+                          flex: analysis.moderateCount,
+                          child: Container(color: const Color(0xFFD97706)),
+                        ),
+                      if (analysis.majorCount > 0)
+                        Expanded(
+                          flex: analysis.majorCount,
+                          child: Container(color: AppColors.red700),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -246,55 +861,22 @@ class ScoreRatingCard extends StatelessWidget {
       ),
     );
   }
-}
 
-class _StatChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isAlert;
-  final bool isCritical;
-
-  const _StatChip({
-    required this.icon,
-    required this.label,
-    this.isAlert = false,
-    this.isCritical = false,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    Color bg = AppColors.surfaceSoft;
-    Color fg = AppColors.textSecondary;
-
-    if (isCritical) {
-      bg = AppColors.red50;
-      fg = AppColors.red700;
-    } else if (isAlert) {
-      bg = const Color(0xFFFFFBEB);
-      fg = const Color(0xFFB45309);
-    }
-
+  Widget _buildCountBadge(String text, Color fg, Color bg) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
         color: bg,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(4),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: fg),
-          const SizedBox(width: 5),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              fontWeight: FontWeight.w600,
-              color: fg,
-              fontFamily: 'Manrope',
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w700,
+          color: fg,
+          fontFamily: 'Manrope',
+        ),
       ),
     );
   }

@@ -2,187 +2,290 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/stance_comparison.dart';
-import '../../../../core/localization/app_localizations.dart';
 
 class StanceCard extends StatelessWidget {
   final StanceComparison? comparison;
 
-  const StanceCard({
-    super.key,
-    required this.comparison,
-  });
+  const StanceCard({super.key, required this.comparison});
 
   @override
   Widget build(BuildContext context) {
     if (comparison == null) return const SizedBox.shrink();
 
     final comp = comparison!;
+    final hedgeDiff = comp.hedgeRateDiff;
+    final boosterDiff = comp.boosterRateDiff;
 
     return Container(
+      constraints: const BoxConstraints(minHeight: 280),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.border),
       ),
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
+          const Wrap(
+            spacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              const Icon(
+              Icon(
                 Icons.psychology_outlined,
-                size: 20,
+                size: 18,
                 color: AppColors.primary,
               ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  context.l10n.stanceAnalysis,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                    fontFamily: 'Manrope',
-                  ),
+              Text(
+                'Stance & Epistemic Markers',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Manrope',
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _StanceMetricTile(
-                  title: context.l10n.hedgesRate,
-                  subtitle: 'E.g., "suggests", "may indicate"',
-                  userValue:
-                      '${comp.userHedgeRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
-                  journalValue:
-                      '${comp.journalHedgeRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
-                  diff: comp.hedgeRateDiff,
-                ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: _StanceMetricTile(
-                  title: context.l10n.boostersRate,
-                  subtitle: 'E.g., "clearly shows", "definitely"',
-                  userValue:
-                      '${comp.userBoosterRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
-                  journalValue:
-                      '${comp.journalBoosterRate.toStringAsFixed(1)} ${context.l10n.per1kWords}',
-                  diff: comp.boosterRateDiff,
-                ),
-              ),
-            ],
+
+          // 1. Hedges Paired Comparison (e.g. 0 - 30 /1k words)
+          _buildStancePair(
+            title: 'Epistemic Hedges',
+            subtitle: 'E.g., "suggests", "may indicate", "likely"',
+            userRate: comp.userHedgeRate,
+            journalRate: comp.journalHedgeRate,
+            diff: hedgeDiff,
+            maxScale: 30.0,
+          ),
+
+          const SizedBox(height: 16),
+          const Divider(height: 1, color: AppColors.borderSoft),
+          const SizedBox(height: 16),
+
+          // 2. Boosters Paired Comparison (e.g. 0 - 15 /1k words)
+          _buildStancePair(
+            title: 'Epistemic Boosters',
+            subtitle: 'E.g., "clearly shows", "definitely", "proves"',
+            userRate: comp.userBoosterRate,
+            journalRate: comp.journalBoosterRate,
+            diff: boosterDiff,
+            maxScale: 15.0,
           ),
         ],
       ),
     );
   }
-}
 
-class _StanceMetricTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-  final String userValue;
-  final String journalValue;
-  final double diff;
+  Widget _buildStancePair({
+    required String title,
+    required String subtitle,
+    required double userRate,
+    required double journalRate,
+    required double diff,
+    required double maxScale,
+  }) {
+    final absDiff = diff.abs();
+    final isMajor = (userRate == 0 && journalRate > 2.0) || absDiff > 4.0;
+    final isModerate = absDiff > 2.0 && !isMajor;
 
-  const _StanceMetricTile({
-    required this.title,
-    required this.subtitle,
-    required this.userValue,
-    required this.journalValue,
-    required this.diff,
-  });
+    Color statusColor = AppColors.green700;
+    Color statusBg = AppColors.green50;
+    String statusBadge = '✓ Match';
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceSoft,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-              fontFamily: 'Manrope',
+    if (isMajor) {
+      statusColor = AppColors.red700;
+      statusBg = AppColors.red50;
+      statusBadge = '!! Major mismatch';
+    } else if (isModerate) {
+      statusColor = const Color(0xFFD97706);
+      statusBg = const Color(0xFFFFFBEB);
+      statusBadge = '! Moderate deviation';
+    }
+
+    final userFraction = (userRate / maxScale).clamp(0.0, 1.0);
+    final journalFraction = (journalRate / maxScale).clamp(0.0, 1.0);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          alignment: WrapAlignment.spaceBetween,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 8,
+          runSpacing: 4,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 10,
+                    color: AppColors.textSubtle,
+                    fontFamily: 'Manrope',
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-          ),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.textSubtle,
-              fontFamily: 'Manrope',
+            Wrap(
+              spacing: 8,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Text(
+                  '${diff >= 0 ? "+" : ""}${diff.toStringAsFixed(1)} /1k',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: statusColor,
+                    fontFamily: 'Manrope',
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: statusBg,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    statusBadge,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color: statusColor,
+                      fontFamily: 'Manrope',
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 16,
-            runSpacing: 6,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'MANUSCRIPT',
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textSubtle,
-                      fontFamily: 'Manrope',
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    userValue,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
-                      fontFamily: 'Manrope',
-                    ),
-                  ),
-                ],
+          ],
+        ),
+        const SizedBox(height: 8),
+
+        // Manuscript Bar
+        Row(
+          children: [
+            const SizedBox(
+              width: 90,
+              child: Text(
+                'Manuscript',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textSecondary,
+                  fontFamily: 'Manrope',
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'JOURNAL',
-                    style: TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textSubtle,
-                      fontFamily: 'Manrope',
+            ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: Container(
+                  height: 10,
+                  color: AppColors.surfaceSoft,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: userFraction,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: isMajor ? AppColors.red700 : AppColors.primary,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 2),
-                  Text(
-                    journalValue,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textMuted,
-                      fontFamily: 'Manrope',
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+            const SizedBox(width: 10),
+            SizedBox(
+              width: 55,
+              child: Text(
+                '${userRate.toStringAsFixed(1)} /1k',
+                textAlign: TextAlign.end,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 4),
+
+        // Journal Profile Bar
+        Row(
+          children: [
+            const SizedBox(
+              width: 90,
+              child: Text(
+                'Journal Median',
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textSubtle,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+            ),
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(3),
+                child: Container(
+                  height: 10,
+                  color: AppColors.surfaceSoft,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: FractionallySizedBox(
+                      widthFactor: journalFraction,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: AppColors.slate400,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            SizedBox(
+              width: 55,
+              child: Text(
+                '${journalRate.toStringAsFixed(1)} /1k',
+                textAlign: TextAlign.end,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textMuted,
+                  fontFamily: 'Manrope',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

@@ -175,6 +175,13 @@ class _JournalsViewState extends State<JournalsView> {
         : (issnL != null ? [issnL] : <String>[]);
     final publisher = journal['publisher']?.toString();
     final homepage = journal['homepage_url']?.toString();
+    final worksCount = journal['works_count'] is int
+        ? journal['works_count'] as int
+        : int.tryParse(journal['works_count']?.toString() ?? '0') ?? 0;
+    final citedByCount = journal['cited_by_count'] is int
+        ? journal['cited_by_count'] as int
+        : int.tryParse(journal['cited_by_count']?.toString() ?? '0') ?? 0;
+    final field = journal['field']?.toString();
 
     setState(() {
       _importingIds.add(openalexId);
@@ -188,6 +195,9 @@ class _JournalsViewState extends State<JournalsView> {
         issns: issns,
         publisher: publisher,
         homepageUrl: homepage,
+        worksCount: worksCount,
+        citedByCount: citedByCount,
+        field: field,
       );
 
       if (!mounted) return;
@@ -397,6 +407,8 @@ class _JournalsViewState extends State<JournalsView> {
                               publisher: publisherController.text.trim().isNotEmpty
                                   ? publisherController.text.trim()
                                   : 'Academic Publisher',
+                              worksCount: 0, // Fallback if manually typed
+                              citedByCount: 0,
                             );
 
                             if (ctx.mounted) Navigator.of(ctx).pop();

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../domain/entities/analysis_pipeline_models.dart';
+import '../../domain/entities/manuscript_check_result.dart';
 import '../../domain/usecases/check_manuscript_usecase.dart';
 import '../../domain/usecases/get_available_journals_usecase.dart';
 import 'student_manuscript_checker_state.dart';
@@ -26,14 +28,18 @@ class StudentManuscriptCheckerCubit
     emit(current.copyWith(isLoadingJournals: true));
     try {
       final journals = await getAvailableJournalsUseCase!();
-      emit(current.copyWith(
-        availableJournals: journals,
-        isLoadingJournals: false,
-        selectedJournalId:
-            current.selectedJournalId ?? (journals.isNotEmpty ? journals.first.id : null),
-        selectedJournalTitle: current.selectedJournalTitle ??
-            (journals.isNotEmpty ? journals.first.title : null),
-      ));
+      emit(
+        current.copyWith(
+          availableJournals: journals,
+          isLoadingJournals: false,
+          selectedJournalId:
+              current.selectedJournalId ??
+              (journals.isNotEmpty ? journals.first.id : null),
+          selectedJournalTitle:
+              current.selectedJournalTitle ??
+              (journals.isNotEmpty ? journals.first.title : null),
+        ),
+      );
     } catch (_) {
       emit(current.copyWith(isLoadingJournals: false));
     }
@@ -42,10 +48,12 @@ class StudentManuscriptCheckerCubit
   void selectJournal(String journalId, String journalTitle) {
     final current = state;
     if (current is StudentManuscriptCheckerInitial) {
-      emit(current.copyWith(
-        selectedJournalId: journalId,
-        selectedJournalTitle: journalTitle,
-      ));
+      emit(
+        current.copyWith(
+          selectedJournalId: journalId,
+          selectedJournalTitle: journalTitle,
+        ),
+      );
     }
   }
 
@@ -59,10 +67,7 @@ class StudentManuscriptCheckerCubit
   void setPickedFile(String name, List<int> bytes) {
     final current = state;
     if (current is StudentManuscriptCheckerInitial) {
-      emit(current.copyWith(
-        fileName: name,
-        fileBytes: bytes,
-      ));
+      emit(current.copyWith(fileName: name, fileBytes: bytes));
     }
   }
 
@@ -89,10 +94,14 @@ class StudentManuscriptCheckerCubit
     String? title = journalTitle;
 
     if (current is StudentManuscriptCheckerInitial) {
-      if (bytes.isEmpty && current.fileBytes != null && current.fileBytes!.isNotEmpty) {
+      if (bytes.isEmpty &&
+          current.fileBytes != null &&
+          current.fileBytes!.isNotEmpty) {
         bytes = current.fileBytes!;
         name = current.fileName ?? 'manuscript.txt';
-      } else if (bytes.isEmpty && current.draftText != null && current.draftText!.trim().isNotEmpty) {
+      } else if (bytes.isEmpty &&
+          current.draftText != null &&
+          current.draftText!.trim().isNotEmpty) {
         bytes = utf8.encode(current.draftText!.trim());
         name = 'manuscript.txt';
       }
@@ -106,18 +115,23 @@ class StudentManuscriptCheckerCubit
     }
 
     if (journalId.trim().isEmpty) {
-      emit(const StudentManuscriptCheckerFailure(
-        message: 'Please select or enter a target journal ID.',
-        statusCode: 400,
-      ));
+      emit(
+        const StudentManuscriptCheckerFailure(
+          message: 'Please select or enter a target journal ID.',
+          statusCode: 400,
+        ),
+      );
       return;
     }
 
     if (bytes.isEmpty) {
-      emit(const StudentManuscriptCheckerFailure(
-        message: 'Please provide manuscript text or select a manuscript file.',
-        statusCode: 400,
-      ));
+      emit(
+        const StudentManuscriptCheckerFailure(
+          message:
+              'Please provide manuscript text or select a manuscript file.',
+          statusCode: 400,
+        ),
+      );
       return;
     }
 
@@ -125,36 +139,85 @@ class StudentManuscriptCheckerCubit
       name = 'manuscript.txt';
     }
 
-    emit(const StudentManuscriptCheckerLoading());
+    var pipelineProgress = AnalysisPipelineProgress.initial();
+
+    emit(
+      StudentManuscriptCheckerLoading(
+        message: pipelineProgress.currentMessage,
+        targetJournalTitle: title,
+        manuscriptFileName: name,
+        pipelineProgress: pipelineProgress,
+      ),
+    );
 
     try {
-      final result = await checkManuscriptUseCase(
+      ManuscriptCheckResult? finalResult;
+
+      await for (final event in checkManuscriptUseCase.callStream(
         fileBytes: bytes,
         filename: name,
         targetJournalId: journalId.trim(),
         includeExemplars: exemplars,
-      );
+      )) {
+        pipelineProgress = pipelineProgress.updateWithEvent(event);
 
-      if (result.sectionScores.isEmpty &&
-          result.warnings.isEmpty &&
-          result.suitabilityScore == 0) {
-        emit(const StudentManuscriptCheckerEmpty(
-          message:
-              'The manuscript does not contain any readable sections or recognizable content.',
-        ));
-      } else {
-        emit(StudentManuscriptCheckerSuccess(
-          result: result,
-          targetJournalId: journalId,
-          targetJournalTitle: title,
-          manuscriptFileName: name,
+        emit(
+          StudentManuscriptCheckerLoading(
+            message: pipelineProgress.currentMessage,
+            targetJournalTitle: title,
+            manuscriptFileName: name,
+            pipelineProgress: pipelineProgress,
+          ),
+        );
+
+        if (pipelineProgress.isFailed) {
+          emit(
+            StudentManuscriptCheckerFailure(
+              message: pipelineProgress.failureMessage ?? 'Analysis failed.',
+            ),
+          );
+          return;
+        }
+
+        if (pipelineProgress.isCompleted && pipelineProgress.result != null) {
+          finalResult = pipelineProgress.result;
+          break;
+        }
+      }
+
+      if (finalResult == null) {
+        finalResult = await checkManuscriptUseCase(
+          fileBytes: bytes,
+          filename: name,
+          targetJournalId: journalId.trim(),
           includeExemplars: exemplars,
-        ));
+        );
+      }
+
+      // Give user smooth visual transition after completion
+      await Future<void>.delayed(const Duration(milliseconds: 600));
+
+      if (finalResult.sectionScores.isEmpty &&
+          finalResult.warnings.isEmpty &&
+          finalResult.suitabilityScore == 0) {
+        emit(
+          const StudentManuscriptCheckerEmpty(
+            message: 'The manuscript does not contain any readable sections or recognizable content.',
+          ),
+        );
+      } else {
+        emit(
+          StudentManuscriptCheckerSuccess(
+            result: finalResult,
+            targetJournalId: journalId,
+            targetJournalTitle: title,
+            manuscriptFileName: name,
+            includeExemplars: exemplars,
+          ),
+        );
       }
     } catch (e) {
-      emit(StudentManuscriptCheckerFailure(
-        message: _cleanMessage(e),
-      ));
+      emit(StudentManuscriptCheckerFailure(message: _cleanMessage(e)));
     }
   }
 
@@ -162,11 +225,13 @@ class StudentManuscriptCheckerCubit
   void reset() {
     final current = state;
     if (current is StudentManuscriptCheckerSuccess) {
-      emit(StudentManuscriptCheckerInitial(
-        selectedJournalId: current.targetJournalId,
-        selectedJournalTitle: current.targetJournalTitle,
-        includeExemplars: current.includeExemplars,
-      ));
+      emit(
+        StudentManuscriptCheckerInitial(
+          selectedJournalId: current.targetJournalId,
+          selectedJournalTitle: current.targetJournalTitle,
+          includeExemplars: current.includeExemplars,
+        ),
+      );
     } else {
       emit(const StudentManuscriptCheckerInitial());
     }
