@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../views/journals_view.dart';
 import '../views/style_and_corpus_view.dart';
@@ -71,10 +73,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                     children: [
                       Text(
                         context.l10n.triggerMiningDesc,
-                        style: const TextStyle(fontSize: 13, color: AppColors.textMuted, fontFamily: 'Manrope'),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textMuted,
+                          fontFamily: 'Manrope',
+                        ),
                       ),
                       const SizedBox(height: 20),
-                      Text(context.l10n.issnOrJournalName, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                      Text(
+                        context.l10n.issnOrJournalName,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          fontFamily: 'Manrope',
+                        ),
+                      ),
                       const SizedBox(height: 6),
                       TextField(
                         controller: journalController,
@@ -89,16 +102,40 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(context.l10n.fromYear, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                                Text(
+                                  context.l10n.fromYear,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<int>(
                                   initialValue: yearStart,
-                                  decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
-                                  items: [2018, 2019, 2020, 2021, 2022].map((y) {
-                                    return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
+                                  decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 10,
+                                    ),
+                                  ),
+                                  items: [2018, 2019, 2020, 2021, 2022].map((
+                                    y,
+                                  ) {
+                                    return DropdownMenuItem(
+                                      value: y,
+                                      child: Text(
+                                        '$y',
+                                        style: const TextStyle(
+                                          fontFamily: 'Manrope',
+                                        ),
+                                      ),
+                                    );
                                   }).toList(),
                                   onChanged: (val) {
-                                    if (val != null) setModalState(() => yearStart = val);
+                                    if (val != null) {
+                                      setModalState(() => yearStart = val);
+                                    }
                                   },
                                 ),
                               ],
@@ -109,16 +146,38 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(context.l10n.toYear, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                                Text(
+                                  context.l10n.toYear,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 13,
+                                    fontFamily: 'Manrope',
+                                  ),
+                                ),
                                 const SizedBox(height: 6),
                                 DropdownButtonFormField<int>(
                                   initialValue: yearEnd,
-                                  decoration: const InputDecoration(contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 10)),
+                                  decoration: const InputDecoration(
+                                    contentPadding: EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 10,
+                                    ),
+                                  ),
                                   items: [2023, 2024, 2025, 2026].map((y) {
-                                    return DropdownMenuItem(value: y, child: Text('$y', style: const TextStyle(fontFamily: 'Manrope')));
+                                    return DropdownMenuItem(
+                                      value: y,
+                                      child: Text(
+                                        '$y',
+                                        style: const TextStyle(
+                                          fontFamily: 'Manrope',
+                                        ),
+                                      ),
+                                    );
                                   }).toList(),
                                   onChanged: (val) {
-                                    if (val != null) setModalState(() => yearEnd = val);
+                                    if (val != null) {
+                                      setModalState(() => yearEnd = val);
+                                    }
                                   },
                                 ),
                               ],
@@ -130,10 +189,21 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(context.l10n.targetPapersCount, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, fontFamily: 'Manrope')),
+                          Text(
+                            context.l10n.targetPapersCount,
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 13,
+                              fontFamily: 'Manrope',
+                            ),
+                          ),
                           Text(
                             '${targetPapers.toInt()} ${context.l10n.papersUnit}',
-                            style: const TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary, fontFamily: 'Manrope'),
+                            style: const TextStyle(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.primary,
+                              fontFamily: 'Manrope',
+                            ),
                           ),
                         ],
                       ),
@@ -143,7 +213,8 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                         max: 500,
                         divisions: 9,
                         activeColor: AppColors.primary,
-                        onChanged: (val) => setModalState(() => targetPapers = val),
+                        onChanged: (val) =>
+                            setModalState(() => targetPapers = val),
                       ),
                     ],
                   ),
@@ -158,12 +229,14 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                   onPressed: () {
                     final successMsg = context.l10n.analysisTriggeredSuccess;
                     Navigator.of(ctx).pop();
-                    _navigateToTab(2, subTabIndex: 0); // Navigate to Tab 2 (Job Monitor logs)
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(successMsg),
-                        behavior: SnackBarBehavior.floating,
-                      ),
+                    _navigateToTab(
+                      2,
+                      subTabIndex: 0,
+                    ); // Navigate to Tab 2 (Job Monitor logs)
+                    AppNotification.showSuccess(
+                      context,
+                      successMsg,
+                      title: context.l10n.success,
                     );
                   },
                   child: Text(context.l10n.startAnalysis),
@@ -236,9 +309,7 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
                       selectedIndex: _selectedIndex,
                       onNewJobPressed: _showTriggerAnalysisDialog,
                     ),
-                    Expanded(
-                      child: _buildActiveView(),
-                    ),
+                    Expanded(child: _buildActiveView()),
                   ],
                 ),
               ),
@@ -251,7 +322,9 @@ class _AdminDashboardPageState extends State<AdminDashboardPage> {
             scrollDirection: Axis.horizontal,
             child: SizedBox(
               width: _minDashboardWidth,
-              height: constraints.hasBoundedHeight ? constraints.maxHeight : null,
+              height: constraints.hasBoundedHeight
+                  ? constraints.maxHeight
+                  : null,
               child: dashboardScaffold,
             ),
           );

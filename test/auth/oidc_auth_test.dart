@@ -22,11 +22,11 @@ void main() {
       expect(a, isNot(equals(b)));
     });
 
-    test('code challenge is BASE64URL(SHA256(verifier)) without padding',
-        () {
+    test('code challenge is BASE64URL(SHA256(verifier)) without padding', () {
       // RFC 7636 appendix B test vector.
       final challenge = OidcAuthUrlBuilder.createCodeChallenge(
-          'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk');
+        'dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk',
+      );
       expect(challenge, 'E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM');
       expect(challenge.contains('='), isFalse);
     });
@@ -80,56 +80,69 @@ void main() {
   group('parseAuthCallback', () {
     const storedState = 'stored-state-123';
     Uri cbUri([Map<String, String>? extra]) => Uri(
-        scheme: 'http',
-        host: 'localhost',
-        port: 3003,
-        path: '/auth/callback',
-        queryParameters: {'code': 'auth-code-1', ...?extra});
+      scheme: 'http',
+      host: 'localhost',
+      port: 3003,
+      path: '/auth/callback',
+      queryParameters: {'code': 'auth-code-1', ...?extra},
+    );
 
     test('valid code and state parse', () {
-      final cb = parseAuthCallback(cbUri({'state': storedState}),
-          storedState: storedState);
+      final cb = parseAuthCallback(
+        cbUri({'state': storedState}),
+        storedState: storedState,
+      );
       expect(cb.code, 'auth-code-1');
       expect(cb.state, storedState);
     });
 
     test('invalid state (mismatch) is rejected', () {
       expect(
-          () => parseAuthCallback(cbUri({'state': 'attacker'}),
-              storedState: storedState),
-          throwsA(isA<ServerException>()));
+        () => parseAuthCallback(
+          cbUri({'state': 'attacker'}),
+          storedState: storedState,
+        ),
+        throwsA(isA<ServerException>()),
+      );
     });
 
     test('missing state param is rejected', () {
-      expect(() => parseAuthCallback(cbUri(), storedState: storedState),
-          throwsA(isA<ServerException>()));
+      expect(
+        () => parseAuthCallback(cbUri(), storedState: storedState),
+        throwsA(isA<ServerException>()),
+      );
     });
 
     test('no stored state (fresh session / consumed) is rejected', () {
       expect(
-          () => parseAuthCallback(cbUri({'state': storedState}),
-              storedState: null),
-          throwsA(isA<ServerException>()));
+        () =>
+            parseAuthCallback(cbUri({'state': storedState}), storedState: null),
+        throwsA(isA<ServerException>()),
+      );
       expect(
-          () => parseAuthCallback(cbUri({'state': storedState}),
-              storedState: ''),
-          throwsA(isA<ServerException>()));
+        () => parseAuthCallback(cbUri({'state': storedState}), storedState: ''),
+        throwsA(isA<ServerException>()),
+      );
     });
 
     test('missing code is rejected', () {
       expect(
-          () => parseAuthCallback(
-              Uri.parse('http://localhost:3003/auth/callback?state=$storedState'),
-              storedState: storedState),
-          throwsA(isA<ServerException>()));
+        () => parseAuthCallback(
+          Uri.parse('http://localhost:3003/auth/callback?state=$storedState'),
+          storedState: storedState,
+        ),
+        throwsA(isA<ServerException>()),
+      );
     });
 
     test('SSO error param (e.g. access_denied) is rejected', () {
       expect(
-          () => parseAuthCallback(
-              Uri.parse('http://localhost:3003/auth/callback?error=access_denied'),
-              storedState: storedState),
-          throwsA(isA<ServerException>()));
+        () => parseAuthCallback(
+          Uri.parse('http://localhost:3003/auth/callback?error=access_denied'),
+          storedState: storedState,
+        ),
+        throwsA(isA<ServerException>()),
+      );
     });
   });
 }

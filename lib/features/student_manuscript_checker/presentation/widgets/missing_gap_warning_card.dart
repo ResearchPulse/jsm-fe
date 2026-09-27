@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_colors.dart';
 import '../../domain/entities/warning_item.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class MissingGapWarningCard extends StatelessWidget {
   final List<WarningItem> gapWarnings;
 
-  const MissingGapWarningCard({
-    super.key,
-    required this.gapWarnings,
-  });
+  const MissingGapWarningCard({super.key, required this.gapWarnings});
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +55,7 @@ class MissingGapWarningCard extends StatelessWidget {
                         Text(
                           primaryGap.title.isNotEmpty
                               ? primaryGap.title
-                              : 'Missing Research Gap Detected',
+                              : context.l10n.missingResearchGapTitle,
                           style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w700,
@@ -67,7 +65,9 @@ class MissingGapWarningCard extends StatelessWidget {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
+                            horizontal: 8,
+                            vertical: 3,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.red700,
                             borderRadius: BorderRadius.circular(6),
@@ -132,10 +132,10 @@ class MissingGapWarningCard extends StatelessWidget {
                         color: AppColors.primary,
                       ),
                       const SizedBox(width: 6),
-                      const Expanded(
+                      Expanded(
                         child: Text(
-                          'Validated Journal Exemplar',
-                          style: TextStyle(
+                          context.l10n.publishedExemplar,
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
                             color: AppColors.primary,
@@ -147,7 +147,9 @@ class MissingGapWarningCard extends StatelessWidget {
                       if (exemplar.doi != null && exemplar.doi!.isNotEmpty)
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 2),
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
                           decoration: BoxDecoration(
                             color: AppColors.primarySoft,
                             borderRadius: BorderRadius.circular(4),

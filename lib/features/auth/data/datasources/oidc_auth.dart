@@ -19,16 +19,18 @@ class OidcAuthUrlBuilder {
         'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
     final rnd = Random.secure();
     return List.generate(
-        length, (_) => chars[rnd.nextInt(chars.length)]).join();
+      length,
+      (_) => chars[rnd.nextInt(chars.length)],
+    ).join();
   }
 
   static String createCodeVerifier() => _randomString(64);
   static String createState() => _randomString(32);
 
   /// code_challenge = BASE64URL(SHA256(code_verifier)), no padding.
-  static String createCodeChallenge(String codeVerifier) =>
-      base64Url.encode(sha256.convert(utf8.encode(codeVerifier)).bytes)
-          .replaceAll('=', '');
+  static String createCodeChallenge(String codeVerifier) => base64Url
+      .encode(sha256.convert(utf8.encode(codeVerifier)).bytes)
+      .replaceAll('=', '');
 
   /// A pending authorization request: the state and PKCE verifier that must
   /// be persisted (sessionStorage on web) before redirecting away.
@@ -54,8 +56,10 @@ class OidcAuthUrlBuilder {
       'code_challenge_method': 'S256',
     };
     final query = params.entries
-        .map((e) =>
-            '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}')
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value)}',
+        )
         .join('&');
     return '${ApiEndpoints.ssoIssuer}/api/v1/oidc/authorize?$query';
   }

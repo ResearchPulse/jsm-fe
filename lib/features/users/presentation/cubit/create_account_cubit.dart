@@ -36,7 +36,7 @@ class CreateAccountCubit extends Cubit<CreateAccountState> {
   final CreateAccountUseCase createAccount;
 
   CreateAccountCubit({required this.createAccount})
-      : super(CreateAccountInitial());
+    : super(CreateAccountInitial());
 
   Future<void> submit({
     required UserRole role,

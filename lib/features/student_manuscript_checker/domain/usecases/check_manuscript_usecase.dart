@@ -19,4 +19,18 @@ class CheckManuscriptUseCase {
       includeExemplars: includeExemplars,
     );
   }
+
+  Stream<Map<String, dynamic>> callStream({
+    required List<int> fileBytes,
+    required String filename,
+    required String targetJournalId,
+    bool includeExemplars = false,
+  }) {
+    return repository.checkManuscriptStream(
+      fileBytes: fileBytes,
+      filename: filename,
+      targetJournalId: targetJournalId,
+      includeExemplars: includeExemplars,
+    );
+  }
 }

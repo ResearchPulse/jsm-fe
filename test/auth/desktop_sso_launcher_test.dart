@@ -24,16 +24,18 @@ void main() {
         client: MockClient((request) async {
           if (request.url.path.endsWith('/oidc/token')) {
             return http.Response(
-                jsonEncode({
-                  'access_token': 'at',
-                  'token_type': 'Bearer',
-                  'expires_in': 3600,
-                }),
-                200);
+              jsonEncode({
+                'access_token': 'at',
+                'token_type': 'Bearer',
+                'expires_in': 3600,
+              }),
+              200,
+            );
           }
           return http.Response(
-              jsonEncode({'sub': 'sub-9', 'email': 'd@e.f', 'name': 'D E'}),
-              200);
+            jsonEncode({'sub': 'sub-9', 'email': 'd@e.f', 'name': 'D E'}),
+            200,
+          );
         }),
       ),
     );
@@ -49,7 +51,10 @@ void main() {
     // Simulate the SSO server redirecting the user's browser back.
     final client = HttpClient();
     final request = await client.getUrl(
-        Uri.parse('http://localhost:$testPort/auth/callback?code=c1&state=$state'));
+      Uri.parse(
+        'http://localhost:$testPort/auth/callback?code=c1&state=$state',
+      ),
+    );
     final response = await request.close();
     await response.drain<void>();
     client.close();
@@ -67,14 +72,16 @@ void main() {
       browserLauncher: (_) async => true,
       apiClient: OidcApiClient(
         client: MockClient(
-            (request) async => fail('exchange must not run on bad state')),
+          (request) async => fail('exchange must not run on bad state'),
+        ),
       ),
     );
     await launcher.start(AuthProvider.web);
 
     final client = HttpClient();
-    final request = await client
-        .getUrl(Uri.parse('http://localhost:$testPort/auth/callback?code=c1&state=evil'));
+    final request = await client.getUrl(
+      Uri.parse('http://localhost:$testPort/auth/callback?code=c1&state=evil'),
+    );
     await (await request.close()).drain<void>();
     client.close();
 

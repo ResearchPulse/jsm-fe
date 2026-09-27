@@ -1,109 +1,97 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
-import '../../../../core/localization/app_localizations.dart';
-import '../../../../core/widgets/language_switcher.dart';
-import '../../../admin/presentation/pages/admin_dashboard_page.dart';
-import '../../../auth/presentation/cubit/auth_cubit.dart';
+import '../../../student_manuscript_checker/presentation/pages/evaluation_history_page.dart';
+import '../../../student_manuscript_checker/presentation/pages/journal_recommendations_page.dart';
+import '../../../student_manuscript_checker/presentation/pages/student_manuscript_checker_page.dart';
+import '../widgets/user_header.dart';
+import '../widgets/user_sidebar.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
   @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+  bool _isSidebarCollapsed = false;
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  Widget _buildActiveTab() {
+    switch (_selectedIndex) {
+      case 0:
+        return const StudentManuscriptCheckerPage(showAppBar: false);
+      case 1:
+        return const JournalRecommendationsPage();
+      case 2:
+        return EvaluationHistoryPage(
+          onNewCheckRequested: () => _navigateToTab(0),
+        );
+      default:
+        return const StudentManuscriptCheckerPage(showAppBar: false);
+    }
+  }
+
+  static const double _minDashboardWidth = 1024.0;
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(context.l10n.journalDashboardTitle),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const AdminDashboardPage(),
-                  ),
-                );
-              },
-              icon: const Icon(
-                Icons.admin_panel_settings_rounded,
-                size: 16,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 1100;
+        final effectiveCollapsed = isNarrow || _isSidebarCollapsed;
+
+        final scaffold = Scaffold(
+          backgroundColor: AppColors.background,
+          body: Row(
+            children: [
+              // User Sidebar
+              UserSidebar(
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: _navigateToTab,
+                isCollapsed: effectiveCollapsed,
+                onToggleCollapse: () {
+                  setState(() {
+                    _isSidebarCollapsed = !_isSidebarCollapsed;
+                  });
+                },
               ),
-              label: Text(context.l10n.adminDashboard),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+
+              // Main content area
+              Expanded(
+                child: Column(
+                  children: [
+                    UserHeader(selectedIndex: _selectedIndex),
+                    Expanded(child: _buildActiveTab()),
+                  ],
                 ),
               ),
-            ),
+            ],
           ),
-          IconButton(
-            tooltip: context.l10n.signOut,
-            icon: const Icon(Icons.logout),
-            onPressed: () => context.read<AuthCubit>().logout(),
-          ),
-          const SizedBox(width: 4),
-          const Padding(
-            padding: EdgeInsets.only(right: 12),
-            child: LanguageSwitcher(),
-          ),
-        ],
-      ),
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/user-info');
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(context.l10n.user),
+        );
+
+        if (constraints.maxWidth < _minDashboardWidth) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: _minDashboardWidth,
+              height: constraints.hasBoundedHeight
+                  ? constraints.maxHeight
+                  : null,
+              child: scaffold,
             ),
-            const SizedBox(width: 16),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const AdminDashboardPage(),
-                  ),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              child: Text(context.l10n.admin),
-            ),
-            const SizedBox(width: 16),
-            ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).pushNamed('/student-checker');
-              },
-              icon: const Icon(
-                Icons.spellcheck_rounded,
-                size: 16,
-              ),
-              label: Text(context.l10n.checker),
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+          );
+        }
+
+        return scaffold;
+      },
     );
   }
-}
+}

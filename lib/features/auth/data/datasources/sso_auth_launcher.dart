@@ -22,9 +22,9 @@ class SsoAuthLauncher implements AuthLauncher {
     OidcAuthUrlBuilder? urlBuilder,
     OidcApiClient? apiClient,
     SsoSessionStore? store,
-  })  : urlBuilder = urlBuilder ?? const OidcAuthUrlBuilder(),
-        apiClient = apiClient ?? OidcApiClient(),
-        store = store ?? createSsoSessionStore();
+  }) : urlBuilder = urlBuilder ?? const OidcAuthUrlBuilder(),
+       apiClient = apiClient ?? OidcApiClient(),
+       store = store ?? createSsoSessionStore();
 
   @override
   Future<void> start(AuthProvider provider) async {
@@ -42,8 +42,9 @@ class SsoAuthLauncher implements AuthLauncher {
       provider: provider,
       redirectUri: redirectUri,
       state: pending.state,
-      codeChallenge:
-          OidcAuthUrlBuilder.createCodeChallenge(pending.codeVerifier),
+      codeChallenge: OidcAuthUrlBuilder.createCodeChallenge(
+        pending.codeVerifier,
+      ),
     );
     BrowserSso.navigate(url);
   }
@@ -52,8 +53,7 @@ class SsoAuthLauncher implements AuthLauncher {
   Future<AuthResult> completeFromCallback() async {
     final uri = BrowserSso.currentUri();
     if (uri.path != '/auth/callback') {
-      throw const AuthLauncherException(
-          'No login callback in progress.');
+      throw const AuthLauncherException('No login callback in progress.');
     }
     final String? stored;
     try {
@@ -123,10 +123,12 @@ class SsoAuthLauncher implements AuthLauncher {
       return null;
     }
     try {
-      final tokens =
-          SsoTokens.fromJson(jsonDecode(tokensJson) as Map<String, dynamic>);
-      final profile =
-          SsoUserInfo.fromJson(jsonDecode(userJson) as Map<String, dynamic>);
+      final tokens = SsoTokens.fromJson(
+        jsonDecode(tokensJson) as Map<String, dynamic>,
+      );
+      final profile = SsoUserInfo.fromJson(
+        jsonDecode(userJson) as Map<String, dynamic>,
+      );
       if (tokens.isExpired) {
         // ponytail: no refresh-token flow yet; add when the SSO server
         // supports refresh_token grant and the app needs longer sessions.
@@ -168,8 +170,9 @@ class AuthSessionSnapshot {
 }
 
 AuthUser _toAuthUser(SsoUserInfo info) => AuthUser(
-      sub: info.sub,
-      email: info.email,
-      name: info.name,
-      picture: info.picture,
-    );
+  sub: info.sub,
+  email: info.email,
+  name: info.name,
+  picture: info.picture,
+  role: info.role,
+);

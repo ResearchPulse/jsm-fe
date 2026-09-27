@@ -83,6 +83,27 @@ class AuthCubit extends Cubit<AuthState> {
     emit(AuthLoggedOut());
   }
 
+  /// Mock authentication for dev/testing: seeds an authenticated session with a specified role.
+  Future<void> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  }) async {
+    emit(AuthLoading());
+    try {
+      final user = await repository.mockLogin(
+        sub: sub,
+        email: email,
+        name: name,
+        role: role,
+      );
+      emit(AuthAuthenticated(user: user));
+    } catch (e) {
+      emit(AuthFailure(message: _sanitize(e)));
+    }
+  }
+
   /// Maps any error to a user-safe message: exception text from the data
   /// layer never contains tokens, but keep this as the single funnel so
   /// raw internals are not surfaced verbatim.

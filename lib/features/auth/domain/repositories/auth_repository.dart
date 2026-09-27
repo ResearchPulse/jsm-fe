@@ -36,6 +36,15 @@ abstract class AuthRepository {
   /// The stored SSO access token for calling protected backend endpoints,
   /// or null when not authenticated.
   Future<String?> currentToken();
+
+  /// Mock login for dev/testing: seeds an authenticated session with a mock SSO token
+  /// and user profile having the specified [role].
+  Future<AuthUser> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  });
 }
 
 /// A persisted authenticated session: user plus the SSO-issued token(s).
@@ -45,9 +54,5 @@ class AuthSession {
   final String? accessToken;
   final String? refreshToken;
 
-  const AuthSession({
-    required this.user,
-    this.accessToken,
-    this.refreshToken,
-  });
+  const AuthSession({required this.user, this.accessToken, this.refreshToken});
 }

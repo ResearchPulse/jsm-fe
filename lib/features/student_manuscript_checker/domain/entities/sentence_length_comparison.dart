@@ -55,10 +55,10 @@ class SentenceLengthComparison extends Equatable {
 
   @override
   List<Object?> get props => [
-        userMedian,
-        journalMedian,
-        journalP10,
-        journalP90,
-        status,
-      ];
+    userMedian,
+    journalMedian,
+    journalP10,
+    journalP90,
+    status,
+  ];
 }

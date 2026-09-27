@@ -7,8 +7,8 @@ class LocaleCubit extends Cubit<Locale> {
   final LocaleStorage _storage;
 
   LocaleCubit({LocaleStorage? storage})
-      : _storage = storage ?? LocaleStorage(),
-        super(const Locale('en')) {
+    : _storage = storage ?? LocaleStorage(),
+      super(const Locale('en')) {
     _loadSavedLocale();
   }
 

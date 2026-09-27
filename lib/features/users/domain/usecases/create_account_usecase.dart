@@ -11,11 +11,10 @@ class CreateAccountUseCase {
     required String email,
     required String fullName,
     required String password,
-  }) =>
-      repository.createAccount(
-        role: role,
-        email: email,
-        fullName: fullName,
-        password: password,
-      );
+  }) => repository.createAccount(
+    role: role,
+    email: email,
+    fullName: fullName,
+    password: password,
+  );
 }

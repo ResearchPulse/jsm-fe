@@ -13,7 +13,8 @@ class _FakeApiClient extends StudentManuscriptApiClient {
   ManuscriptCheckResult? resultToReturn;
   List<TargetJournal>? journalsToReturn;
 
-  _FakeApiClient() : super(client: MockClient((_) async => http.Response('', 200)));
+  _FakeApiClient()
+    : super(client: MockClient((_) async => http.Response('', 200)));
 
   @override
   Future<ManuscriptCheckResult> checkManuscript({
@@ -37,34 +38,34 @@ class _FakeApiClient extends StudentManuscriptApiClient {
   Future<List<TargetJournal>> getAvailableJournals() async {
     if (errorToThrow != null) throw errorToThrow!;
     return journalsToReturn ??
-        const [
-          TargetJournal(id: 'j1', title: 'Target Journal 1'),
-        ];
+        const [TargetJournal(id: 'j1', title: 'Target Journal 1')];
   }
 }
 
 void main() {
   group('StudentManuscriptRepositoryImpl', () {
-    test('validation: throws ServerException if targetJournalId is blank',
-        () async {
-      final fakeClient = _FakeApiClient();
-      final repo = StudentManuscriptRepositoryImpl.withClient(fakeClient);
+    test(
+      'validation: throws ServerException if targetJournalId is blank',
+      () async {
+        final fakeClient = _FakeApiClient();
+        final repo = StudentManuscriptRepositoryImpl.withClient(fakeClient);
 
-      await expectLater(
-        repo.checkManuscript(
-          fileBytes: [1, 2, 3],
-          filename: 'draft.txt',
-          targetJournalId: '   ',
-        ),
-        throwsA(
-          isA<ServerException>().having(
-            (e) => e.message,
-            'message',
-            contains('target journal'),
+        await expectLater(
+          repo.checkManuscript(
+            fileBytes: [1, 2, 3],
+            filename: 'draft.txt',
+            targetJournalId: '   ',
           ),
-        ),
-      );
-    });
+          throwsA(
+            isA<ServerException>().having(
+              (e) => e.message,
+              'message',
+              contains('target journal'),
+            ),
+          ),
+        );
+      },
+    );
 
     test('validation: throws ServerException if fileBytes is empty', () async {
       final fakeClient = _FakeApiClient();
@@ -86,22 +87,24 @@ void main() {
       );
     });
 
-    test('success: delegates to client with default filename if empty',
-        () async {
-      final fakeClient = _FakeApiClient();
-      final repo = StudentManuscriptRepositoryImpl.withClient(fakeClient);
+    test(
+      'success: delegates to client with default filename if empty',
+      () async {
+        final fakeClient = _FakeApiClient();
+        final repo = StudentManuscriptRepositoryImpl.withClient(fakeClient);
 
-      final result = await repo.checkManuscript(
-        fileBytes: [65, 66, 67],
-        filename: '',
-        targetJournalId: 'j-uuid',
-        includeExemplars: true,
-      );
+        final result = await repo.checkManuscript(
+          fileBytes: [65, 66, 67],
+          filename: '',
+          targetJournalId: 'j-uuid',
+          includeExemplars: true,
+        );
 
-      expect(result.suitabilityScore, 80.0);
-      expect(result.ratingLevel, 'MODERATE_ALIGNMENT');
-      expect(result.isModerate, isTrue);
-    });
+        expect(result.suitabilityScore, 80.0);
+        expect(result.ratingLevel, 'MODERATE_ALIGNMENT');
+        expect(result.isModerate, isTrue);
+      },
+    );
 
     test('getAvailableJournals delegates to apiClient', () async {
       final fakeClient = _FakeApiClient();

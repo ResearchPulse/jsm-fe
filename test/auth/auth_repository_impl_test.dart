@@ -38,7 +38,8 @@ class _FakeLauncher implements AuthLauncher {
   Object? startError;
   Object? callbackError;
   AuthResult? callbackResult = AuthResult(
-      user: AuthUser(sub: 'u1', email: 'user@example.com'));
+    user: AuthUser(sub: 'u1', email: 'user@example.com'),
+  );
   AuthProvider? startedProvider;
   bool completeCalled = false;
 
@@ -59,8 +60,8 @@ class _FakeLauncher implements AuthLauncher {
 void main() {
   setUp(() {
     // Simulate a /auth/callback page load (tests never touch a browser).
-    BrowserSso.currentUri =
-        () => Uri.parse('http://localhost:3003/auth/callback?code=c&state=s');
+    BrowserSso.currentUri = () =>
+        Uri.parse('http://localhost:3003/auth/callback?code=c&state=s');
   });
 
   test('login delegates to the launcher (redirect issued)', () async {
@@ -75,7 +76,9 @@ void main() {
       ..startError = const ServerException('no browser', 500);
     final repo = AuthRepositoryImpl(launcher: launcher);
     await expectLater(
-        repo.login(AuthProvider.web), throwsA(isA<ServerException>()));
+      repo.login(AuthProvider.web),
+      throwsA(isA<ServerException>()),
+    );
   });
 
   test('handleCallback delegates to the launcher', () async {
@@ -86,14 +89,18 @@ void main() {
     expect(result?.user.sub, 'u1');
   });
 
-  test('handleCallback returns null when missing callback code or error param', () async {
-    BrowserSso.currentUri = () => Uri.parse('http://localhost:3003/auth/callback');
-    final launcher = _FakeLauncher();
-    final repo = AuthRepositoryImpl(launcher: launcher);
-    final result = await repo.handleCallback();
-    expect(result, isNull);
-    expect(launcher.completeCalled, isFalse);
-  });
+  test(
+    'handleCallback returns null when missing callback code or error param',
+    () async {
+      BrowserSso.currentUri = () =>
+          Uri.parse('http://localhost:3003/auth/callback');
+      final launcher = _FakeLauncher();
+      final repo = AuthRepositoryImpl(launcher: launcher);
+      final result = await repo.handleCallback();
+      expect(result, isNull);
+      expect(launcher.completeCalled, isFalse);
+    },
+  );
 
   test('restoreSession returns null when nothing stored', () async {
     final repo = AuthRepositoryImpl(launcher: _FakeLauncher());
@@ -103,19 +110,25 @@ void main() {
   test('restoreSession restores stored tokens + userinfo', () async {
     final store = _MemoryStore();
     final repo = AuthRepositoryImpl(
-        launcher: SsoAuthLauncher(
-      store: store,
-      apiClient: OidcApiClient(
-        client: _neverCalledClient(),
+      launcher: SsoAuthLauncher(
+        store: store,
+        apiClient: OidcApiClient(client: _neverCalledClient()),
       ),
-    ));
-    store.write(SsoSessionKeys.tokens,
-        jsonEncode(SsoTokens(accessToken: 'at').toJson()));
-    store.write(SsoSessionKeys.user, jsonEncode(const SsoUserInfo(
-      sub: 'u1',
-      email: 'user@example.com',
-      name: 'Example User',
-    ).toJson()));
+    );
+    store.write(
+      SsoSessionKeys.tokens,
+      jsonEncode(SsoTokens(accessToken: 'at').toJson()),
+    );
+    store.write(
+      SsoSessionKeys.user,
+      jsonEncode(
+        const SsoUserInfo(
+          sub: 'u1',
+          email: 'user@example.com',
+          name: 'Example User',
+        ).toJson(),
+      ),
+    );
 
     final session = await repo.restoreSession();
     expect(session, isNotNull);
@@ -128,16 +141,26 @@ void main() {
   test('restoreSession ignores expired tokens', () async {
     final store = _MemoryStore();
     final repo = AuthRepositoryImpl(
-        launcher: SsoAuthLauncher(
-            store: store, apiClient: OidcApiClient(client: _neverCalledClient())));
+      launcher: SsoAuthLauncher(
+        store: store,
+        apiClient: OidcApiClient(client: _neverCalledClient()),
+      ),
+    );
     store.write(
-        SsoSessionKeys.tokens,
-        jsonEncode(SsoTokens(
+      SsoSessionKeys.tokens,
+      jsonEncode(
+        SsoTokens(
           accessToken: 'at',
-          expiresAtMs:
-              DateTime.now().subtract(const Duration(hours: 1)).millisecondsSinceEpoch,
-        ).toJson()));
-    store.write(SsoSessionKeys.user, jsonEncode(const SsoUserInfo(sub: 'u1').toJson()));
+          expiresAtMs: DateTime.now()
+              .subtract(const Duration(hours: 1))
+              .millisecondsSinceEpoch,
+        ).toJson(),
+      ),
+    );
+    store.write(
+      SsoSessionKeys.user,
+      jsonEncode(const SsoUserInfo(sub: 'u1').toJson()),
+    );
 
     expect(await repo.restoreSession(), isNull);
     // Expired data must be cleared, not kept for the next restore.
@@ -147,8 +170,11 @@ void main() {
   test('logout clears all stored session state', () async {
     final store = _MemoryStore();
     final repo = AuthRepositoryImpl(
-        launcher: SsoAuthLauncher(store: store),
-        httpClient: MockClient((req) async => http.Response('{"message":"ok"}', 200)));
+      launcher: SsoAuthLauncher(store: store),
+      httpClient: MockClient(
+        (req) async => http.Response('{"message":"ok"}', 200),
+      ),
+    );
     store.write(SsoSessionKeys.pendingRequest, '{}');
     store.write(SsoSessionKeys.tokens, '{"access_token":"at"}');
     store.write(SsoSessionKeys.user, '{"sub":"u1"}');
@@ -160,14 +186,17 @@ void main() {
   test('logout never throws even if the store is broken', () async {
     final store = _BrokenStore();
     final repo = AuthRepositoryImpl(
-        launcher: SsoAuthLauncher(store: store),
-        httpClient: MockClient((req) async => http.Response('{"message":"ok"}', 200)));
+      launcher: SsoAuthLauncher(store: store),
+      httpClient: MockClient(
+        (req) async => http.Response('{"message":"ok"}', 200),
+      ),
+    );
     await repo.logout(); // must not throw
   });
 }
 
-http.Client _neverCalledClient() => MockClient(
-    (req) async => fail('network must not be called in this test'));
+http.Client _neverCalledClient() =>
+    MockClient((req) async => fail('network must not be called in this test'));
 
 class _BrokenStore implements SsoSessionStore {
   @override

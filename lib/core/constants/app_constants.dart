@@ -1,5 +1,17 @@
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 class AppConstants {
   AppConstants._();
+
+  static bool get isProduction {
+    if (dotenv.isInitialized) {
+      final envVal = dotenv.maybeGet('IS_PRODUCTION');
+      if (envVal != null) {
+        return envVal.toLowerCase() == 'true';
+      }
+    }
+    return const bool.fromEnvironment('IS_PRODUCTION', defaultValue: false);
+  }
 
   static const String appName = 'Journal Publication Trend';
   static const int connectTimeoutSeconds = 30;

@@ -13,10 +13,7 @@ void main() {
       'rating_level': 'EXCELLENT_ALIGNMENT',
       'summary':
           'The manuscript shows excellent alignment with the target journal.',
-      'section_scores': {
-        'INTRO': 92.0,
-        'METHODS': 85.0,
-      },
+      'section_scores': {'INTRO': 92.0, 'METHODS': 85.0},
       'feature_comparison': {
         'sentence_length': {
           'user_median': 18.5,
@@ -26,10 +23,10 @@ void main() {
           'status': 'WITHIN_RANGE',
         },
         'voice_and_person': {
-          'user_passive_rate': 0.25,
-          'journal_passive_rate': 0.22,
-          'user_we_rate': 0.05,
-          'journal_we_rate': 0.08,
+          'user_passive_rate': 25.0,
+          'journal_passive_rate': 22.0,
+          'user_we_rate': 5.0,
+          'journal_we_rate': 8.0,
         },
         'additional': {
           'stance': {
@@ -56,100 +53,110 @@ void main() {
       ],
     };
 
-    test('success: posts multipart file with target_journal_id and bearer token',
-        () async {
-      Uri? capturedUri;
-      String? capturedAuth;
-      final capturedFields = <String, String>{};
-      final capturedFiles = <String>[];
+    test(
+      'success: posts multipart file with target_journal_id and bearer token',
+      () async {
+        Uri? capturedUri;
+        String? capturedAuth;
+        final capturedFields = <String, String>{};
+        final capturedFiles = <String>[];
 
-      final mockClient = MockClient.streaming((request, bodyStream) async {
-        capturedUri = request.url;
-        capturedAuth = request.headers['Authorization'];
-        if (request is http.MultipartRequest) {
-          capturedFields.addAll(request.fields);
-          capturedFiles.addAll(request.files.map((f) => f.field));
-        }
-        final bytes = utf8.encode(jsonEncode({
-          'success': true,
-          'data': sampleResultData,
-          'message': 'Manuscript suitability check completed.',
-        }));
-        return http.StreamedResponse(
-          Stream.value(bytes),
-          200,
-          headers: {'content-type': 'application/json'},
+        final mockClient = MockClient.streaming((request, bodyStream) async {
+          capturedUri = request.url;
+          capturedAuth = request.headers['Authorization'];
+          if (request is http.MultipartRequest) {
+            capturedFields.addAll(request.fields);
+            capturedFiles.addAll(request.files.map((f) => f.field));
+          }
+          final bytes = utf8.encode(
+            jsonEncode({
+              'success': true,
+              'data': sampleResultData,
+              'message': 'Manuscript suitability check completed.',
+            }),
+          );
+          return http.StreamedResponse(
+            Stream.value(bytes),
+            200,
+            headers: {'content-type': 'application/json'},
+          );
+        });
+
+        final client = StudentManuscriptApiClient(
+          tokenProvider: () async => 'sso-token-xyz',
+          client: mockClient,
         );
-      });
 
-      final client = StudentManuscriptApiClient(
-        tokenProvider: () async => 'sso-token-xyz',
-        client: mockClient,
-      );
-
-      final result = await client.checkManuscript(
-        fileBytes: utf8.encode('Introduction\nDraft manuscript content.'),
-        filename: 'test_draft.txt',
-        targetJournalId: 'j-uuid-1234',
-        includeExemplars: true,
-      );
-
-      expect(
-          capturedUri!.toString(), contains('/api/v1/student/manuscript/check'));
-      expect(capturedAuth, 'Bearer sso-token-xyz');
-      expect(capturedFields['target_journal_id'], 'j-uuid-1234');
-      expect(capturedFields['include_exemplars'], 'true');
-      expect(capturedFiles, contains('file'));
-
-      expect(result.suitabilityScore, 88.5);
-      expect(result.ratingLevel, 'EXCELLENT_ALIGNMENT');
-      expect(result.ratingLabel, 'Excellent Alignment');
-      expect(result.isExcellent, isTrue);
-      expect(result.summary, contains('excellent alignment'));
-      expect(result.sectionScores['INTRO'], 92.0);
-      expect(result.featureComparison.sentenceLength?.userMedian, 18.5);
-      expect(result.featureComparison.voiceAndPerson?.userPassiveRate, 0.25);
-      expect(result.featureComparison.stance?.userHedgeRate, 12.0);
-      expect(result.warnings.length, 1);
-      expect(result.hasMissingGap, isTrue);
-      expect(result.validatedExemplars.length, 1);
-      expect(result.validatedExemplars.first.doi, '10.1234/example');
-    });
-
-    test('failure: backend 404 surfaces error message as ServerException',
-        () async {
-      final mockClient = MockClient.streaming((request, bodyStream) async {
-        final bytes = utf8.encode(jsonEncode({
-          'success': false,
-          'error': {
-            'code': 'NOT_FOUND',
-            'message': 'Journal with ID j-999 not found',
-          },
-        }));
-        return http.StreamedResponse(
-          Stream.value(bytes),
-          404,
-          headers: {'content-type': 'application/json'},
+        final result = await client.checkManuscript(
+          fileBytes: utf8.encode('Introduction\nDraft manuscript content.'),
+          filename: 'test_draft.txt',
+          targetJournalId: 'j-uuid-1234',
+          includeExemplars: true,
         );
-      });
 
-      final client = StudentManuscriptApiClient(client: mockClient);
+        expect(
+          capturedUri!.toString(),
+          contains('/api/v1/student/manuscript/check'),
+        );
+        expect(capturedAuth, 'Bearer sso-token-xyz');
+        expect(capturedFields['target_journal_id'], 'j-uuid-1234');
+        expect(capturedFields['include_exemplars'], 'true');
+        expect(capturedFiles, contains('file'));
 
-      await expectLater(
-        client.checkManuscript(
-          fileBytes: [1, 2, 3],
-          filename: 'draft.txt',
-          targetJournalId: 'j-999',
-        ),
-        throwsA(
-          isA<ServerException>().having(
-            (e) => e.message,
-            'message',
-            'Journal with ID j-999 not found',
+        expect(result.suitabilityScore, 88.5);
+        expect(result.ratingLevel, 'EXCELLENT_ALIGNMENT');
+        expect(result.ratingLabel, 'Excellent Alignment');
+        expect(result.isExcellent, isTrue);
+        expect(result.summary, contains('excellent alignment'));
+        expect(result.sectionScores['INTRO'], 92.0);
+        expect(result.featureComparison.sentenceLength?.userMedian, 18.5);
+        expect(result.featureComparison.voiceAndPerson?.userPassiveRate, 25.0);
+        expect(result.featureComparison.stance?.userHedgeRate, 12.0);
+        expect(result.warnings.length, 1);
+        expect(result.hasMissingGap, isTrue);
+        expect(result.validatedExemplars.length, 1);
+        expect(result.validatedExemplars.first.doi, '10.1234/example');
+      },
+    );
+
+    test(
+      'failure: backend 404 surfaces error message as ServerException',
+      () async {
+        final mockClient = MockClient.streaming((request, bodyStream) async {
+          final bytes = utf8.encode(
+            jsonEncode({
+              'success': false,
+              'error': {
+                'code': 'NOT_FOUND',
+                'message': 'Journal with ID j-999 not found',
+              },
+            }),
+          );
+          return http.StreamedResponse(
+            Stream.value(bytes),
+            404,
+            headers: {'content-type': 'application/json'},
+          );
+        });
+
+        final client = StudentManuscriptApiClient(client: mockClient);
+
+        await expectLater(
+          client.checkManuscript(
+            fileBytes: [1, 2, 3],
+            filename: 'draft.txt',
+            targetJournalId: 'j-999',
           ),
-        ),
-      );
-    });
+          throwsA(
+            isA<ServerException>().having(
+              (e) => e.message,
+              'message',
+              'Journal with ID j-999 not found',
+            ),
+          ),
+        );
+      },
+    );
 
     test('failure: network error throws NetworkException', () async {
       final mockClient = MockClient.streaming((request, bodyStream) async {
@@ -179,10 +186,7 @@ void main() {
                 'title': 'IEEE TSE',
                 'domain': 'Software Engineering',
               },
-              {
-                'id': 'j2',
-                'title': 'ACM TOSEM',
-              },
+              {'id': 'j2', 'title': 'ACM TOSEM'},
             ],
           }),
           200,

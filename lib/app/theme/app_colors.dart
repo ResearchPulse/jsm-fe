@@ -58,6 +58,10 @@ class AppColors {
   static const Color successBorder = green100;
   static const Color successSurface = green50;
 
+  static const Color warning = Color(0xFFB45309);
+  static const Color warningBorder = Color(0xFFFDE68A);
+  static const Color warningSurface = Color(0xFFFFFBEB);
+
   static const Color primaryAccent = blue600;
   static const Color statusSuccess = green700;
   static const Color statusError = red700;
@@ -69,7 +73,9 @@ class AppColors {
   static const Color sidebarBorder = Color(0xFFE8EEF2);
   static const Color sidebarSectionText = Color(0xFF8B9AA4);
   static const Color sidebarHover = Color(0xFFF7F9FA);
-  static const Color sidebarActive = Color(0xFFE1F0FA); // Soft blue selection pill
+  static const Color sidebarActive = Color(
+    0xFFE1F0FA,
+  ); // Soft blue selection pill
   static const Color sidebarActiveText = blue600; // #0071bc
   static const Color sidebarActiveIcon = blue600;
   static const Color sidebarTextActive = blue600;

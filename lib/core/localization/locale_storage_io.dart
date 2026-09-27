@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'locale_storage.dart';
 
 class IoLocaleStorage implements LocaleStorage {
@@ -6,7 +7,8 @@ class IoLocaleStorage implements LocaleStorage {
 
   File? _getConfigFile() {
     try {
-      final appData = Platform.environment['APPDATA'] ??
+      final appData =
+          Platform.environment['APPDATA'] ??
           Platform.environment['LOCALAPPDATA'] ??
           Platform.environment['HOME'] ??
           Directory.current.path;

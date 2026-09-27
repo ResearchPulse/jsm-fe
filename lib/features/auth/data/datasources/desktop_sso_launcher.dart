@@ -40,7 +40,10 @@ Future<bool> defaultDesktopBrowserLauncher(String url) async {
 
     // 2. Fallback to rundll32 url.dll,FileProtocolHandler (preserves '&' and query parameters)
     try {
-      final res = await Process.run('rundll32', ['url.dll,FileProtocolHandler', url]);
+      final res = await Process.run('rundll32', [
+        'url.dll,FileProtocolHandler',
+        url,
+      ]);
       if (res.exitCode == 0) return true;
     } catch (_) {}
 
@@ -85,9 +88,9 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
     super.apiClient,
     SsoSessionStore? store,
     BrowserLauncher? browserLauncher,
-  })  : listenPort = listenPort ?? _defaultPort(),
-        browserLauncher = browserLauncher ?? defaultDesktopBrowserLauncher,
-        super(store: store ?? MemorySsoSessionStore());
+  }) : listenPort = listenPort ?? _defaultPort(),
+       browserLauncher = browserLauncher ?? defaultDesktopBrowserLauncher,
+       super(store: store ?? MemorySsoSessionStore());
 
   static int _defaultPort() {
     final configured = Uri.tryParse(ApiEndpoints.ssoRedirectUri)?.port;
@@ -105,14 +108,18 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
     final pending = OidcAuthUrlBuilder.createPendingRequest();
     store.write(
       SsoSessionKeys.pendingRequest,
-      jsonEncode({'state': pending.state, 'code_verifier': pending.codeVerifier}),
+      jsonEncode({
+        'state': pending.state,
+        'code_verifier': pending.codeVerifier,
+      }),
     );
     final url = urlBuilder.build(
       provider: provider,
       redirectUri: redirectUri,
       state: pending.state,
-      codeChallenge:
-          OidcAuthUrlBuilder.createCodeChallenge(pending.codeVerifier),
+      codeChallenge: OidcAuthUrlBuilder.createCodeChallenge(
+        pending.codeVerifier,
+      ),
     );
     final ok = await browserLauncher(url);
     if (!ok) {
@@ -127,7 +134,8 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
     final uri = await _callback.future.timeout(
       const Duration(minutes: 5),
       onTimeout: () => throw const AuthLauncherException(
-          'Login timed out. Please try again.'),
+        'Login timed out. Please try again.',
+      ),
     );
     return completeFromLoopbackCallback(uri);
   }
@@ -135,13 +143,13 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
   Future<void> _startLoopbackServer() async {
     if (_server != null) return;
     try {
-      _server = await HttpServer.bind(
-          InternetAddress.loopbackIPv4, listenPort);
+      _server = await HttpServer.bind(InternetAddress.loopbackIPv4, listenPort);
     } on SocketException {
       // Port busy: a previous server may still be running; reuse it.
       if (_server != null) return;
       throw AuthLauncherException(
-          'Port $listenPort is already in use. Close other apps and retry.');
+        'Port $listenPort is already in use. Close other apps and retry.',
+      );
     }
     _server!.listen((request) async {
       final uri = Uri.parse('http://localhost:$listenPort${request.uri}');
@@ -160,8 +168,7 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
     // Reuse the parent class validation/exchange by temporarily pointing the
     // browser seam at the loopback callback URI.
     BrowserSso.currentUri = () => uri;
-    BrowserSso.redirectUri =
-        () => 'http://localhost:$listenPort/auth/callback';
+    BrowserSso.redirectUri = () => 'http://localhost:$listenPort/auth/callback';
     BrowserSso.cleanHistory = () {};
     try {
       return await completeFromCallback();
@@ -176,16 +183,18 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
 
   Future<void> _respondBrowserPage(HttpRequest request, bool success) async {
     request.response.headers.contentType = ContentType.html;
-    request.response.write(success
-        ? '<!DOCTYPE html><html><head><meta charset="utf-8">'
-            '<title>Login Successful</title>'
-            '<script>setTimeout(function(){window.close();}, 800);</script>'
-            '</head><body style="font-family:sans-serif;text-align:center;padding-top:80px">'
-            '<h2 style="color:#2e7d32;">&#10004; Đăng nhập thành công</h2>'
-            '<p>Cửa sổ này sẽ tự động đóng và quay lại ứng dụng.</p>'
-            '<script>window.close();</script></body></html>'
-        : '<!DOCTYPE html><html><body style="font-family:sans-serif;padding-top:80px">'
-            '<p>Waiting for sign-in&hellip;</p></body></html>');
+    request.response.write(
+      success
+          ? '<!DOCTYPE html><html><head><meta charset="utf-8">'
+                '<title>Login Successful</title>'
+                '<script>setTimeout(function(){window.close();}, 800);</script>'
+                '</head><body style="font-family:sans-serif;text-align:center;padding-top:80px">'
+                '<h2 style="color:#2e7d32;">&#10004; Đăng nhập thành công</h2>'
+                '<p>Cửa sổ này sẽ tự động đóng và quay lại ứng dụng.</p>'
+                '<script>window.close();</script></body></html>'
+          : '<!DOCTYPE html><html><body style="font-family:sans-serif;padding-top:80px">'
+                '<p>Waiting for sign-in&hellip;</p></body></html>',
+    );
     await request.response.close();
   }
 

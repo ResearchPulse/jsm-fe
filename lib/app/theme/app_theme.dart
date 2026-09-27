@@ -1,8 +1,19 @@
 import 'package:flutter/material.dart';
+
 import 'app_colors.dart';
 
 class AppTheme {
   AppTheme._();
+
+  /// Primary font family used across the application.
+  static const String primaryFontFamily = 'Manrope';
+
+  /// Secondary / fallback font family.
+  static const String secondaryFontFamily = 'Roboto';
+
+  /// Font fallback chain – tried in order when the primary font
+  /// lacks a glyph or fails to load.
+  static const List<String> fontFallback = ['Roboto', 'Arial', 'sans-serif'];
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -15,7 +26,8 @@ class AppTheme {
         error: AppColors.error,
       ),
       scaffoldBackgroundColor: AppColors.background,
-      fontFamily: 'Manrope',
+      fontFamily: primaryFontFamily,
+      fontFamilyFallback: fontFallback,
       appBarTheme: const AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -25,7 +37,8 @@ class AppTheme {
           color: AppColors.textPrimary,
           fontSize: 16,
           fontWeight: FontWeight.w700,
-          fontFamily: 'Manrope',
+          fontFamily: primaryFontFamily,
+          fontFamilyFallback: fontFallback,
           letterSpacing: -0.2,
         ),
         iconTheme: IconThemeData(color: AppColors.textPrimary),
@@ -51,7 +64,8 @@ class AppTheme {
           textStyle: const TextStyle(
             fontWeight: FontWeight.w600,
             fontSize: 14,
-            fontFamily: 'Manrope',
+            fontFamily: primaryFontFamily,
+            fontFamilyFallback: fontFallback,
             letterSpacing: -0.1,
           ),
         ),
@@ -67,14 +81,18 @@ class AppTheme {
           textStyle: const TextStyle(
             fontWeight: FontWeight.w500,
             fontSize: 13,
-            fontFamily: 'Manrope',
+            fontFamily: primaryFontFamily,
+            fontFamilyFallback: fontFallback,
           ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surface,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppColors.border),

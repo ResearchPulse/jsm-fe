@@ -1,5 +1,7 @@
 import 'dart:convert';
+
 import 'package:http/http.dart' as http;
+
 import '../../../../core/constants/api_endpoints.dart';
 import '../../../../core/errors/exceptions.dart';
 
@@ -9,10 +11,8 @@ class AdminApiClient {
   final http.Client _client;
   final Future<String?> Function()? tokenProvider;
 
-  AdminApiClient({
-    this.tokenProvider,
-    http.Client? client,
-  }) : _client = client ?? http.Client();
+  AdminApiClient({this.tokenProvider, http.Client? client})
+    : _client = client ?? http.Client();
 
   Future<Map<String, String>> _headers() async {
     final token = tokenProvider != null ? await tokenProvider!() : null;
@@ -29,10 +29,13 @@ class AdminApiClient {
     int perPage = 50,
   }) async {
     try {
-      final uri = Uri.parse('${ApiEndpoints.adminJournals}?page=$page&per_page=$perPage');
+      final uri = Uri.parse(
+        '${ApiEndpoints.adminJournals}?page=$page&per_page=$perPage',
+      );
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is List) {
           return data.whereType<Map<String, dynamic>>().toList();
@@ -45,12 +48,17 @@ class AdminApiClient {
     }
   }
 
-  Future<List<Map<String, dynamic>>> searchOpenAlexJournals(String query) async {
+  Future<List<Map<String, dynamic>>> searchOpenAlexJournals(
+    String query,
+  ) async {
     try {
-      final uri = Uri.parse('${ApiEndpoints.adminOpenAlexJournals}?search=${Uri.encodeComponent(query)}');
+      final uri = Uri.parse(
+        '${ApiEndpoints.adminOpenAlexJournals}?search=${Uri.encodeComponent(query)}',
+      );
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is Map<String, dynamic>) {
           final list = data['items'] ?? data['results'];
@@ -72,6 +80,9 @@ class AdminApiClient {
     List<String>? issns,
     String? publisher,
     String? homepageUrl,
+    int? worksCount,
+    int? citedByCount,
+    String? field,
   }) async {
     try {
       final uri = Uri.parse(ApiEndpoints.adminImportJournal);
@@ -85,10 +96,14 @@ class AdminApiClient {
           'issns': issns ?? (issnL != null ? [issnL] : []),
           'publisher': publisher,
           'homepage_url': homepageUrl,
+          'works_count': ?worksCount,
+          'cited_by_count': ?citedByCount,
+          'field': ?field,
         }),
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         return (body['data'] as Map<String, dynamic>?) ?? {};
       }
       throw ServerException('Lỗi khi đăng ký tạp chí', res.statusCode);
@@ -104,7 +119,8 @@ class AdminApiClient {
       final uri = Uri.parse(ApiEndpoints.adminConfigurations);
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is List) {
           return data.whereType<Map<String, dynamic>>().toList();
@@ -140,7 +156,8 @@ class AdminApiClient {
         }),
       );
       if (res.statusCode == 200 || res.statusCode == 201) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         return (body['data'] as Map<String, dynamic>?) ?? {};
       }
       throw ServerException('Lỗi khi tạo cấu hình', res.statusCode);
@@ -164,15 +181,16 @@ class AdminApiClient {
         uri,
         headers: await _headers(),
         body: jsonEncode({
-          if (yearFrom != null) 'year_from': yearFrom,
-          if (yearTo != null) 'year_to': yearTo,
-          if (targetArticles != null) 'target_articles': targetArticles,
-          if (domain != null) 'domain': domain,
-          if (isActive != null) 'is_active': isActive,
+          'year_from': ?yearFrom,
+          'year_to': ?yearTo,
+          'target_articles': ?targetArticles,
+          'domain': ?domain,
+          'is_active': ?isActive,
         }),
       );
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         return (body['data'] as Map<String, dynamic>?) ?? {};
       }
       throw ServerException('Lỗi khi cập nhật cấu hình', res.statusCode);
@@ -197,13 +215,19 @@ class AdminApiClient {
 
   Future<Map<String, dynamic>> triggerAnalysis(String configId) async {
     try {
-      final uri = Uri.parse('${ApiEndpoints.adminConfigurations}/$configId/analyze');
+      final uri = Uri.parse(
+        '${ApiEndpoints.adminConfigurations}/$configId/analyze',
+      );
       final res = await _client.post(uri, headers: await _headers());
       if (res.statusCode == 200 || res.statusCode == 201) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         return (body['data'] as Map<String, dynamic>?) ?? {};
       }
-      throw ServerException('Không thể kích hoạt tác vụ phân tích', res.statusCode);
+      throw ServerException(
+        'Không thể kích hoạt tác vụ phân tích',
+        res.statusCode,
+      );
     } catch (e) {
       if (e is ServerException) rethrow;
       throw NetworkException('Lỗi kết nối máy chủ: $e');
@@ -224,7 +248,8 @@ class AdminApiClient {
       final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}$qs');
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is List) {
           return data.whereType<Map<String, dynamic>>().toList();
@@ -242,7 +267,8 @@ class AdminApiClient {
       final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}/$jobId/metrics');
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         return (body['data'] as Map<String, dynamic>?) ?? {};
       }
       return {};
@@ -260,10 +286,13 @@ class AdminApiClient {
     try {
       final queryParams = <String>['page=$page', 'per_page=$perPage'];
       if (status != null) queryParams.add('status=$status');
-      final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}/$jobId/articles?${queryParams.join('&')}');
+      final uri = Uri.parse(
+        '${ApiEndpoints.adminAnalysisJobs}/$jobId/articles?${queryParams.join('&')}',
+      );
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is List) {
           return data.whereType<Map<String, dynamic>>().toList();
@@ -280,7 +309,8 @@ class AdminApiClient {
       final uri = Uri.parse('${ApiEndpoints.adminAnalysisJobs}/$jobId/retry');
       final res = await _client.post(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'] as Map<String, dynamic>?;
         return (data?['retried_count'] as num?)?.toInt() ?? 0;
       }
@@ -316,7 +346,8 @@ class AdminApiClient {
       final uri = Uri.parse(ApiEndpoints.adminSnapshots);
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is List) {
           return data.whereType<Map<String, dynamic>>().toList();
@@ -329,13 +360,16 @@ class AdminApiClient {
   }
 
   // ── 5. Style Profiles Review ──────────────────────────────────
-  Future<List<Map<String, dynamic>>> getStyleProfiles({String? journalId}) async {
+  Future<List<Map<String, dynamic>>> getStyleProfiles({
+    String? journalId,
+  }) async {
     try {
       final qs = journalId != null ? '?journal_id=$journalId' : '';
       final uri = Uri.parse('${ApiEndpoints.adminStyleProfiles}$qs');
       final res = await _client.get(uri, headers: await _headers());
       if (res.statusCode == 200) {
-        final body = jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
+        final body =
+            jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         final data = body['data'];
         if (data is List) {
           return data.whereType<Map<String, dynamic>>().toList();

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../app/theme/app_colors.dart';
+import '../../../../core/constants/app_constants.dart';
+import '../../../../core/widgets/app_notification.dart';
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/widgets/language_switcher.dart';
 import '../../domain/entities/auth_provider.dart';
@@ -46,15 +48,13 @@ class _LoginViewState extends State<LoginView>
       curve: const Interval(0.0, 0.75, curve: Curves.easeOutCubic),
     );
 
-    _cardSlide = Tween<Offset>(
-      begin: const Offset(0, 0.04),
-      end: Offset.zero,
-    ).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 0.85, curve: Curves.easeOutCubic),
-      ),
-    );
+    _cardSlide = Tween<Offset>(begin: const Offset(0, 0.04), end: Offset.zero)
+        .animate(
+          CurvedAnimation(
+            parent: _controller,
+            curve: const Interval(0.0, 0.85, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _emblemScale = Tween<double>(begin: 0.7, end: 1.0).animate(
       CurvedAnimation(
@@ -142,30 +142,20 @@ class _LoginViewState extends State<LoginView>
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 16,
+                ),
                 child: Row(
                   children: [
                     // Brand Logo
-                    Container(
-                      width: 34,
-                      height: 34,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.primary.withAlpha(50),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.auto_stories_rounded,
-                          size: 18,
-                          color: Colors.white,
-                        ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.asset(
+                        'assets/images/app_logo.png',
+                        width: 34,
+                        height: 34,
+                        fit: BoxFit.contain,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -197,7 +187,9 @@ class _LoginViewState extends State<LoginView>
                     const Spacer(),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
+                        horizontal: 10,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.surface,
                         borderRadius: BorderRadius.circular(16),
@@ -241,31 +233,10 @@ class _LoginViewState extends State<LoginView>
                 child: BlocConsumer<AuthCubit, AuthState>(
                   listener: (context, state) {
                     if (state is AuthFailure) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: AppColors.error,
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          content: Row(
-                            children: [
-                              const Icon(Icons.error_outline_rounded,
-                                  color: Colors.white, size: 18),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  state.message,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 13,
-                                    fontFamily: 'Manrope',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      AppNotification.showError(
+                        context,
+                        state.message,
+                        title: context.l10n.loginFailedTitle,
                       );
                     }
                   },
@@ -297,7 +268,9 @@ class _LoginViewState extends State<LoginView>
                                 ],
                               ),
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 32),
+                                horizontal: 24,
+                                vertical: 32,
+                              ),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
@@ -341,9 +314,7 @@ class _LoginViewState extends State<LoginView>
 
                                   // Subtitle
                                   Text(
-                                    context.l10n.isVietnamese
-                                        ? 'Cổng xác thực tập trung cho nghiên cứu & xuất bản tạp chí khoa học'
-                                        : 'Central authentication portal for scientific research & journal publication',
+                                    context.l10n.authPortalSubtitle,
                                     textAlign: TextAlign.center,
                                     style: const TextStyle(
                                       fontSize: 13,
@@ -357,7 +328,9 @@ class _LoginViewState extends State<LoginView>
                                   // SSO security chip
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 4),
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppColors.blue50,
                                       borderRadius: BorderRadius.circular(16),
@@ -404,27 +377,31 @@ class _LoginViewState extends State<LoginView>
                                         onPressed: busy
                                             ? null
                                             : () => _launch(
-                                                context, AuthProvider.web),
+                                                context,
+                                                AuthProvider.web,
+                                              ),
                                         style: ElevatedButton.styleFrom(
                                           backgroundColor: AppColors.primary,
                                           foregroundColor: Colors.white,
                                           elevation: 0,
-                                          shadowColor:
-                                              AppColors.primary.withAlpha(60),
+                                          shadowColor: AppColors.primary
+                                              .withAlpha(60),
                                           shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(12),
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
                                           ),
                                         ),
                                         child: AnimatedSwitcher(
-                                          duration:
-                                              const Duration(milliseconds: 200),
+                                          duration: const Duration(
+                                            milliseconds: 200,
+                                          ),
                                           transitionBuilder:
                                               (child, animation) =>
                                                   FadeTransition(
-                                            opacity: animation,
-                                            child: child,
-                                          ),
+                                                    opacity: animation,
+                                                    child: child,
+                                                  ),
                                           child: busy
                                               ? const SizedBox(
                                                   key: ValueKey('loading'),
@@ -432,12 +409,14 @@ class _LoginViewState extends State<LoginView>
                                                   width: 20,
                                                   child:
                                                       CircularProgressIndicator(
-                                                    strokeWidth: 2,
-                                                    color: Colors.white,
-                                                  ),
+                                                        strokeWidth: 2,
+                                                        color: Colors.white,
+                                                      ),
                                                 )
                                               : Row(
-                                                  key: const ValueKey('content'),
+                                                  key: const ValueKey(
+                                                    'content',
+                                                  ),
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
@@ -463,7 +442,207 @@ class _LoginViewState extends State<LoginView>
                                     ),
                                   ),
 
-                                  const SizedBox(height: 22),
+                                  if (!AppConstants.isProduction) ...[
+                                    const SizedBox(height: 20),
+
+                                    // Divider: Test Mock Accounts
+                                    Row(
+                                      children: [
+                                        const Expanded(
+                                          child: Divider(
+                                            color: AppColors.border,
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 10,
+                                          ),
+                                          child: Text(
+                                            context.l10n.orSimulateSso,
+                                            style: const TextStyle(
+                                              fontSize: 10.5,
+                                              fontWeight: FontWeight.w700,
+                                              color: AppColors.textSubtle,
+                                              fontFamily: 'Manrope',
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ),
+                                        const Expanded(
+                                          child: Divider(
+                                            color: AppColors.border,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 14),
+
+                                    // Button Mock ADMIN
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 46,
+                                      child: OutlinedButton(
+                                        onPressed: busy
+                                            ? null
+                                            : () => context
+                                                  .read<AuthCubit>()
+                                                  .mockLogin(
+                                                    sub: 'mock-sso-admin-id',
+                                                    email: 'admin@jsm.edu.vn',
+                                                    name: context
+                                                        .l10n
+                                                        .ssoAdminRole,
+                                                    role: 'ADMIN',
+                                                  ),
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(
+                                            color: Color(0xFF7C3AED),
+                                            width: 1.5,
+                                          ),
+                                          backgroundColor: const Color(
+                                            0xFFF5F3FF,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons
+                                                  .admin_panel_settings_rounded,
+                                              size: 18,
+                                              color: Color(0xFF7C3AED),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                context.l10n.ssoAdminBtn,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF7C3AED),
+                                                  fontFamily: 'Manrope',
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFEDE9FE),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: const Text(
+                                                'ADMIN',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Color(0xFF7C3AED),
+                                                  fontFamily: 'Manrope',
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+
+                                    const SizedBox(height: 8),
+
+                                    // Button Mock USER
+                                    SizedBox(
+                                      width: double.infinity,
+                                      height: 46,
+                                      child: OutlinedButton(
+                                        onPressed: busy
+                                            ? null
+                                            : () => context
+                                                  .read<AuthCubit>()
+                                                  .mockLogin(
+                                                    sub: 'mock-sso-user-id',
+                                                    email: 'scholar.user@lab.edu.vn',
+                                                    name: context
+                                                        .l10n
+                                                        .ssoScholarRole,
+                                                    role: 'USER',
+                                                  ),
+                                        style: OutlinedButton.styleFrom(
+                                          side: const BorderSide(
+                                            color: Color(0xFF0D9488),
+                                            width: 1.5,
+                                          ),
+                                          backgroundColor: const Color(
+                                            0xFFF0FDFA,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            const Icon(
+                                              Icons.person_rounded,
+                                              size: 18,
+                                              color: Color(0xFF0D9488),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                context.l10n.ssoUserBtn,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Color(0xFF0D9488),
+                                                  fontFamily: 'Manrope',
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 6,
+                                                    vertical: 2,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                color: const Color(0xFFCCFBF1),
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                              ),
+                                              child: const Text(
+                                                'USER',
+                                                style: TextStyle(
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w800,
+                                                  color: Color(0xFF0D9488),
+                                                  fontFamily: 'Manrope',
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+
+                                  const SizedBox(height: 20),
 
                                   // Explanatory note
                                   Container(

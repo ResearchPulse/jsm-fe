@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_provider.dart';
 import 'package:jsm_fe/features/auth/domain/entities/auth_result.dart';
+import 'package:jsm_fe/features/auth/domain/entities/auth_user.dart';
 import 'package:jsm_fe/features/auth/domain/repositories/auth_repository.dart';
 import 'package:jsm_fe/features/auth/domain/usecases/login_usecase.dart';
 
@@ -25,6 +26,16 @@ class _RecordingRepo implements AuthRepository {
 
   @override
   Future<String?> currentToken() async => null;
+
+  @override
+  Future<AuthUser> mockLogin({
+    required String sub,
+    required String email,
+    required String name,
+    required String role,
+  }) async {
+    return AuthUser(sub: sub, email: email, name: name, role: role);
+  }
 }
 
 void main() {
@@ -41,8 +52,7 @@ void main() {
     final repo = _RecordingRepo()..error = Exception('no browser');
     final useCase = LoginUseCase(repo);
 
-    await expectLater(
-        useCase(AuthProvider.web), throwsA(isA<Exception>()));
+    await expectLater(useCase(AuthProvider.web), throwsA(isA<Exception>()));
     expect(repo.provider, AuthProvider.web);
   });
 }
