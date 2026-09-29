@@ -8,6 +8,6 @@ Uri currentBrowserUri() => Uri.parse('http://localhost/');
 
 void cleanCallbackFromHistory() {}
 
-void navigateToUrl(String url) {
-  defaultDesktopBrowserLauncher(url);
+Future<void> navigateToUrl(String url) async {
+  await defaultDesktopBrowserLauncher(url);
 }

@@ -53,22 +53,28 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  /// Issues the redirect to the SSO authorize page. On web the browser
-  /// navigates away; the result arrives via checkSession() on the callback
-  /// page load. If the redirect could not be issued, recoverable failure.
+  /// Starts the SSO authorize flow. Web waits for its popup to close and then
+  /// restores the session written by the callback page; desktop waits for the
+  /// loopback callback. A closed popup without a session is a login failure.
   Future<void> login(AuthProvider provider) async {
     emit(AuthLoading());
     try {
       await loginUseCase(provider);
-      // Web: the browser navigated away — nothing more to do here.
-      // Desktop: the full flow (browser + loopback callback + exchange)
-      // already finished inside the repository; pick up the session.
+      // The browser callback or desktop loopback flow should have persisted
+      // the session before the launcher returns.
       final session = await restoreSessionUseCase();
       if (session != null) {
         emit(AuthAuthenticated(user: session.user));
+      } else {
+        // The web popup can close without returning an SSO session. End the
+        // loading state and let the login page report the failed attempt.
+        emit(const AuthFailure(
+          message: 'Login was cancelled or could not be completed.',
+          showOnLoginPage: true,
+        ));
       }
     } catch (e) {
-      emit(AuthFailure(message: _sanitize(e)));
+      emit(AuthFailure(message: _sanitize(e), showOnLoginPage: true));
     }
   }
 

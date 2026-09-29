@@ -207,7 +207,7 @@ class StudentManuscriptApiClient {
       if (search != null && search.isNotEmpty) 'search': search,
     };
 
-    final uri = Uri.parse(ApiEndpoints.studentEvaluations)
+    final uri = Uri.parse(ApiEndpoints.studentEvaluationHistory)
         .replace(queryParameters: queryParams);
     final headers = <String, String>{
       'Content-Type': 'application/json',

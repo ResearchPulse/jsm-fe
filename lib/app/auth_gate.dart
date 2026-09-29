@@ -57,6 +57,7 @@ class _AuthSwitch extends StatelessWidget {
           );
         }
         if (state is AuthFailure) {
+          if (state.showOnLoginPage) return const LoginPage();
           // Recoverable error: user can retry the login flow.
           return Scaffold(
             body: ErrorView(

@@ -1553,6 +1553,9 @@ class AppLocalizations {
       : 'Suspended (access blocked)';
 
   // Login Page SSO simulation
+  String get loginCancelledMessage => isVietnamese
+      ? 'Quá trình đăng nhập đã bị hủy hoặc không thể hoàn tất.'
+      : 'The login was cancelled or could not be completed.';
   String get loginFailedTitle =>
       isVietnamese ? 'Đăng nhập thất bại' : 'Login Failed';
   String get authPortalSubtitle => isVietnamese

@@ -29,11 +29,12 @@ class AuthAuthenticated extends AuthState {
 
 class AuthFailure extends AuthState {
   final String message;
+  final bool showOnLoginPage;
 
-  const AuthFailure({required this.message});
+  const AuthFailure({required this.message, this.showOnLoginPage = false});
 
   @override
-  List<Object?> get props => [message];
+  List<Object?> get props => [message, showOnLoginPage];
 }
 
 /// User signed out (distinct from never-authenticated, for routing/logging).

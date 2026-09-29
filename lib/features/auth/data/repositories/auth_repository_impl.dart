@@ -62,7 +62,9 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<AuthResult?> handleCallback() async {
     if (!isOnCallbackPage()) return null;
-    return launcher.completeFromCallback();
+    final result = await launcher.completeFromCallback();
+    final session = await restoreSession();
+    return AuthResult(user: session?.user ?? result.user);
   }
 
   @override
@@ -71,14 +73,15 @@ class AuthRepositoryImpl implements AuthRepository {
     if (ssoLauncher is SsoAuthLauncher) {
       final snapshot = await ssoLauncher.restoreStoredSession();
       if (snapshot == null) return null;
+      final ssoUser = AuthUser(
+        sub: snapshot.userInfo.sub,
+        email: snapshot.userInfo.email,
+        name: snapshot.userInfo.name,
+        picture: snapshot.userInfo.picture,
+        role: snapshot.userInfo.role,
+      );
       return AuthSession(
-        user: AuthUser(
-          sub: snapshot.userInfo.sub,
-          email: snapshot.userInfo.email,
-          name: snapshot.userInfo.name,
-          picture: snapshot.userInfo.picture,
-          role: snapshot.userInfo.role,
-        ),
+        user: await _fetchBackendUser(ssoUser, snapshot.tokens.accessToken),
         accessToken: snapshot.tokens.accessToken,
         refreshToken: snapshot.tokens.refreshToken,
       );
@@ -104,8 +107,43 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<String?> currentToken() async {
-    final session = await restoreSession();
-    return session?.accessToken;
+    final ssoLauncher = launcher;
+    if (ssoLauncher is! SsoAuthLauncher) return null;
+    final snapshot = await ssoLauncher.restoreStoredSession();
+    return snapshot?.tokens.accessToken;
+  }
+
+  /// Reads the effective application role from the backend user record. The
+  /// SSO profile identifies the user, while the backend owns JSM permissions.
+  Future<AuthUser> _fetchBackendUser(
+    AuthUser fallback,
+    String accessToken,
+  ) async {
+    try {
+      final client = httpClient ?? http.Client();
+      final response = await client
+          .get(
+            Uri.parse('${ApiEndpoints.users}/me'),
+            headers: {'Authorization': 'Bearer $accessToken'},
+          )
+          .timeout(const Duration(seconds: 5));
+      if (response.statusCode != 200) return fallback;
+
+      final decoded = jsonDecode(response.body) as Map<String, dynamic>;
+      final profile = decoded['data'] as Map<String, dynamic>?;
+      if (profile == null) return fallback;
+      return AuthUser(
+        sub: (profile['id'] ?? fallback.sub).toString(),
+        email: profile['email'] as String? ?? fallback.email,
+        name: (profile['full_name'] ?? fallback.name) as String?,
+        picture: fallback.picture,
+        role: profile['role'] as String? ?? fallback.role,
+      );
+    } catch (_) {
+      // Authentication should still work when the JSM API is temporarily
+      // unavailable; use the profile returned by SSO in that case.
+      return fallback;
+    }
   }
 
   @override

@@ -59,6 +59,8 @@ class ApiEndpoints {
   static String get studentAvailableJournals =>
       '$baseUrl/student/available-journals';
   static String get studentEvaluations => '$baseUrl/student/evaluations';
+  static String get studentEvaluationHistory =>
+      '$baseUrl/student/evaluations/history';
   static String get studentEvaluationStats =>
       '$baseUrl/student/evaluations/stats';
   static String get studentRecommendations =>

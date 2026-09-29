@@ -34,6 +34,7 @@ class _LoginViewState extends State<LoginView>
   late final Animation<double> _cardFade;
   late final Animation<Offset> _cardSlide;
   late final Animation<double> _emblemScale;
+  String? _lastFailureMessage;
 
   @override
   void initState() {
@@ -64,6 +65,11 @@ class _LoginViewState extends State<LoginView>
     );
 
     _controller.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final state = context.read<AuthCubit>().state;
+      if (state is AuthFailure) _showFailure(context, state);
+    });
   }
 
   @override
@@ -74,6 +80,20 @@ class _LoginViewState extends State<LoginView>
 
   void _launch(BuildContext context, AuthProvider provider) {
     context.read<AuthCubit>().login(provider);
+  }
+
+  void _showFailure(BuildContext context, AuthFailure state) {
+    if (_lastFailureMessage == state.message) return;
+    _lastFailureMessage = state.message;
+    final message = state.message == 'Login was cancelled.' ||
+            state.message == 'Login was cancelled or could not be completed.'
+        ? context.l10n.loginCancelledMessage
+        : state.message;
+    AppNotification.showError(
+      context,
+      message,
+      title: context.l10n.loginFailedTitle,
+    );
   }
 
   @override
@@ -233,11 +253,7 @@ class _LoginViewState extends State<LoginView>
                 child: BlocConsumer<AuthCubit, AuthState>(
                   listener: (context, state) {
                     if (state is AuthFailure) {
-                      AppNotification.showError(
-                        context,
-                        state.message,
-                        title: context.l10n.loginFailedTitle,
-                      );
+                      _showFailure(context, state);
                     }
                   },
                   builder: (context, state) {

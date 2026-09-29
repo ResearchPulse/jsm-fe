@@ -51,6 +51,7 @@ class OidcAuthUrlBuilder {
       'redirect_uri': redirectUri,
       'response_type': 'code',
       'scope': 'openid profile email',
+      'prompt': 'select_account',
       'state': state,
       'code_challenge': codeChallenge,
       'code_challenge_method': 'S256',
