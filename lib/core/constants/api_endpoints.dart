@@ -71,7 +71,7 @@ class ApiEndpoints {
   static String get adminOpenAlexJournals => '$baseUrl/admin/journals/openalex';
   static String get adminImportJournal => '$baseUrl/admin/journals/import';
   static String get adminConfigurations =>
-      '$baseUrl/admin/journal-configurations';
+      '$baseUrl/admin/configurations';
   static String get adminAnalysisJobs => '$baseUrl/admin/analysis-jobs';
   static String get adminSnapshots => '$baseUrl/admin/snapshots';
   static String get adminStyleProfiles => '$baseUrl/admin/style-profiles';

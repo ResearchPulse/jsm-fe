@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
@@ -127,21 +128,39 @@ class AuthRepositoryImpl implements AuthRepository {
             headers: {'Authorization': 'Bearer $accessToken'},
           )
           .timeout(const Duration(seconds: 5));
-      if (response.statusCode != 200) return fallback;
+      if (response.statusCode != 200) {
+        developer.log(
+          'Could not load the current JSM user (HTTP ${response.statusCode}); '
+          'using the SSO profile role.',
+          name: 'auth',
+        );
+        return fallback;
+      }
 
       final decoded = jsonDecode(response.body) as Map<String, dynamic>;
       final profile = decoded['data'] as Map<String, dynamic>?;
-      if (profile == null) return fallback;
+      if (profile == null || profile['role'] is! String) {
+        developer.log(
+          'The current JSM user response did not include a role; '
+          'using the SSO profile role.',
+          name: 'auth',
+        );
+        return fallback;
+      }
       return AuthUser(
         sub: (profile['id'] ?? fallback.sub).toString(),
         email: profile['email'] as String? ?? fallback.email,
         name: (profile['full_name'] ?? fallback.name) as String?,
         picture: fallback.picture,
-        role: profile['role'] as String? ?? fallback.role,
+        role: profile['role'] as String,
       );
     } catch (_) {
       // Authentication should still work when the JSM API is temporarily
       // unavailable; use the profile returned by SSO in that case.
+      developer.log(
+        'Could not load the current JSM user; using the SSO profile role.',
+        name: 'auth',
+      );
       return fallback;
     }
   }

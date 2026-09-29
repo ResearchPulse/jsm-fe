@@ -114,6 +114,7 @@ void main() {
         store: store,
         apiClient: OidcApiClient(client: _neverCalledClient()),
       ),
+      httpClient: _backendUserClient('USER'),
     );
     store.write(
       SsoSessionKeys.tokens,
@@ -136,6 +137,35 @@ void main() {
     expect(session.user.email, 'user@example.com');
     expect(session.user.name, 'Example User');
     expect(session.accessToken, 'at');
+  });
+
+  test('restoreSession uses the role returned by the JSM backend', () async {
+    final store = _MemoryStore();
+    final repo = AuthRepositoryImpl(
+      launcher: SsoAuthLauncher(
+        store: store,
+        apiClient: OidcApiClient(client: _neverCalledClient()),
+      ),
+      httpClient: _backendUserClient('ADMIN'),
+    );
+    store.write(
+      SsoSessionKeys.tokens,
+      jsonEncode(SsoTokens(accessToken: 'at').toJson()),
+    );
+    store.write(
+      SsoSessionKeys.user,
+      jsonEncode(
+        const SsoUserInfo(
+          sub: 'sso-sub',
+          email: 'admin@example.com',
+          role: 'USER',
+        ).toJson(),
+      ),
+    );
+
+    final session = await repo.restoreSession();
+    expect(session?.user.role, 'ADMIN');
+    expect(session?.user.sub, 'postgres-user-id');
   });
 
   test('restoreSession ignores expired tokens', () async {
@@ -197,6 +227,22 @@ void main() {
 
 http.Client _neverCalledClient() =>
     MockClient((req) async => fail('network must not be called in this test'));
+
+http.Client _backendUserClient(String role) => MockClient((request) async {
+  expect(request.url.path, '/api/v1/users/me');
+  expect(request.headers['Authorization'], 'Bearer at');
+  return http.Response(
+    jsonEncode({
+      'data': {
+        'id': 'postgres-user-id',
+        'email': 'admin@example.com',
+        'full_name': 'Admin User',
+        'role': role,
+      },
+    }),
+    200,
+  );
+});
 
 class _BrokenStore implements SsoSessionStore {
   @override
