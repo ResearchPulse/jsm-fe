@@ -46,7 +46,7 @@ class SsoAuthLauncher implements AuthLauncher {
         pending.codeVerifier,
       ),
     );
-    BrowserSso.navigate(url);
+    await BrowserSso.navigate(url);
   }
 
   @override

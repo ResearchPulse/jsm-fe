@@ -216,10 +216,12 @@ class AdminApiClient {
   Future<Map<String, dynamic>> triggerAnalysis(String configId) async {
     try {
       final uri = Uri.parse(
-        '${ApiEndpoints.adminConfigurations}/$configId/analyze',
+        '${ApiEndpoints.adminConfigurations}/$configId/trigger',
       );
       final res = await _client.post(uri, headers: await _headers());
-      if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res.statusCode == 200 ||
+          res.statusCode == 201 ||
+          res.statusCode == 202) {
         final body =
             jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;
         return (body['data'] as Map<String, dynamic>?) ?? {};

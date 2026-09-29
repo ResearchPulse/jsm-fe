@@ -15,9 +15,25 @@ import 'sso_session_store_io.dart';
 
 typedef BrowserLauncher = Future<bool> Function(String url);
 
+/// Exit future for the dedicated Windows Edge window, when available.
+Future<void>? _defaultBrowserExit;
+Process? _defaultSsoBrowserProcess;
+
+void _closeDefaultSsoBrowser() {
+  final process = _defaultSsoBrowserProcess;
+  _defaultSsoBrowserProcess = null;
+  if (process != null) {
+    try {
+      process.kill();
+    } catch (_) {}
+  }
+}
+
 /// Launches the browser on Desktop platforms using pure dart:io (no native plugin needed).
 /// On Windows, it attempts to launch Edge in app mode for a clean embedded-window appearance.
 Future<bool> defaultDesktopBrowserLauncher(String url) async {
+  _defaultBrowserExit = null;
+  _defaultSsoBrowserProcess = null;
   if (Platform.isWindows) {
     // 1. Try launching Microsoft Edge in app mode (frameless window)
     const edgePaths = [
@@ -28,10 +44,28 @@ Future<bool> defaultDesktopBrowserLauncher(String url) async {
     for (final edgePath in edgePaths) {
       try {
         if (edgePath == 'msedge.exe' || File(edgePath).existsSync()) {
-          await Process.start(edgePath, [
+          // An isolated profile keeps this Edge process tied to the SSO
+          // window. Its exit tells the app when the user closes that window.
+          final profile = await Directory.systemTemp.createTemp('jsm_sso_');
+          final process = await Process.start(edgePath, [
+            '--user-data-dir=${profile.path}',
             '--inprivate',
+            '--disable-background-mode',
+            '--no-first-run',
             '--app=$url',
             '--window-size=520,720',
+          ]);
+          _defaultSsoBrowserProcess = process;
+          final processExit = process.exitCode.then((_) async {
+            try {
+              await profile.delete(recursive: true);
+            } catch (_) {}
+          });
+          // Edge can keep a background process alive after its app window is
+          // closed. Watch the top-level window as well as the process handle.
+          _defaultBrowserExit = Future.any<void>([
+            processExit,
+            _watchWindowsBrowserWindow(process),
           ]);
           return true;
         }
@@ -73,6 +107,38 @@ Future<bool> defaultDesktopBrowserLauncher(String url) async {
   return false;
 }
 
+Future<void> _watchWindowsBrowserWindow(Process process) async {
+  var hasSeenWindow = false;
+  var consecutiveMissingChecks = 0;
+  while (true) {
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    try {
+      final script =
+          '\$p = Get-Process -Id ${process.pid} -ErrorAction SilentlyContinue; '
+          'if (\$null -eq \$p) { Write-Output CLOSED } '
+          'elseif (\$p.MainWindowHandle -ne 0) { Write-Output OPEN } '
+          'else { Write-Output WAIT }';
+      final result = await Process.run('powershell.exe', [
+        '-NoProfile',
+        '-NonInteractive',
+        '-Command',
+        script,
+      ]);
+      final status = (result.stdout as String).trim();
+      if (status == 'CLOSED') return;
+      if (status == 'OPEN') {
+        hasSeenWindow = true;
+        consecutiveMissingChecks = 0;
+      } else if (hasSeenWindow && ++consecutiveMissingChecks >= 3) {
+        return;
+      }
+    } catch (_) {
+      // The process exit future remains as a fallback if window polling fails.
+      return;
+    }
+  }
+}
+
 /// Desktop implementation of the Central SSO flow:
 /// 1. builds the same PKCE/S256 authorize URL as the web launcher,
 /// 2. opens the user's browser in standalone app mode,
@@ -99,10 +165,15 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
   }
 
   HttpServer? _server;
-  final _callback = Completer<Uri>();
+  Completer<Uri> _callback = Completer<Uri>();
+  Future<void>? _browserClosed;
 
   @override
   Future<void> start(AuthProvider provider) async {
+    _callback = Completer<Uri>();
+    _browserClosed = null;
+    _defaultBrowserExit = null;
+    _defaultSsoBrowserProcess = null;
     await _startLoopbackServer();
     final redirectUri = 'http://localhost:$listenPort/auth/callback';
     final pending = OidcAuthUrlBuilder.createPendingRequest();
@@ -122,6 +193,7 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
       ),
     );
     final ok = await browserLauncher(url);
+    _browserClosed = _defaultBrowserExit;
     if (!ok) {
       await _server?.close(force: true);
       _server = null;
@@ -131,13 +203,28 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
 
   /// Waits for the browser redirect, then completes the SSO exchange.
   Future<AuthResult> awaitCallbackAndComplete() async {
-    final uri = await _callback.future.timeout(
-      const Duration(minutes: 5),
-      onTimeout: () => throw const AuthLauncherException(
-        'Login timed out. Please try again.',
-      ),
-    );
-    return completeFromLoopbackCallback(uri);
+    try {
+      final closed = _browserClosed;
+      final uri = await (closed == null
+          ? _callback.future
+          : Future.any([
+              _callback.future,
+              closed.then<Uri>(
+                (_) => throw const AuthLauncherException('Login was cancelled.'),
+              ),
+            ])).timeout(
+        const Duration(minutes: 5),
+        onTimeout: () => throw const AuthLauncherException(
+          'Login timed out. Please try again.',
+        ),
+      );
+      return completeFromLoopbackCallback(uri);
+    } catch (_) {
+      await _server?.close(force: true);
+      _server = null;
+      store.remove(SsoSessionKeys.pendingRequest);
+      rethrow;
+    }
   }
 
   Future<void> _startLoopbackServer() async {
@@ -174,6 +261,10 @@ class DesktopSsoLauncher extends SsoAuthLauncher {
       return await completeFromCallback();
     } finally {
       BrowserSso.resetToDefaults();
+      // Edge app windows are not script-opened, so window.close() in the
+      // callback page is ignored. Close the dedicated browser process after
+      // callback exchange finishes instead.
+      _closeDefaultSsoBrowser();
     }
   }
 

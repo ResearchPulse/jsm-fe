@@ -52,7 +52,9 @@
   <script>
     // Handle SSO callback when loaded in an embedded iframe or popup
     (function () {
-      var isCallback = window.location.pathname.indexOf('/auth/callback') !== -1 || n.search.indexOf('code=') !== -1;
+      var search = window.location.search || "";
+      var pathname = window.location.pathname || "";
+      var isCallback = pathname.indexOf("/auth/callback") !== -1 || search.indexOf("code=") !== -1;
       if (isCallback) {
         if (window.parent && window.parent !== window) {
           try {
@@ -68,7 +70,6 @@
               type: 'SSO_CALLBACK',
               href: window.location.href
             }, '*');
-            setTimeout(function () { window.close(); }, 500);
           } catch (e) { }
         }
       }

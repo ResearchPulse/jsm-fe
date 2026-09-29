@@ -6,7 +6,8 @@ class WebSsoSessionStore implements SsoSessionStore {
   @override
   String? read(String key) {
     if (key == SsoSessionKeys.pendingRequest) {
-      return web.window.sessionStorage.getItem(key);
+      return web.window.sessionStorage.getItem(key) ??
+          web.window.localStorage.getItem(key);
     }
     return web.window.localStorage.getItem(key) ??
         web.window.sessionStorage.getItem(key);
@@ -16,6 +17,9 @@ class WebSsoSessionStore implements SsoSessionStore {
   void write(String key, String value) {
     if (key == SsoSessionKeys.pendingRequest) {
       web.window.sessionStorage.setItem(key, value);
+      // The SSO popup has a separate sessionStorage area. Keep a shared copy
+      // so its callback page can validate the PKCE state created by the app.
+      web.window.localStorage.setItem(key, value);
     } else {
       web.window.localStorage.setItem(key, value);
       web.window.sessionStorage.setItem(key, value);
