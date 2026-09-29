@@ -2,9 +2,9 @@ name: Flutter CI
 
 on:
   push:
-    branches: [main, master, develop]
+    branches: [main, master, dev]
   pull_request:
-    branches: [main, master, develop]
+    branches: [main, master, dev]
 
 # Huỷ các workflow đang chạy nếu có commit mới được push vào cùng PR/nhánh
 concurrency:
@@ -22,6 +22,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Create .env from template
+        run: cp .env.example .env
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -47,6 +50,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Create .env from template
+        run: cp .env.example .env
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
@@ -77,6 +83,10 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Create .env from template
+        run: copy .env.example .env
+        shell: cmd
 
       - name: Set up Flutter
         uses: subosito/flutter-action@v2

@@ -1,0 +1,222 @@
+[
+  {
+    "id": "phase-01-sidebar-and-header",
+    "title": "Sidebar, Header & Navigation Reorganization",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.0s)",
+    "user_visible_behavior": "Sidebar is reorganized into 3 groups with authentic Vietnamese Admin labels and matching header breadcrumbs.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-overview-pipeline-dashboard",
+    "title": "Pipeline Overview Dashboard Overhaul",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.1s)",
+    "user_visible_behavior": "Tab 0 displays an interactive 5-stage pipeline diagram, 4 KPI cards, and recent jobs list.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-pipeline-views-modernization",
+    "title": "Data Pipeline Subviews Modernization",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.0s)",
+    "user_visible_behavior": "Subviews for Journals, Configs, Job Monitor, Snapshots, and Profiles are un-constrained and feature actionable data lists.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-04-system-views-and-qa",
+    "title": "System Views, Language Harmonization & QA",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 11.6s)",
+    "user_visible_behavior": "Users and Settings views modernized; 100% unified Vietnamese terminology across entire Admin console.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-master-detail-layout",
+    "title": "Master-Detail Layout in JournalsView",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "JournalsView splits into 40% Left Catalog and 60% Right Command Center with active card selection.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-command-center-controls",
+    "title": "1-Touch Preset Execution & Advanced Overrides",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "1-click action triggers auto-configuration and pipeline start with 300 articles preset and collapsible overrides.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-realtime-stepper-and-polling",
+    "title": "Real-Time 4-Stage Stepper & Live Polling",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "Interactive 4-stage animated stepper with percentage bar, article counters, and auto-polling.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-04-nlp-style-profile-card",
+    "title": "Instant NLP Style Profile Overview",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.0s)",
+    "user_visible_behavior": "Automatic display of sentence length distribution, Hyland stance, and CARS rhetorical moves upon completion.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P3",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-sidebar-three-tabs",
+    "title": "Minimalist 3-Item Sidebar & Default Landing View",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 18.3s)",
+    "user_visible_behavior": "Sidebar renders exactly 3 items and boots directly into Trung tâm Tạp chí.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-style-corpus-composite-view",
+    "title": "Unified Style & Corpus Analytics Hub",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 21.3s)",
+    "user_visible_behavior": "Tab 1 combines Profiles Review and Snapshots View with top segmented switcher.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-system-debug-composite-view",
+    "title": "Unified System Monitor & Settings Hub",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 13.5s)",
+    "user_visible_behavior": "Tab 2 combines Job Monitor and Settings/Users with top segmented switcher.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-04-dashboard-routing-and-deep-links",
+    "title": "Dashboard Routing & Deep-Link Synchronization",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 15.0s)",
+    "user_visible_behavior": "Router maps 0..2 cleanly and all deep links from Command Center work seamlessly.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-pagination-and-header-cleanup",
+    "title": "Catalog Pagination & Header Clean-up",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.7s)",
+    "user_visible_behavior": "Left journal catalog displays 6 items per page with compact pagination controls; header removes Kích hoạt phân tích button.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-realtime-analysis-card",
+    "title": "Real-time 'Đang phân tích' Progress Card",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.8s)",
+    "user_visible_behavior": "4-box technical pipeline replaced with clean 'Đang phân tích' card displaying exact article title being analyzed.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-system-debug-declutter",
+    "title": "System & Debug Tab Decluttering",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 12.7s)",
+    "user_visible_behavior": "Job Monitor removes 6-stage diagram and duplicate action button, displaying a clean task list.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-radar-chart-painter",
+    "title": "Multi-Series Radar Chart Component",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 17.2s)",
+    "user_visible_behavior": "Interactive 6-axis polygonal radar chart displaying overlapping journal style fingerprints with vertex dots and legend.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-comparison-view-integration",
+    "title": "Comparison Mode & Side-by-Side Layout",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 13.7s)",
+    "user_visible_behavior": "Toggle between single-journal view and side-by-side comparison mode for 2–3 selected journals with live metric cards.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-03-responsive-and-verification",
+    "title": "Responsive Polish & QA Verification",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 13.2s)",
+    "user_visible_behavior": "Polished, responsive side-by-side layout with zero pixel overflow and passing flutter analyze.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-backend-user-crud",
+    "title": "Backend User CRUD & Safety Guards",
+    "status": "passing",
+    "evidence": "docker compose exec api pytest tests/integration/test_users_crud.py: 21 passed in 4.93s",
+    "user_visible_behavior": "REST API supports PATCH /api/v1/users/{user_id} and DELETE /api/v1/users/{user_id} with admin lockout prevention.",
+    "verification_command": "pytest tests/ -k user",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-02-frontend-user-inline-crud",
+    "title": "Frontend User Inline CRUD UI & API Client",
+    "status": "passing",
+    "evidence": "flutter analyze lib/features/users: No issues found! (ran in 1.1s)",
+    "user_visible_behavior": "Inline dropdowns for Role and Status, confirm save button on changes, and delete with confirmation dialog on user rows.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-04-radar-point-hover-tooltip",
+    "title": "Interactive Radar Chart Point Hover & Tooltip",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.6s)",
+    "user_visible_behavior": "Hovering near any radar chart vertex highlights the point with a colored halo and shows a floating tooltip badge displaying journal name, metric title, raw value, and percentage.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1, P2",
+    "priority": "P1"
+  },
+  {
+    "id": "phase-01-compact-user-table",
+    "title": "Compact User Table & Mini-Action Bar",
+    "status": "passing",
+    "evidence": "flutter analyze: No issues found! (ran in 14.6s)",
+    "user_visible_behavior": "Merged join date under email, removed separate date column, 76px action bar with subtle hover delete and compact save/cancel triggers.",
+    "verification_command": "flutter analyze",
+    "notes": "Covers stories: P1",
+    "priority": "P1"
+  }
+]

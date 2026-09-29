@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../cubit/home_cubit.dart';
-import '../cubit/home_state.dart';
-import '../../../../core/widgets/loading_view.dart';
-import '../../../../core/widgets/error_view.dart';
+import '../../../../app/theme/app_colors.dart';
+import '../../../student_manuscript_checker/presentation/pages/evaluation_history_page.dart';
+import '../../../student_manuscript_checker/presentation/pages/journal_recommendations_page.dart';
+import '../../../student_manuscript_checker/presentation/pages/student_manuscript_checker_page.dart';
+import '../widgets/user_header.dart';
+import '../widgets/user_sidebar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -14,55 +15,83 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  @override
-  void initState() {
-    super.initState();
-    // Fetch data initially
-    context.read<HomeCubit>().fetchFeaturedJournals();
+  int _selectedIndex = 0;
+  bool _isSidebarCollapsed = false;
+
+  void _navigateToTab(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
   }
+
+  Widget _buildActiveTab() {
+    switch (_selectedIndex) {
+      case 0:
+        return const StudentManuscriptCheckerPage(showAppBar: false);
+      case 1:
+        return const JournalRecommendationsPage();
+      case 2:
+        return EvaluationHistoryPage(
+          onNewCheckRequested: () => _navigateToTab(0),
+        );
+      default:
+        return const StudentManuscriptCheckerPage(showAppBar: false);
+    }
+  }
+
+  static const double _minDashboardWidth = 1024.0;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Journal Dashboard')),
-      body: BlocBuilder<HomeCubit, HomeState>(
-        builder: (context, state) {
-          if (state is HomeLoading) {
-            return const LoadingView(message: 'Tải danh sách tạp chí...');
-          } else if (state is HomeError) {
-            return ErrorView(
-              message: state.message,
-              onRetry: () => context.read<HomeCubit>().fetchFeaturedJournals(),
-            );
-          } else if (state is HomeLoaded) {
-            final journals = state.journals;
-            if (journals.isEmpty) {
-              return const Center(child: Text('Không có tạp chí nào.'));
-            }
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: journals.length,
-              itemBuilder: (context, index) {
-                final item = journals[index];
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    title: Text(item.title),
-                    subtitle: Text(item.category),
-                    trailing: Chip(
-                      label: Text(
-                        'IF: ${item.impactFactor}',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isNarrow = constraints.maxWidth < 1100;
+        final effectiveCollapsed = isNarrow || _isSidebarCollapsed;
+
+        final scaffold = Scaffold(
+          backgroundColor: AppColors.background,
+          body: Row(
+            children: [
+              // User Sidebar
+              UserSidebar(
+                selectedIndex: _selectedIndex,
+                onDestinationSelected: _navigateToTab,
+                isCollapsed: effectiveCollapsed,
+                onToggleCollapse: () {
+                  setState(() {
+                    _isSidebarCollapsed = !_isSidebarCollapsed;
+                  });
+                },
+              ),
+
+              // Main content area
+              Expanded(
+                child: Column(
+                  children: [
+                    UserHeader(selectedIndex: _selectedIndex),
+                    Expanded(child: _buildActiveTab()),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+
+        if (constraints.maxWidth < _minDashboardWidth) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: _minDashboardWidth,
+              height: constraints.hasBoundedHeight
+                  ? constraints.maxHeight
+                  : null,
+              child: scaffold,
+            ),
+          );
+        }
+
+        return scaffold;
+      },
     );
   }
 }
