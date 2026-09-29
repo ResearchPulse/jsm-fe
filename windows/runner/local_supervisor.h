@@ -22,7 +22,10 @@ class LocalSupervisor {
     std::wstring worker_executable = L"jsm-worker.exe";
     std::string readiness_path = "/ready";
     DWORD readiness_timeout_ms = 30'000;
-    DWORD worker_start_grace_ms = 1'000;
+    // PyInstaller startup includes Python import time and local SQLite/storage
+    // initialization. Keep this independent from the API readiness timeout so
+    // slower Windows machines do not get a false worker-start failure.
+    DWORD worker_start_grace_ms = 15'000;
     DWORD shutdown_timeout_ms = 3'000;
   };
 
