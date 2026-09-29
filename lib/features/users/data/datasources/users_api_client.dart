@@ -30,6 +30,7 @@ class UsersApiClient {
       response = await _client.post(
         Uri.parse(ApiEndpoints.users),
         headers: {
+          ...ApiEndpoints.localRuntimeHeaders,
           'Content-Type': 'application/json',
           if (token.isNotEmpty) 'Authorization': 'Bearer $token',
         },
@@ -89,6 +90,7 @@ class UsersApiClient {
       final response = await _client.get(
         uri,
         headers: {
+          ...ApiEndpoints.localRuntimeHeaders,
           'Content-Type': 'application/json',
           if (token != null && token.isNotEmpty)
             'Authorization': 'Bearer $token',
@@ -124,6 +126,7 @@ class UsersApiClient {
     final response = await _client.patch(
       uri,
       headers: {
+        ...ApiEndpoints.localRuntimeHeaders,
         'Content-Type': 'application/json',
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
@@ -152,6 +155,7 @@ class UsersApiClient {
     final response = await _client.delete(
       uri,
       headers: {
+        ...ApiEndpoints.localRuntimeHeaders,
         if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
       },
     );

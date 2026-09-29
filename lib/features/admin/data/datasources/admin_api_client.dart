@@ -17,6 +17,7 @@ class AdminApiClient {
   Future<Map<String, String>> _headers() async {
     final token = tokenProvider != null ? await tokenProvider!() : null;
     return {
+      ...ApiEndpoints.localRuntimeHeaders,
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',

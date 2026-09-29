@@ -4,7 +4,7 @@ project(jsm_fe LANGUAGES CXX)
 
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
-set(BINARY_NAME "jsm_fe")
+set(BINARY_NAME "JSM")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

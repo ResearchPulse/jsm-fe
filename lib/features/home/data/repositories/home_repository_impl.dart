@@ -15,7 +15,10 @@ class HomeRepositoryImpl implements HomeRepository {
   Future<List<JournalItemEntity>> getFeaturedJournals() async {
     try {
       final uri = Uri.parse('${ApiEndpoints.adminJournals}?per_page=6');
-      final res = await _client.get(uri);
+      final res = await _client.get(
+        uri,
+        headers: ApiEndpoints.localRuntimeHeaders,
+      );
       if (res.statusCode == 200) {
         final body =
             jsonDecode(utf8.decode(res.bodyBytes)) as Map<String, dynamic>;

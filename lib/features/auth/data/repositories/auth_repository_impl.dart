@@ -125,7 +125,10 @@ class AuthRepositoryImpl implements AuthRepository {
       final response = await client
           .get(
             Uri.parse('${ApiEndpoints.users}/me'),
-            headers: {'Authorization': 'Bearer $accessToken'},
+            headers: {
+              ...ApiEndpoints.localRuntimeHeaders,
+              'Authorization': 'Bearer $accessToken',
+            },
           )
           .timeout(const Duration(seconds: 5));
       if (response.statusCode != 200) {

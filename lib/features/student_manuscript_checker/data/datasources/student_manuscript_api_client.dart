@@ -30,6 +30,7 @@ class StudentManuscriptApiClient {
   }) async {
     final uri = Uri.parse(ApiEndpoints.studentManuscriptCheck);
     final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll(ApiEndpoints.localRuntimeHeaders);
 
     if (tokenProvider != null) {
       final token = await tokenProvider!();
@@ -88,6 +89,7 @@ class StudentManuscriptApiClient {
   }) async* {
     final uri = Uri.parse(ApiEndpoints.studentManuscriptCheckStream);
     final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll(ApiEndpoints.localRuntimeHeaders);
 
     if (tokenProvider != null) {
       final token = await tokenProvider!();
@@ -160,6 +162,7 @@ class StudentManuscriptApiClient {
   Future<List<TargetJournal>> getAvailableJournals() async {
     final token = tokenProvider != null ? await tokenProvider!() : null;
     final headers = <String, String>{
+      ...ApiEndpoints.localRuntimeHeaders,
       'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
@@ -210,6 +213,7 @@ class StudentManuscriptApiClient {
     final uri = Uri.parse(ApiEndpoints.studentEvaluationHistory)
         .replace(queryParameters: queryParams);
     final headers = <String, String>{
+      ...ApiEndpoints.localRuntimeHeaders,
       'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
@@ -233,6 +237,7 @@ class StudentManuscriptApiClient {
     final token = tokenProvider != null ? await tokenProvider!() : null;
     final uri = Uri.parse(ApiEndpoints.studentEvaluationStats);
     final headers = <String, String>{
+      ...ApiEndpoints.localRuntimeHeaders,
       'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
@@ -252,6 +257,7 @@ class StudentManuscriptApiClient {
     final token = tokenProvider != null ? await tokenProvider!() : null;
     final uri = Uri.parse('${ApiEndpoints.studentEvaluations}/$id');
     final headers = <String, String>{
+      ...ApiEndpoints.localRuntimeHeaders,
       'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
@@ -276,6 +282,7 @@ class StudentManuscriptApiClient {
     final token = tokenProvider != null ? await tokenProvider!() : null;
     final uri = Uri.parse('${ApiEndpoints.studentEvaluations}/$id');
     final headers = <String, String>{
+      ...ApiEndpoints.localRuntimeHeaders,
       'Content-Type': 'application/json',
       if (token != null && token.isNotEmpty) 'Authorization': 'Bearer $token',
     };
@@ -298,6 +305,7 @@ class StudentManuscriptApiClient {
   }) async {
     final uri = Uri.parse(ApiEndpoints.studentRecommendations);
     final request = http.MultipartRequest('POST', uri);
+    request.headers.addAll(ApiEndpoints.localRuntimeHeaders);
 
     final token = tokenProvider != null ? await tokenProvider!() : null;
     if (token != null && token.isNotEmpty) {

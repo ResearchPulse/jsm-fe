@@ -94,7 +94,7 @@ BEGIN
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "journal system miner" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2026 HyperDataLab. All rights reserved." "\0"
-            VALUE "OriginalFilename", "jsm_fe.exe" "\0"
+            VALUE "OriginalFilename", "JSM.exe" "\0"
             VALUE "ProductName", "journal system miner - HyperDataLab" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END

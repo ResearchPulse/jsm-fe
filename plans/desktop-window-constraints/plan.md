@@ -5,6 +5,8 @@
 **Risk:** tiny  
 **Spec:** `plans/desktop-window-constraints/spec.md`  
 
+**Coordination:** Native bootstrap/window work is subsumed by the cross-repository desktop runtime plan at `E:/jsm/jsm-be/plans/260929-2258-desktop-runtime-workflow/phase-06-flutter-supervisor.md`. Do not implement a second startup path; keep the window constraints as acceptance criteria inside the shared supervisor phase.
+
 ---
 
 ## Architecture & Strategy

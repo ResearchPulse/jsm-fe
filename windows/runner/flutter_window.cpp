@@ -3,9 +3,11 @@
 #include <optional>
 
 #include "flutter/generated_plugin_registrant.h"
+#include "local_supervisor.h"
 
-FlutterWindow::FlutterWindow(const flutter::DartProject& project)
-    : project_(project) {}
+FlutterWindow::FlutterWindow(const flutter::DartProject& project,
+                             LocalSupervisor* supervisor)
+    : project_(project), supervisor_(supervisor) {}
 
 FlutterWindow::~FlutterWindow() {}
 
@@ -40,6 +42,9 @@ bool FlutterWindow::OnCreate() {
 }
 
 void FlutterWindow::OnDestroy() {
+  if (supervisor_ != nullptr) {
+    supervisor_->Stop();
+  }
   if (flutter_controller_) {
     flutter_controller_ = nullptr;
   }

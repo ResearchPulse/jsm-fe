@@ -1,4 +1,5 @@
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/constants/api_endpoints.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -729,7 +730,7 @@ class _OverviewViewState extends State<OverviewView> {
                 const SizedBox(height: 16),
                 _buildHealthItem(
                   name: 'FastAPI Backend Core',
-                  endpoint: 'http://127.0.0.1:8000/api/v1',
+                  endpoint: ApiEndpoints.baseUrl,
                   isOk: _backendAlive,
                 ),
                 const SizedBox(height: 12),
